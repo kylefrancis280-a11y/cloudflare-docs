@@ -1745,20 +1745,27 @@ function wireVisionStep(p){
     // fill in genre conventions and palette refinements so every downstream
     // specialist inherits a richer vision.
     document.getElementById('vision-status') && (document.getElementById('vision-status').textContent = 'Genre & palette analysis...');
+    // Both callbacks merge into the *current* project on disk rather than the
+    // closure-captured `p`. Otherwise any edits the user makes between locking
+    // vision and these background calls returning (typically 30-90s) get
+    // silently clobbered when we save the stale snapshot.
     runPassive('genre-specialist',
       JSON.stringify({ vision: p.vision, instruction: 'List 5-8 genre conventions for ' + genre + ' to honor in this project. Return {conventions: [string], visual_motifs: [string], avoid: [string]}.' }, null, 2),
       p,
       (out) => {
-        p.genre_tags = out;
-        saveProject(p);
+        const latest = getProject(p.id) || p;
+        latest.genre_tags = out;
+        saveProject(latest);
       }
     ).then(() => runPassive('color-theorist',
       JSON.stringify({ vision: p.vision, instruction: 'Refine the palette. Return {primary, secondary, accent, rationale} as hex colors and a one-line rationale tied to the genre.' }, null, 2),
       p,
       (out) => {
         if (out.primary || out.secondary || out.accent) {
-          p.vision.palette = { primary: out.primary, secondary: out.secondary, accent: out.accent, rationale: out.rationale };
-          saveProject(p);
+          const latest = getProject(p.id) || p;
+          latest.vision = latest.vision || {};
+          latest.vision.palette = { primary: out.primary, secondary: out.secondary, accent: out.accent, rationale: out.rationale };
+          saveProject(latest);
           render();
         }
       }
@@ -3509,17 +3516,23 @@ function wireGenerateStep(p){
   // is mounted in this same window, skip the re-render — the user is looking
   // at the iframe, not the wrapper, and the wrapper will pick up the latest
   // state when they close the pane via the "Back to shot list" handler above.
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'SB_Projects_v1') {
-      // Skip while the Media Hub iframe is active in this window — re-rendering
-      // would tear it down mid-generation.
-      if (document.getElementById('sb-mediahub-frame')) return;
-      const latest = getProject(p.id);
-      if (latest && Object.keys(latest.clips || {}).length !== Object.keys(p.clips || {}).length) {
-        render(); // re-render so new clips show up
-      }
+  // De-dupe the storage listener — renderGenerateStep can be called many times
+  // per session as the user navigates back and forth. Without this, every
+  // render adds a new listener and a single Media Hub clip update fires N
+  // times, multiplying re-renders and burning the main thread.
+  if (window._sbStorageListener) {
+    window.removeEventListener('storage', window._sbStorageListener);
+  }
+  const onStorage = (e) => {
+    if (e.key !== 'SB_Projects_v1') return;
+    if (document.getElementById('sb-mediahub-frame')) return;
+    const latest = getProject(p.id);
+    if (latest && Object.keys(latest.clips || {}).length !== Object.keys(p.clips || {}).length) {
+      render();
     }
-  });
+  };
+  window._sbStorageListener = onStorage;
+  window.addEventListener('storage', onStorage);
 }
 
 // ═══════════════════════════════════════════════════════════════════════

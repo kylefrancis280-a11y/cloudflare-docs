@@ -97,12 +97,17 @@ async function readUser(uid) {
   };
 }
 
-// Auto-bootstrap a free user doc if one doesn't exist. Called after successful
-// token verification so new users get a clean record on their first request
-// rather than hitting a raw READ_FAIL error from the credit check.
-async function getOrCreateUser(uid) {
+// Auto-bootstrap a user doc if one doesn't exist. Called right after
+// verifyToken so new users always have a clean record on their first request.
+// Pass { isOwner: true } to seed an owner record so the UI shows the right
+// tier badge — credit math is still skipped at runtime via auth.isOwner.
+async function getOrCreateUser(uid, opts = {}) {
   const existing = await readUser(uid);
   if (existing) return existing;
+
+  const isOwner     = !!opts.isOwner;
+  const seedTier    = isOwner ? 'owner'  : 'free';
+  const seedCredits = isOwner ? 999999   : 0;
 
   const token = await getSystemToken();
   await fetch(
@@ -112,15 +117,14 @@ async function getOrCreateUser(uid) {
       headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         fields: {
-          tier:      { stringValue: 'free' },
-          credits:   { integerValue: '0' },
+          tier:      { stringValue: seedTier },
+          credits:   { integerValue: String(seedCredits) },
           createdAt: { timestampValue: new Date().toISOString() },
         },
       }),
     }
   );
-  // Return the default free record — no need to re-fetch.
-  return { tier: 'free', credits: 0 };
+  return { tier: seedTier, credits: seedCredits };
 }
 
 async function setCredits(uid, newCredits) {

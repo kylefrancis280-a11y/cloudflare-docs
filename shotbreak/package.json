@@ -1,0 +1,10 @@
+{
+  "name": "shotbreak",
+  "version": "91.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "SHOTBREAK — AI film production crew. 50 agents, 90 seconds.",
+  "engines": {
+    "node": ">=20"
+  }
+}
