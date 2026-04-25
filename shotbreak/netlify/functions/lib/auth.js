@@ -97,6 +97,32 @@ async function readUser(uid) {
   };
 }
 
+// Auto-bootstrap a free user doc if one doesn't exist. Called after successful
+// token verification so new users get a clean record on their first request
+// rather than hitting a raw READ_FAIL error from the credit check.
+async function getOrCreateUser(uid) {
+  const existing = await readUser(uid);
+  if (existing) return existing;
+
+  const token = await getSystemToken();
+  await fetch(
+    `${FIRESTORE_BASE()}/users?documentId=${uid}`,
+    {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fields: {
+          tier:      { stringValue: 'free' },
+          credits:   { integerValue: '0' },
+          createdAt: { timestampValue: new Date().toISOString() },
+        },
+      }),
+    }
+  );
+  // Return the default free record — no need to re-fetch.
+  return { tier: 'free', credits: 0 };
+}
+
 async function setCredits(uid, newCredits) {
   const token = await getSystemToken();
   const r = await fetch(
@@ -115,4 +141,4 @@ async function setCredits(uid, newCredits) {
   if (!r.ok) throw new Error('WRITE_FAIL_' + r.status);
 }
 
-module.exports = { getSystemToken, rawTokenFromEvent, verifyToken, readUser, setCredits };
+module.exports = { getSystemToken, rawTokenFromEvent, verifyToken, readUser, getOrCreateUser, setCredits };

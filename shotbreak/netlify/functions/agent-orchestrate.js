@@ -1,10 +1,11 @@
 // ═══════════════════════════════════════════════════════════════════════════
 //  SHOTBREAK — Agent Orchestration (multi-agent chains)
-//  Same auth + credit model as agent-invoke.js. Runs 4 modes:
+//  Same auth + credit model as agent-invoke.js. Runs 5 modes:
 //    auteur_plan       — 50 credits.  AUTEUR alone; returns execution plan.
 //    showrunner_cut    — 50 credits.  SHOWRUNNER alone; returns cut JSON.
-//    full_production   — 150 credits. AUTEUR -> specialists (parallel) -> SHOWRUNNER.
-//    custom_chain      — variable.    Caller specifies the specialist chain.
+//    full_production   — 150 credits. AUTEUR -> planned specialists (parallel) -> SHOWRUNNER.
+//    full_crew         — 250 credits. AUTEUR -> ALL 48 agents (parallel) -> SHOWRUNNER.
+//    custom_chain      — variable.    Caller specifies the specialist chain (sequential).
 //
 //  POST /.netlify/functions/agent-orchestrate
 //  Headers:  Authorization: Bearer <HMAC-owner-token | firebase-idToken>
@@ -13,16 +14,12 @@
 
 'use strict';
 
-const { getAgent, AGENTS } = require('../../agents/registry');
+const { getAgent, AGENTS }                           = require('../../agents/registry');
+const { verifyToken, getOrCreateUser, setCredits }   = require('./lib/auth');
 
 const ANTHROPIC_URL     = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
 const FALLBACK_MODEL    = 'claude-haiku-4-5-20251001';
-
-const FIREBASE_PROJECT_ID = () => process.env.FIREBASE_PROJECT_ID;
-const FIREBASE_API_KEY    = () => process.env.FIREBASE_API_KEY;
-const FIRESTORE_BASE      = () =>
-  `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID()}/databases/(default)/documents`;
 
 const VALID_DEDUCTIONS = [5, 15, 20, 50, 75, 150, 250];
 
@@ -30,6 +27,7 @@ const MODE_COSTS = {
   auteur_plan:     50,
   showrunner_cut:  50,
   full_production: 150,
+  full_crew:       250,
 };
 
 // Per-call Anthropic budget. Sonnet gets 17s; if it stalls/overloads we flip
@@ -54,99 +52,6 @@ function respond(statusCode, body) {
 function roundUpToValidTier(amount) {
   for (const v of VALID_DEDUCTIONS) if (v >= amount) return v;
   return VALID_DEDUCTIONS[VALID_DEDUCTIONS.length - 1];
-}
-
-// ── System-token cache ──────────────────────────────────────────────────
-let _systemTokenCache = { token: null, expires: 0 };
-async function getSystemToken() {
-  const now = Date.now();
-  if (_systemTokenCache.token && _systemTokenCache.expires > now + 60_000) {
-    return _systemTokenCache.token;
-  }
-  const email    = process.env.SYSTEM_EMAIL;
-  const password = process.env.SYSTEM_PASSWORD;
-  if (!email || !password) throw new Error('SYSTEM_EMAIL / SYSTEM_PASSWORD not set');
-  const r = await fetch(
-    'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + FIREBASE_API_KEY(),
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, returnSecureToken: true }),
-    }
-  );
-  const d = await r.json();
-  if (!r.ok || !d.idToken) throw new Error('SYSTEM_AUTH_FAIL: ' + JSON.stringify(d));
-  _systemTokenCache = {
-    token:   d.idToken,
-    expires: now + (parseInt(d.expiresIn || '3600', 10) * 1000),
-  };
-  return d.idToken;
-}
-
-function rawTokenFromEvent(event) {
-  return ((event.headers.authorization || event.headers.Authorization || '')
-    .replace(/^Bearer\s+/i, '')).trim();
-}
-
-async function verifyToken(event) {
-  const tk = rawTokenFromEvent(event);
-  if (!tk) throw new Error('NO_TOKEN');
-  if (tk.startsWith('owner:')) {
-    const { verifyOwnerToken } = require('./verify-owner');
-    const verified = verifyOwnerToken(tk);
-    if (!verified) throw new Error('BAD_OWNER_TOKEN');
-    return { uid: 'owner_' + verified.name, isOwner: true, tier: 'owner', name: verified.name };
-  }
-  const OWNER_EMAIL_SET = new Set(
-    (process.env.OWNER_EMAILS || 'kyle@shotbreak.io,scott@shotbreak.io,steve@shotbreak.io')
-      .split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
-  );
-  const r = await fetch(
-    'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' + FIREBASE_API_KEY(),
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken: tk }),
-    }
-  );
-  const d = await r.json();
-  if (!r.ok || !d.users || !d.users[0]) throw new Error('BAD_TOKEN');
-  const u = d.users[0];
-  const email = (u.email || '').toLowerCase();
-  const isOwner = OWNER_EMAIL_SET.has(email);
-  return { uid: u.localId, email: u.email, isOwner, tier: isOwner ? 'owner' : undefined };
-}
-
-async function readUser(uid) {
-  const token = await getSystemToken();
-  const r = await fetch(
-    `${FIRESTORE_BASE()}/users/${uid}`,
-    { headers: { Authorization: 'Bearer ' + token } }
-  );
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error('READ_FAIL_' + r.status);
-  const d = await r.json();
-  const f = d.fields || {};
-  return {
-    tier:    f.tier?.stringValue || 'free',
-    credits: parseInt(f.credits?.integerValue || '0', 10),
-  };
-}
-
-async function setCredits(uid, newCredits) {
-  const token = await getSystemToken();
-  const url = `${FIRESTORE_BASE()}/users/${uid}?updateMask.fieldPaths=credits`;
-  const r = await fetch(url, {
-    method: 'PATCH',
-    headers: {
-      Authorization:  'Bearer ' + token,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      fields: { credits: { integerValue: String(newCredits) } },
-    }),
-  });
-  if (!r.ok) throw new Error('WRITE_FAIL_' + r.status);
 }
 
 // ── Partial JSON salvage ────────────────────────────────────────────────
@@ -372,7 +277,7 @@ exports.handler = async function (event) {
   let userCredits = 0;
   if (!auth.isOwner) {
     let user;
-    try { user = await readUser(auth.uid); }
+    try { user = await getOrCreateUser(auth.uid); }
     catch (e) { return respond(500, { error: 'Credit lookup failed: ' + e.message }); }
     userCredits = user?.credits || 0;
     if (userCredits < cost) {
@@ -428,6 +333,38 @@ exports.handler = async function (event) {
         result: {
           plan:        plan.structured || plan.raw,
           specialists: chainResult.results.map(r => ({
+            agent_id: r.agent_id, agent_name: r.agent_name,
+            output: r.structured || r.raw,
+          })),
+          cut: review.structured || review.raw,
+        },
+      };
+
+    } else if (mode === 'full_crew') {
+      // Run every non-orchestrator agent in parallel — all 48 at once — then
+      // showrunner synthesizes the full output. The auteur plan is the shared
+      // seed context so every agent starts from the same brief.
+      const auteur    = getAgent('auteur');
+      const plan      = await callAnthropic(auteur, input, context, callStart);
+      const seedCtx   = { auteur_plan: plan.structured || plan.raw };
+
+      const crewIds = AGENTS
+        .filter(a => a.wing !== 'orchestrator')
+        .map(a => a.id);
+
+      const chainResult = await runParallelChain(crewIds, input, seedCtx, callStart);
+
+      const showrunner = getAgent('showrunner');
+      const review     = await callAnthropic(showrunner, timeline || input, chainResult.context, callStart);
+
+      output = {
+        mode,
+        auteur,
+        crew:   chainResult.results,
+        showrunner: review,
+        result: {
+          plan:  plan.structured || plan.raw,
+          crew:  chainResult.results.map(r => ({
             agent_id: r.agent_id, agent_name: r.agent_name,
             output: r.structured || r.raw,
           })),

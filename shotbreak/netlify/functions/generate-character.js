@@ -43,100 +43,7 @@ function respond(statusCode, body) {
   return { statusCode, headers: CORS, body: JSON.stringify(body) };
 }
 
-const FIRESTORE_BASE = () =>
-  `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents`;
-
-// ── System-token cache ──────────────────────────────────────────────────
-let _systemTokenCache = { token: null, expires: 0 };
-async function getSystemToken() {
-  const now = Date.now();
-  if (_systemTokenCache.token && _systemTokenCache.expires > now + 60_000) {
-    return _systemTokenCache.token;
-  }
-  const email    = process.env.SYSTEM_EMAIL;
-  const password = process.env.SYSTEM_PASSWORD;
-  if (!email || !password) throw new Error('SYSTEM_EMAIL / SYSTEM_PASSWORD not set');
-  const r = await fetch(
-    'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + process.env.FIREBASE_API_KEY,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, returnSecureToken: true }),
-    }
-  );
-  const d = await r.json();
-  if (!r.ok || !d.idToken) throw new Error('SYSTEM_AUTH_FAIL: ' + JSON.stringify(d));
-  _systemTokenCache = {
-    token:   d.idToken,
-    expires: now + (parseInt(d.expiresIn || '3600', 10) * 1000),
-  };
-  return d.idToken;
-}
-
-function rawTokenFromEvent(event) {
-  return ((event.headers.authorization || event.headers.Authorization || '')
-    .replace(/^Bearer\s+/i, '')).trim();
-}
-
-async function verifyToken(event) {
-  const tk = rawTokenFromEvent(event);
-  if (!tk) throw new Error('NO_TOKEN');
-  if (tk.startsWith('owner:')) {
-    const { verifyOwnerToken } = require('./verify-owner');
-    const verified = verifyOwnerToken(tk);
-    if (!verified) throw new Error('BAD_OWNER_TOKEN');
-    return { uid: 'owner_' + verified.name, isOwner: true };
-  }
-  const OWNER_EMAIL_SET = new Set(
-    (process.env.OWNER_EMAILS || 'kyle@shotbreak.io,scott@shotbreak.io,steve@shotbreak.io')
-      .split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
-  );
-  const r = await fetch(
-    'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' + process.env.FIREBASE_API_KEY,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken: tk }),
-    }
-  );
-  const d = await r.json();
-  if (!r.ok || !d.users?.[0]) throw new Error('BAD_TOKEN');
-  const u = d.users[0];
-  const email = (u.email || '').toLowerCase();
-  const isOwner = OWNER_EMAIL_SET.has(email);
-  return { uid: u.localId, email: u.email, isOwner };
-}
-
-async function readUser(uid) {
-  const token = await getSystemToken();
-  const r = await fetch(
-    `${FIRESTORE_BASE()}/users/${uid}`,
-    { headers: { Authorization: 'Bearer ' + token } }
-  );
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error('READ_FAIL_' + r.status);
-  const d = await r.json();
-  if (!d?.fields) return null;
-  const out = {};
-  for (const [k, v] of Object.entries(d.fields)) {
-    if (v.integerValue !== undefined) out[k] = parseInt(v.integerValue, 10);
-    else if (v.stringValue !== undefined) out[k] = v.stringValue;
-  }
-  return out;
-}
-
-async function setCredits(uid, newCredits) {
-  const token = await getSystemToken();
-  const r = await fetch(
-    `${FIRESTORE_BASE()}/users/${uid}?updateMask.fieldPaths=credits`,
-    {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-      body: JSON.stringify({ fields: { credits: { integerValue: String(Math.floor(newCredits)) } } }),
-    }
-  );
-  if (!r.ok) throw new Error('WRITE_FAIL_' + r.status);
-}
+const { verifyToken, getOrCreateUser, setCredits } = require('./lib/auth');
 
 // ── Handler ─────────────────────────────────────────────────────────────
 exports.handler = async (event) => {
@@ -176,7 +83,7 @@ exports.handler = async (event) => {
 
     if (!auth.isOwner) {
       let user;
-      try { user = await readUser(auth.uid); }
+      try { user = await getOrCreateUser(auth.uid); }
       catch (e) { return respond(500, { error: 'Account lookup failed: ' + e.message }); }
 
       if (!user?.tier) return respond(402, { error: 'No subscription', code: 'NO_SUBSCRIPTION' });
@@ -211,7 +118,7 @@ exports.handler = async (event) => {
       if (!r.ok) {
         if (!auth.isOwner && deductedCredits > 0) {
           // Refund exact amount deducted — no re-read needed.
-          const current = (await readUser(auth.uid).catch(() => null))?.credits || 0;
+          const current = (await getOrCreateUser(auth.uid).catch(() => null))?.credits || 0;
           await setCredits(auth.uid, current + deductedCredits).catch(() => {});
         }
         return respond(502, { error: 'Image gen failed. Credits refunded.', detail: d?.message || d?.error || d });
@@ -224,7 +131,7 @@ exports.handler = async (event) => {
       });
     } catch (e) {
       if (!auth.isOwner && deductedCredits > 0) {
-        const current = (await readUser(auth.uid).catch(() => null))?.credits || 0;
+        const current = (await getOrCreateUser(auth.uid).catch(() => null))?.credits || 0;
         await setCredits(auth.uid, current + deductedCredits).catch(() => {});
       }
       return respond(502, { error: 'Network error. Credits refunded.', detail: e.message });

@@ -155,118 +155,7 @@ function respond(statusCode, body) {
   return { statusCode, headers: CORS, body: JSON.stringify(body) };
 }
 
-// ── Firebase REST helpers ───────────────────────────────────────────────
-const FIRESTORE_BASE = () =>
-  `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents`;
-
-// Cache the system user's token across invocations (token is good for 1 hour
-// per Firebase Identity Toolkit). Refresh 60s before expiry.
-let _systemTokenCache = { token: null, expires: 0 };
-async function getSystemToken() {
-  const now = Date.now();
-  if (_systemTokenCache.token && _systemTokenCache.expires > now + 60_000) {
-    return _systemTokenCache.token;
-  }
-  const email = process.env.SYSTEM_EMAIL;
-  const password = process.env.SYSTEM_PASSWORD;
-  if (!email || !password) throw new Error("SYSTEM_EMAIL / SYSTEM_PASSWORD not set");
-  const r = await fetch(
-    "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" +
-      process.env.FIREBASE_API_KEY,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, returnSecureToken: true }),
-    }
-  );
-  const d = await r.json();
-  if (!r.ok || !d.idToken) throw new Error("SYSTEM_AUTH_FAIL: " + JSON.stringify(d));
-  _systemTokenCache = {
-    token: d.idToken,
-    expires: now + (parseInt(d.expiresIn || "3600", 10) * 1000),
-  };
-  return d.idToken;
-}
-
-function rawTokenFromEvent(event) {
-  return ((event.headers.authorization || event.headers.Authorization || "")
-    .replace(/^Bearer\s+/i, "")).trim();
-}
-
-async function verifyToken(event) {
-  const tk = rawTokenFromEvent(event);
-  if (!tk) throw new Error("NO_TOKEN");
-  // Owner: verify HMAC-signed token from verify-owner function (legacy)
-  if (tk.startsWith("owner:")) {
-    const { verifyOwnerToken } = require("./verify-owner");
-    const verified = verifyOwnerToken(tk);
-    if (!verified) throw new Error("BAD_OWNER_TOKEN");
-    return { uid: "owner_" + verified.name, isOwner: true, tier: "owner" };
-  }
-  // Firebase idToken: look up user, and grant owner status if their email
-  // is in OWNER_EMAILS. This is how new sign-ins (post-rebuild) work.
-  const OWNER_EMAIL_SET = new Set(
-    (process.env.OWNER_EMAILS || 'kyle@shotbreak.io,scott@shotbreak.io,steve@shotbreak.io')
-      .split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
-  );
-  const r = await fetch(
-    "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" +
-      process.env.FIREBASE_API_KEY,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idToken: tk }),
-    }
-  );
-  const d = await r.json();
-  if (!r.ok || !d.users || !d.users[0]) throw new Error("BAD_TOKEN");
-  const user = d.users[0];
-  const email = (user.email || '').toLowerCase();
-  const isOwner = OWNER_EMAIL_SET.has(email);
-  return {
-    uid: user.localId,
-    email: user.email,
-    isOwner,
-    tier: isOwner ? 'owner' : undefined,
-  };
-}
-
-// NOTE: readUser and setCredits now use the SYSTEM user token, not the
-// end-user's token. This lets Firestore rules lock down credit/tier fields
-// to server-only writes while still supporting credit deduction during
-// video generation.
-async function readUser(uid /* , rawToken (ignored, kept for call-site compat) */) {
-  const token = await getSystemToken();
-  const r = await fetch(
-    `${FIRESTORE_BASE()}/users/${uid}`,
-    { headers: { Authorization: "Bearer " + token } }
-  );
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error("READ_FAIL_" + r.status);
-  const d = await r.json();
-  const f = d.fields || {};
-  return {
-    tier:    f.tier?.stringValue || "free",
-    credits: parseInt(f.credits?.integerValue || "0", 10),
-  };
-}
-
-async function setCredits(uid, newCredits /* , rawToken (ignored) */) {
-  const token = await getSystemToken();
-  const url =
-    `${FIRESTORE_BASE()}/users/${uid}?updateMask.fieldPaths=credits`;
-  const r = await fetch(url, {
-    method: "PATCH",
-    headers: {
-      Authorization: "Bearer " + token,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      fields: { credits: { integerValue: String(newCredits) } },
-    }),
-  });
-  if (!r.ok) throw new Error("WRITE_FAIL_" + r.status);
-}
+const { verifyToken, getOrCreateUser, setCredits } = require('./lib/auth');
 
 // ── WaveSpeedAI API helpers ─────────────────────────────────────────────
 const WS_BASE        = "https://api.wavespeed.ai/api/v3";
@@ -336,7 +225,6 @@ exports.handler = async (event) => {
   catch { return respond(400, { error: "Invalid JSON body" }); }
 
   const { action } = body;
-  const rawToken = rawTokenFromEvent(event);
 
   // ── MODELS (public) ──────────────────────────────────────────────────
   if (action === "models") {
@@ -427,7 +315,7 @@ exports.handler = async (event) => {
     if (auth.isOwner) {
       return respond(200, { credits: 999999, tier: "owner", isOwner: true });
     }
-    const user = await readUser(auth.uid, rawToken);
+    const user = await getOrCreateUser(auth.uid);
     return respond(200, {
       credits: user?.credits || 0,
       tier:    user?.tier    || "free",
@@ -478,9 +366,9 @@ exports.handler = async (event) => {
     if (!targetUid || !amount)
       return respond(400, { error: "targetUid + amount required" });
 
-    const user = await readUser(targetUid, rawToken);
+    const user = await getOrCreateUser(targetUid);
     const current = user?.credits || 0;
-    await setCredits(targetUid, current + amount, rawToken);
+    await setCredits(targetUid, current + amount);
     return respond(200, {
       success: true, uid: targetUid, added: amount,
       newBalance: current + amount,
@@ -505,7 +393,7 @@ exports.handler = async (event) => {
     let userTier = "owner";
     let userCredits = 999999;
     if (!auth.isOwner) {
-      const user = await readUser(auth.uid, rawToken);
+      const user = await getOrCreateUser(auth.uid);
       userTier    = user?.tier    || "free";
       userCredits = user?.credits || 0;
 
@@ -522,7 +410,7 @@ exports.handler = async (event) => {
         });
       }
       // Deduct BEFORE calling provider
-      await setCredits(auth.uid, userCredits - cfg.credits, rawToken);
+      await setCredits(auth.uid, userCredits - cfg.credits);
     }
 
     let submitted;
@@ -537,7 +425,7 @@ exports.handler = async (event) => {
       if (!r.ok) {
         // REFUND on submit failure
         if (!auth.isOwner) {
-          await setCredits(auth.uid, userCredits, rawToken).catch(() => {});
+          await setCredits(auth.uid, userCredits).catch(() => {});
         }
         return respond(502, {
           error: "WaveSpeedAI submit failed",
@@ -546,7 +434,7 @@ exports.handler = async (event) => {
       }
     } catch (e) {
       if (!auth.isOwner) {
-        await setCredits(auth.uid, userCredits, rawToken).catch(() => {});
+        await setCredits(auth.uid, userCredits).catch(() => {});
       }
       return respond(502, { error: "WaveSpeedAI unreachable", detail: e.message });
     }
@@ -555,7 +443,7 @@ exports.handler = async (event) => {
     if (!requestId) {
       // Refund — bad response shape from provider
       if (!auth.isOwner) {
-        await setCredits(auth.uid, userCredits, rawToken).catch(() => {});
+        await setCredits(auth.uid, userCredits).catch(() => {});
       }
       return respond(502, {
         error: "No request_id returned by provider",

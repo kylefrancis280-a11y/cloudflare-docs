@@ -112,48 +112,80 @@ function toFormBody(obj) {
   return pairs.join("&");
 }
 
+const STRIPE_TIMEOUT_MS = 15000;
+
+function stripeAbortController() {
+  const ctrl  = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), STRIPE_TIMEOUT_MS);
+  return { signal: ctrl.signal, clear: () => clearTimeout(timer) };
+}
+
 async function stripeGet(path) {
-  const r = await fetch(STRIPE_API + path, {
-    headers: { Authorization: stripeAuthHeader() },
-  });
-  const d = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(`STRIPE_GET_FAIL ${path} ${r.status}: ${JSON.stringify(d)}`);
-  return d;
+  const { signal, clear } = stripeAbortController();
+  try {
+    const r = await fetch(STRIPE_API + path, {
+      headers: { Authorization: stripeAuthHeader() },
+      signal,
+    });
+    clear();
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(`STRIPE_GET_FAIL ${path} ${r.status}: ${JSON.stringify(d)}`);
+    return d;
+  } catch (e) {
+    clear();
+    if (e.name === "AbortError") throw new Error(`STRIPE_TIMEOUT ${path}`);
+    throw e;
+  }
 }
 
 async function stripePost(path, body) {
-  const r = await fetch(STRIPE_API + path, {
-    method: "POST",
-    headers: {
-      Authorization: stripeAuthHeader(),
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: toFormBody(body || {}),
-  });
-  const d = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(`STRIPE_POST_FAIL ${path} ${r.status}: ${JSON.stringify(d)}`);
-  return d;
+  const { signal, clear } = stripeAbortController();
+  try {
+    const r = await fetch(STRIPE_API + path, {
+      method: "POST",
+      headers: {
+        Authorization: stripeAuthHeader(),
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body:   toFormBody(body || {}),
+      signal,
+    });
+    clear();
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(`STRIPE_POST_FAIL ${path} ${r.status}: ${JSON.stringify(d)}`);
+    return d;
+  } catch (e) {
+    clear();
+    if (e.name === "AbortError") throw new Error(`STRIPE_TIMEOUT ${path}`);
+    throw e;
+  }
 }
 
 // ── Firebase REST helpers ───────────────────────────────────────────────
 const FIRESTORE_BASE = () =>
   `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
+// Cached system token — same pattern as other functions.
+let _systemTokenCache = { token: null, expires: 0 };
 async function getSystemToken() {
-  const email = process.env.SYSTEM_EMAIL;
+  const now = Date.now();
+  if (_systemTokenCache.token && _systemTokenCache.expires > now + 60_000) {
+    return _systemTokenCache.token;
+  }
+  const email    = process.env.SYSTEM_EMAIL;
   const password = process.env.SYSTEM_PASSWORD;
   if (!email || !password) throw new Error("SYSTEM_EMAIL / SYSTEM_PASSWORD not configured");
-
-  const url =
-    "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" +
-    process.env.FIREBASE_API_KEY;
-  const r = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, returnSecureToken: true }),
-  });
+  const r = await fetch(
+    "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + process.env.FIREBASE_API_KEY,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, returnSecureToken: true }),
+    }
+  );
   const d = await r.json();
   if (!r.ok || !d.idToken) throw new Error("SYSTEM_AUTH_FAIL: " + JSON.stringify(d));
+  _systemTokenCache = { token: d.idToken, expires: now + (parseInt(d.expiresIn || "3600", 10) * 1000) };
   return d.idToken;
 }
 

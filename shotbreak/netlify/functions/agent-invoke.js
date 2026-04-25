@@ -17,15 +17,11 @@
 
 'use strict';
 
-const { getAgent } = require('../../agents/registry');
+const { getAgent }                                    = require('../../agents/registry');
+const { verifyToken, getOrCreateUser, setCredits }    = require('./lib/auth');
 
 const ANTHROPIC_URL     = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
-
-const FIREBASE_PROJECT_ID = () => process.env.FIREBASE_PROJECT_ID;
-const FIREBASE_API_KEY    = () => process.env.FIREBASE_API_KEY;
-const FIRESTORE_BASE      = () =>
-  `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID()}/databases/(default)/documents`;
 
 const VALID_DEDUCTIONS = new Set([5, 15, 20, 50, 75, 150, 250]);
 
@@ -38,115 +34,6 @@ const CORS = {
 
 function respond(statusCode, body) {
   return { statusCode, headers: CORS, body: JSON.stringify(body) };
-}
-
-// ── System-token cache (matches generate-video.js) ──────────────────────
-let _systemTokenCache = { token: null, expires: 0 };
-async function getSystemToken() {
-  const now = Date.now();
-  if (_systemTokenCache.token && _systemTokenCache.expires > now + 60_000) {
-    return _systemTokenCache.token;
-  }
-  const email    = process.env.SYSTEM_EMAIL;
-  const password = process.env.SYSTEM_PASSWORD;
-  if (!email || !password) throw new Error('SYSTEM_EMAIL / SYSTEM_PASSWORD not set');
-  const r = await fetch(
-    'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + FIREBASE_API_KEY(),
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, returnSecureToken: true }),
-    }
-  );
-  const d = await r.json();
-  if (!r.ok || !d.idToken) throw new Error('SYSTEM_AUTH_FAIL: ' + JSON.stringify(d));
-  _systemTokenCache = {
-    token:   d.idToken,
-    expires: now + (parseInt(d.expiresIn || '3600', 10) * 1000),
-  };
-  return d.idToken;
-}
-
-// ── Auth helpers (match generate-video.js line-for-line) ────────────────
-function rawTokenFromEvent(event) {
-  return ((event.headers.authorization || event.headers.Authorization || '')
-    .replace(/^Bearer\s+/i, '')).trim();
-}
-
-async function verifyToken(event) {
-  const tk = rawTokenFromEvent(event);
-  if (!tk) throw new Error('NO_TOKEN');
-
-  // Owner: verify HMAC-signed token issued by verify-owner function (legacy)
-  if (tk.startsWith('owner:')) {
-    const { verifyOwnerToken } = require('./verify-owner');
-    const verified = verifyOwnerToken(tk);
-    if (!verified) throw new Error('BAD_OWNER_TOKEN');
-    return { uid: 'owner_' + verified.name, isOwner: true, tier: 'owner', name: verified.name };
-  }
-
-  // Firebase idToken — look up + check email against owner whitelist.
-  // Owners skip all Firestore credit logic below. This makes the entire
-  // 50-agent flow run without any Firestore dependency for owner accounts.
-  const OWNER_EMAIL_SET = new Set(
-    (process.env.OWNER_EMAILS || 'kyle@shotbreak.io,scott@shotbreak.io,steve@shotbreak.io')
-      .split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
-  );
-  const r = await fetch(
-    'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' + FIREBASE_API_KEY(),
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken: tk }),
-    }
-  );
-  const d = await r.json();
-  if (!r.ok || !d.users || !d.users[0]) throw new Error('BAD_TOKEN');
-  const u = d.users[0];
-
-  const emailRaw = u.email || u.providerUserInfo?.[0]?.email || '';
-  const email = emailRaw.trim().toLowerCase();
-  const isOwner = OWNER_EMAIL_SET.has(email);
-  console.log(JSON.stringify({
-    tag: 'SB_OWNER_CHECK',
-    presented_email: email,
-    uid: u.localId,
-    matched: isOwner,
-  }));
-  return { uid: u.localId, email: u.email, isOwner, tier: isOwner ? 'owner' : undefined };
-}
-
-// ── Firestore read/write via SYSTEM token ───────────────────────────────
-async function readUser(uid) {
-  const token = await getSystemToken();
-  const r = await fetch(
-    `${FIRESTORE_BASE()}/users/${uid}`,
-    { headers: { Authorization: 'Bearer ' + token } }
-  );
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error('READ_FAIL_' + r.status);
-  const d = await r.json();
-  const f = d.fields || {};
-  return {
-    tier:    f.tier?.stringValue || 'free',
-    credits: parseInt(f.credits?.integerValue || '0', 10),
-  };
-}
-
-async function setCredits(uid, newCredits) {
-  const token = await getSystemToken();
-  const url = `${FIRESTORE_BASE()}/users/${uid}?updateMask.fieldPaths=credits`;
-  const r = await fetch(url, {
-    method: 'PATCH',
-    headers: {
-      Authorization:  'Bearer ' + token,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      fields: { credits: { integerValue: String(newCredits) } },
-    }),
-  });
-  if (!r.ok) throw new Error('WRITE_FAIL_' + r.status);
 }
 
 // ── Anthropic call ──────────────────────────────────────────────────────
@@ -492,7 +379,7 @@ exports.handler = async function (event) {
   let userCredits = 0;
   if (!auth.isOwner) {
     let user;
-    try { user = await readUser(auth.uid); }
+    try { user = await getOrCreateUser(auth.uid); }
     catch (e) { logTelemetry({ agent_id, agent_tier: agent.tier, uid: auth.uid, email: auth.email, status: 'error', http_status: 500, error_code: 'CREDIT_LOOKUP_FAIL', error_msg: e.message }); return respond(500, { error: 'Credit lookup failed: ' + e.message }); }
     userCredits = user?.credits || 0;
     if (userCredits < agent.credits) {
