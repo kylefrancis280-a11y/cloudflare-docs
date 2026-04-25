@@ -26,7 +26,7 @@ const ANTHROPIC_VERSION = '2023-06-01';
 const VALID_DEDUCTIONS = new Set([5, 15, 20, 50, 75, 150, 250]);
 
 const CORS = {
-  'Access-Control-Allow-Origin':  '*',
+  'Access-Control-Allow-Origin':  'https://shotbreak.io',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Content-Type':                 'application/json',

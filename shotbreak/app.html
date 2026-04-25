@@ -922,6 +922,8 @@ async function loadUser(fbUser){
     uid:     fbUser.uid,
     color:   isOwner ? ownerMeta.color : '#d4a843',
   };
+  // Bootstrap Firestore user doc on first login — idempotent, non-blocking.
+  window.SB_Agents?.bootstrap();
   enterApp();
 }
 

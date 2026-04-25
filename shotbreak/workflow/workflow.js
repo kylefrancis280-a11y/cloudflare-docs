@@ -20,8 +20,16 @@ window.addEventListener('unhandledrejection', (e) => {
 });
 
 // ── Wait for dependencies ─────────────────────────────────────────────
+let _bootTries = 0;
 function bootWhenReady(){
-  if (!window.SB_Agents || !window.SB_Normalize || !window.SB_Appliers || !window.SB_Enricher) { setTimeout(bootWhenReady, 50); return; }
+  if (!window.SB_Agents || !window.SB_Normalize || !window.SB_Appliers || !window.SB_Enricher) {
+    if (++_bootTries > 200) { // 10s max (200 × 50ms) — fail loudly, not silently forever
+      console.error('[SB] Dependencies failed to load. Check agent script tags.');
+      return;
+    }
+    setTimeout(bootWhenReady, 50);
+    return;
+  }
   boot();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootWhenReady);
@@ -998,11 +1006,17 @@ function humanizeError(e){
 //  BOOT
 // ═══════════════════════════════════════════════════════════════════════
 function boot(){
-  // Keep rendering responsive to auth changes (firebase is async)
-  try { firebase.auth().onAuthStateChanged(render); } catch(e){}
+  // Keep rendering responsive to auth changes (firebase is async).
+  // Also call bootstrap() on sign-in to ensure the Firestore user doc exists
+  // before the user fires their first agent call.
+  try {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) window.SB_Agents?.bootstrap();
+      render();
+    });
+  } catch(e) { render(); }
   // Install delegated click handlers for crew Apply actions once.
   installCrewApplyHandlers();
-  render();
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -1301,7 +1315,7 @@ function wireProjectsHandlers(){
     link.style.pointerEvents = 'none';
     const started = Date.now();
     try {
-      const r = await window.SB_Agents.invoke('vision-director',
+      const r = await window.SB_Agents.invoke('auteur',
         'ping: warmup test. Return a minimal vision JSON.',
         { context: {} }
       );

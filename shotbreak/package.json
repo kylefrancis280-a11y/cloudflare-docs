@@ -4,6 +4,9 @@
   "private": true,
   "type": "commonjs",
   "description": "SHOTBREAK — AI film production crew. 50 agents, 90 seconds.",
+  "scripts": {
+    "test": "node test/integration.js"
+  },
   "engines": {
     "node": ">=20"
   }

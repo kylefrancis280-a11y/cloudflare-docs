@@ -39,7 +39,7 @@ const FALLBACK_MIN_BUDGET_MS  = 8000;
 const KEY_CAP_CHARS = 15 * 1024;
 
 const CORS = {
-  'Access-Control-Allow-Origin':  '*',
+  'Access-Control-Allow-Origin':  'https://shotbreak.io',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Content-Type':                 'application/json',
