@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SHOTBREAK — The AI film crew. 50 agents. One script.</title>
+<meta name="description" content="Paste your script. The full 50-agent crew — directors, writers, builders, editors — breaks it down in 90 seconds. Every shot prompted, every character locked, every scene production-ready. AI filmmaking, finally cinematic." />
+<meta property="og:title" content="SHOTBREAK — The AI film crew. 50 agents. One script." />
+<meta property="og:description" content="Paste your script. 50 AI agents do the full breakdown in 90 seconds." />
+<meta property="og:image" content="/og-image.png" />
+<meta property="og:type" content="website" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/tutorial/tutorial.css" />
+<style>
+  :root {
+    --bg: #050507;
+    --bg-2: #0d0d11;
+    --bg-3: #15151b;
+    --surface: #1a1a22;
+    --ink: #f5f3ee;
+    --ink-2: #b8b5ad;
+    --ink-3: #6e6a63;
+    --gold: #d4a843;
+    --gold-dark: #b8922e;
+    --gold-soft: rgba(212, 168, 67, 0.15);
+    --line: rgba(245, 243, 238, 0.08);
+    --line-strong: rgba(245, 243, 238, 0.18);
+    --danger: #ff5252;
+    --display: 'Syne', Georgia, serif;
+    --ui: 'Inter', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --radius: 4px;
+    --radius-lg: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--ui);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  ::selection { background: var(--gold); color: var(--bg); }
+
+  /* ─────────────────────── NAV ─────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 20px 40px; display: flex; align-items: center; justify-content: space-between;
+    background: rgba(5, 5, 7, 0.7); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--line);
+  }
+  .logo {
+    font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: 0.04em;
+    color: var(--ink); display: flex; align-items: center; gap: 10px;
+  }
+  .logo-mark {
+    width: 28px; height: 28px; display: inline-grid; place-items: center;
+    background: var(--gold); color: var(--bg); border-radius: 3px;
+    font-family: var(--display); font-weight: 800; font-size: 16px;
+  }
+  .nav-links { display: flex; gap: 36px; align-items: center; font-size: 14px; color: var(--ink-2); }
+  .nav-links a { transition: color 0.2s; }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta-group { display: flex; gap: 12px; align-items: center; }
+  .btn {
+    padding: 11px 22px; border-radius: var(--radius);
+    font-weight: 500; font-size: 14px; letter-spacing: 0.02em;
+    transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid transparent;
+  }
+  .btn-gold { background: var(--gold); color: var(--bg); }
+  .btn-gold:hover { background: #e8bc51; transform: translateY(-1px); }
+  .btn-ghost { border-color: var(--line-strong); color: var(--ink); }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-lg { padding: 16px 32px; font-size: 15px; }
+
+  /* ─────────────────────── HERO ─────────────────────── */
+  .hero {
+    min-height: 100vh; padding: 160px 40px 80px; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 60% at 30% 20%, rgba(212, 168, 67, 0.08), transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 70%, rgba(212, 168, 67, 0.04), transparent 60%);
+  }
+  .hero-bg::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 70% 60% at center, black 20%, transparent 80%);
+    opacity: 0.5;
+  }
+  .hero-inner { max-width: 1200px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.16em;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 28px;
+    padding: 6px 14px; border: 1px solid var(--gold-soft); border-radius: 100px;
+    background: rgba(212, 168, 67, 0.04);
+  }
+  .eyebrow-dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  h1.hero-title {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(48px, 8vw, 96px); line-height: 0.98; letter-spacing: -0.03em;
+    margin-bottom: 32px; max-width: 1000px;
+  }
+  h1.hero-title .gold { color: var(--gold); }
+  h1.hero-title .accent { font-style: italic; font-weight: 600; }
+  .hero-sub {
+    font-size: 20px; line-height: 1.5; color: var(--ink-2);
+    max-width: 640px; margin-bottom: 48px; font-weight: 400;
+  }
+  .hero-cta-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+  .hero-stats {
+    display: flex; gap: 48px; margin-top: 80px; padding-top: 48px;
+    border-top: 1px solid var(--line); flex-wrap: wrap;
+  }
+  .stat { }
+  .stat-num { font-family: var(--display); font-size: 40px; font-weight: 700; color: var(--gold); letter-spacing: -0.02em; }
+  .stat-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--ink-3); text-transform: uppercase; margin-top: 4px; }
+
+  /* ─────────────────────── SECTION ─────────────────────── */
+  section { padding: 120px 40px; position: relative; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-head { margin-bottom: 64px; max-width: 800px; }
+  .section-kicker {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.16em;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 20px;
+  }
+  h2.section-title {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(36px, 5vw, 60px); line-height: 1.0; letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .section-sub { font-size: 18px; color: var(--ink-2); line-height: 1.6; }
+
+  /* ─────────────────── LIVE DEMO STRIP ─────────────────── */
+  .demo-wrap {
+    border: 1px solid var(--line-strong); border-radius: var(--radius-lg);
+    overflow: hidden; background: var(--bg-2);
+  }
+  .demo-header {
+    padding: 14px 20px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 14px; background: var(--bg-3);
+  }
+  .demo-dots { display: flex; gap: 6px; }
+  .demo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-strong); }
+  .demo-dot.active { background: var(--gold); }
+  .demo-title { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: 0.05em; }
+  .demo-split { display: grid; grid-template-columns: 1fr 1fr; min-height: 520px; }
+  @media (max-width: 900px) { .demo-split { grid-template-columns: 1fr; } }
+  .demo-pane { padding: 28px 32px; overflow: hidden; position: relative; }
+  .demo-pane-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; color: var(--ink-3); text-transform: uppercase; margin-bottom: 20px; }
+  .demo-pane + .demo-pane { border-left: 1px solid var(--line); }
+  @media (max-width: 900px) { .demo-pane + .demo-pane { border-left: none; border-top: 1px solid var(--line); } }
+  .script-text {
+    font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--ink-2);
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .script-text .slug { color: var(--gold); font-weight: 500; }
+  .script-text .char { color: var(--ink); letter-spacing: 0.05em; }
+  .crew-live { }
+  .crew-row { display: flex; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 13px; }
+  .crew-row:last-child { border-bottom: none; }
+  .crew-status { font-family: var(--mono); font-size: 10px; width: 68px; letter-spacing: 0.05em; }
+  .crew-status.done { color: var(--gold); }
+  .crew-status.working { color: var(--ink); }
+  .crew-status.queued { color: var(--ink-3); }
+  .crew-name { color: var(--ink); font-weight: 500; }
+  .crew-name.specialist { color: var(--ink-2); font-weight: 400; padding-left: 16px; font-size: 12px; }
+  .crew-detail { color: var(--ink-3); font-size: 11px; margin-left: auto; font-family: var(--mono); }
+  .spinner {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--gold); animation: working 1.2s ease-in-out infinite;
+    display: inline-block;
+  }
+  @keyframes working { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.5); opacity: 0.4; } }
+
+  /* ─────────────────── CREW WINGS GRID ─────────────────── */
+  .wings-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  @media (max-width: 1100px) { .wings-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .wings-grid { grid-template-columns: 1fr; } }
+  .wing {
+    padding: 28px 24px; border: 1px solid var(--line); border-radius: var(--radius-lg);
+    background: var(--bg-2); transition: all 0.3s;
+  }
+  .wing:hover { border-color: var(--gold-soft); background: var(--bg-3); }
+  .wing-header {
+    padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 20px;
+    display: flex; align-items: baseline; justify-content: space-between;
+  }
+  .wing-name { font-family: var(--display); font-weight: 600; font-size: 18px; letter-spacing: -0.01em; }
+  .wing-count { font-family: var(--mono); font-size: 11px; color: var(--gold); letter-spacing: 0.05em; }
+  .mgr-block { margin-bottom: 18px; }
+  .mgr-block:last-child { margin-bottom: 0; }
+  .mgr-name { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.005em; }
+  .mgr-badge {
+    font-family: var(--mono); font-size: 9px; color: var(--gold); letter-spacing: 0.14em;
+    text-transform: uppercase; margin-right: 8px;
+  }
+  .spec-list { list-style: none; padding: 0; }
+  .spec-list li {
+    font-size: 11.5px; color: var(--ink-3); padding: 2px 0;
+    font-family: var(--mono); letter-spacing: 0.01em;
+  }
+  .spec-list li::before { content: '· '; color: var(--gold); margin-right: 4px; }
+
+  /* ─────────────────── HOW IT WORKS ─────────────────── */
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; }
+  @media (max-width: 900px) { .steps { grid-template-columns: 1fr; } }
+  .step { padding: 32px 28px; border-right: 1px solid var(--line); background: var(--bg-2); }
+  .step:last-child { border-right: none; }
+  @media (max-width: 900px) { .step { border-right: none; border-bottom: 1px solid var(--line); } .step:last-child { border-bottom: none; } }
+  .step-num { font-family: var(--display); font-size: 48px; font-weight: 800; color: var(--gold); line-height: 1; margin-bottom: 24px; }
+  .step-title { font-family: var(--display); font-size: 20px; font-weight: 600; margin-bottom: 12px; letter-spacing: -0.01em; }
+  .step-desc { font-size: 13px; color: var(--ink-2); line-height: 1.55; }
+  .step-meta { font-family: var(--mono); font-size: 10px; color: var(--ink-3); letter-spacing: 0.1em; margin-top: 20px; text-transform: uppercase; }
+
+  /* ─────────────────── PRICING ─────────────────── */
+  .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 900px) { .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .pricing-grid { grid-template-columns: 1fr; } }
+  .tier {
+    padding: 32px 28px; border: 1px solid var(--line); border-radius: var(--radius-lg);
+    background: var(--bg-2); display: flex; flex-direction: column; min-height: 480px; position: relative;
+  }
+  .tier.featured { border-color: var(--gold); background: linear-gradient(180deg, rgba(212, 168, 67, 0.06), var(--bg-2)); }
+  .tier-flag {
+    position: absolute; top: -1px; right: 20px;
+    background: var(--gold); color: var(--bg); font-family: var(--mono); font-size: 10px; font-weight: 500;
+    padding: 4px 10px; border-radius: 0 0 3px 3px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .tier-name { font-family: var(--display); font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+  .tier-price { font-family: var(--display); font-size: 40px; font-weight: 700; color: var(--gold); line-height: 1; margin: 12px 0 6px; }
+  .tier-price small { font-size: 14px; color: var(--ink-2); font-weight: 400; }
+  .tier-credits { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: 0.05em; margin-bottom: 24px; }
+  .tier-divider { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
+  .tier-features { list-style: none; padding: 0; margin: 0 0 24px; flex: 1; }
+  .tier-features li { font-size: 13px; color: var(--ink-2); padding: 6px 0 6px 22px; position: relative; }
+  .tier-features li::before {
+    content: ''; position: absolute; left: 4px; top: 12px;
+    width: 6px; height: 6px; background: var(--gold); border-radius: 50%;
+  }
+  .tier .btn { width: 100%; justify-content: center; }
+
+  /* ─────────────────── FINAL CTA ─────────────────── */
+  .final-cta {
+    padding: 120px 40px; text-align: center; position: relative; overflow: hidden;
+    border-top: 1px solid var(--line);
+  }
+  .final-cta::before {
+    content: ''; position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(212, 168, 67, 0.08), transparent 70%);
+  }
+  .final-cta-inner { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+  .final-cta h2 {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(40px, 6vw, 72px); line-height: 1.0; letter-spacing: -0.02em;
+    margin-bottom: 28px;
+  }
+  .final-cta h2 .gold { color: var(--gold); font-style: italic; }
+  .final-cta p { font-size: 20px; color: var(--ink-2); margin-bottom: 40px; }
+
+  /* ─────────────────── FOOTER ─────────────────── */
+  footer { padding: 60px 40px 40px; border-top: 1px solid var(--line); background: var(--bg-2); }
+  .footer-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+  }
+  .footer-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-3); letter-spacing: 0.05em; }
+  .footer-links { display: flex; gap: 28px; font-size: 13px; color: var(--ink-2); }
+
+  /* ─────────────────── UTIL ─────────────────── */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.8s, transform 0.8s; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  @media (max-width: 720px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    .hero { padding: 120px 20px 60px; }
+    section { padding: 80px 20px; }
+    .final-cta { padding: 80px 20px; }
+    footer { padding: 40px 20px 30px; }
+    .hero-stats { gap: 28px; margin-top: 48px; padding-top: 32px; }
+    .stat-num { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═════════════════════════════ NAV ═════════════════════════════ -->
+<nav>
+  <a href="/" class="logo"><span class="logo-mark">S</span>SHOTBREAK</a>
+  <div class="nav-links">
+    <a href="#watch">Watch it work</a>
+    <a href="#crew">The crew</a>
+    <a href="#how">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="/learn/">Learn</a>
+  </div>
+  <div class="nav-cta-group">
+    <a href="/app.html" class="btn btn-ghost">Sign in</a>
+    <a href="#pricing" class="btn btn-gold">Start subscription</a>
+  </div>
+</nav>
+
+<!-- ═════════════════════════════ HERO ═════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <div class="eyebrow reveal"><span class="eyebrow-dot"></span>50 AI agents · working in parallel · free on every subscription</div>
+    <h1 class="hero-title reveal">
+      Paste a script.<br/>
+      Get a <span class="gold">production-ready</span><br/>
+      <span class="accent">breakdown in 90 seconds.</span>
+    </h1>
+    <p class="hero-sub reveal">
+      SHOTBREAK is the only AI filmmaking platform with a full 50-agent crew. Three directors set the vision. Nine builders lock character, voice, and world. Three script writers turn your pages into optimized AI prompts. Nine editors assemble the cut. Every specialist runs automatically on every script. No clicks. No rationing. No credit meters.
+    </p>
+    <div class="hero-cta-row reveal">
+      <a href="#pricing" class="btn btn-gold btn-lg">Start 7-day trial →</a>
+      <button class="btn btn-ghost btn-lg" onclick="SB_Tutorial.playWalkthrough('script_to_breakdown', { force: true })">▶ Play walkthrough (90s)</button>
+      <button class="btn btn-ghost btn-lg" onclick="SB_Tutorial.startTour('home_intro', { force: true })">Take the tour</button>
+    </div>
+    <div class="hero-stats reveal">
+      <div class="stat"><div class="stat-num">50</div><div class="stat-label">AI Agents</div></div>
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">Wings</div></div>
+      <div class="stat"><div class="stat-num">15</div><div class="stat-label">Managers</div></div>
+      <div class="stat"><div class="stat-num">~90s</div><div class="stat-label">End-to-End</div></div>
+      <div class="stat"><div class="stat-num">&infin;</div><div class="stat-label">Runs / Month</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════ WATCH IT WORK ═════════════════════════════ -->
+<section id="watch">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <div class="section-kicker">· Live demo ·</div>
+      <h2 class="section-title">Watch 50 agents cut a scene apart.</h2>
+      <p class="section-sub">A real script paste. A real crew run. The Vision Director locks the tone, the Scene Architect breaks coverage, the Prompt Smith writes 47 AI-ready prompts, the Continuity Supervisor flags a wardrobe drift. All while you watch.</p>
+    </div>
+    <div class="demo-wrap reveal">
+      <div class="demo-header">
+        <div class="demo-dots">
+          <div class="demo-dot"></div><div class="demo-dot"></div><div class="demo-dot active"></div>
+        </div>
+        <div class="demo-title">shotbreak.app — project: "The Last Dispatch" · run <span id="run-timer">00:01:24</span></div>
+      </div>
+      <div class="demo-split">
+        <div class="demo-pane">
+          <div class="demo-pane-title">Script · input</div>
+<pre class="script-text" id="script-pane"><span class="slug">INT. DETECTIVE OFFICE — NIGHT</span>
+
+Rain streaks the window. MAYA CHEN (40s,
+sharp, exhausted) stands over a desk
+buried in case files. She doesn't
+look up when the door opens.
+
+                <span class="char">MAYA</span>
+You're three hours late.
+
+                <span class="char">DANE</span>
+                  (breathless)
+I found him.
+
+She finally looks up.
+
+                <span class="char">MAYA</span>
+Where.
+
+                <span class="char">DANE</span>
+Warehouse on Pier 9.
+He's not alone.
+
+<span class="slug">EXT. PIER 9 WAREHOUSE — CONTINUOUS</span>
+
+Fog rolls off the water. A single
+sodium lamp buzzes. DANE and MAYA
+approach the warehouse from shadow,
+weapons drawn.</pre>
+        </div>
+        <div class="demo-pane">
+          <div class="demo-pane-title">Crew · working</div>
+          <div class="crew-live" id="crew-live">
+            <div class="crew-row"><span class="crew-status done">✓ done</span><span class="crew-name">Vision Director</span><span class="crew-detail">neo-noir · sodium palette · 85mm</span></div>
+            <div class="crew-row"><span class="crew-status done">✓ done</span><span class="crew-name">Story Director</span><span class="crew-detail">3 beats mapped</span></div>
+            <div class="crew-row"><span class="crew-status done">✓ done</span><span class="crew-name">Visual Director</span><span class="crew-detail">look locked</span></div>
+            <div class="crew-row"><span class="crew-status done">✓ done</span><span class="crew-name">Visual Character Builder</span><span class="crew-detail">2 characters</span></div>
+            <div class="crew-row"><span class="crew-status done">✓ done</span><span class="crew-name specialist">↳ Character Sculptor</span><span class="crew-detail">Maya · Dane</span></div>
+            <div class="crew-row"><span class="crew-status done">✓ done</span><span class="crew-name specialist">↳ Wardrobe &amp; Props</span><span class="crew-detail">locked</span></div>
+            <div class="crew-row"><span class="crew-status working"><span class="spinner"></span> live</span><span class="crew-name">Environment Builder</span><span class="crew-detail">Pier 9 warehouse</span></div>
+            <div class="crew-row"><span class="crew-status working"><span class="spinner"></span> live</span><span class="crew-name specialist">↳ Location Scout</span><span class="crew-detail">fog · sodium · water</span></div>
+            <div class="crew-row"><span class="crew-status working"><span class="spinner"></span> live</span><span class="crew-name">Scene Architect</span><span class="crew-detail">breaking sc 2</span></div>
+            <div class="crew-row"><span class="crew-status working"><span class="spinner"></span> live</span><span class="crew-name">Prompt Smith</span><span class="crew-detail">shot 17 / 47</span></div>
+            <div class="crew-row"><span class="crew-status queued">queued</span><span class="crew-name">Cinematographer</span><span class="crew-detail">coverage fill</span></div>
+            <div class="crew-row"><span class="crew-status queued">queued</span><span class="crew-name">Lighting Designer</span><span class="crew-detail">per-scene lighting</span></div>
+            <div class="crew-row"><span class="crew-status queued">queued</span><span class="crew-name">Continuity Supervisor</span><span class="crew-detail">final audit</span></div>
+            <div class="crew-row"><span class="crew-status queued">queued</span><span class="crew-name">Assembly Editor</span><span class="crew-detail">ship verdict</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════ THE CREW ═════════════════════════════ -->
+<section id="crew" style="background: var(--bg-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <div class="section-kicker">· The 50-agent crew ·</div>
+      <h2 class="section-title">Five wings.<br/>Fifteen managers.<br/>Thirty-five specialists.</h2>
+      <p class="section-sub">Every agent is a real Claude 4.7 prompt with a defined job. Managers (Opus) orchestrate. Specialists (Sonnet) execute. The chain of command is enforced by the orchestrator — the Vision Director's word is law, and every one of the 49 downstream agents reads her handoff before writing a single line.</p>
+    </div>
+
+    <div class="wings-grid reveal">
+      <div class="wing">
+        <div class="wing-header"><div class="wing-name">Directors</div><div class="wing-count">3 + 7</div></div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Vision Director</div>
+          <ul class="spec-list"><li>Genre Specialist</li></ul>
+        </div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Story Director</div>
+          <ul class="spec-list"><li>Beat Analyst</li><li>Continuity Supervisor</li></ul>
+        </div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Visual Director</div>
+          <ul class="spec-list"><li>Cinematographer</li><li>Movement Choreographer</li><li>Color Theorist</li><li>Colorist</li></ul>
+        </div>
+      </div>
+
+      <div class="wing">
+        <div class="wing-header"><div class="wing-name">Script Writers</div><div class="wing-count">3 + 8</div></div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Dialogue Writer</div>
+          <ul class="spec-list"><li>Dialogue Coach</li><li>Cliche Detector</li></ul>
+        </div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Action Writer</div>
+          <ul class="spec-list"><li>Script Doctor</li><li>Script Formatter</li><li>Subtext Writer</li></ul>
+        </div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Prompt Writer</div>
+          <ul class="spec-list"><li>Prompt Smith</li><li>Scene Architect</li><li>Shot Calibrator</li></ul>
+        </div>
+      </div>
+
+      <div class="wing">
+        <div class="wing-header"><div class="wing-name">Characters</div><div class="wing-count">3 + 5</div></div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Visual Character Builder</div>
+          <ul class="spec-list"><li>Character Sculptor</li><li>Wardrobe &amp; Props</li></ul>
+        </div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Psychological Builder</div>
+          <ul class="spec-list"><li>Emotion Mapper</li></ul>
+        </div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Voice Builder</div>
+          <ul class="spec-list"><li>Voice Consistency Auditor</li><li>ADR Supervisor</li></ul>
+        </div>
+      </div>
+
+      <div class="wing">
+        <div class="wing-header"><div class="wing-name">Settings</div><div class="wing-count">3 + 8</div></div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Environment Builder</div>
+          <ul class="spec-list"><li>Location Scout</li><li>Architecture Designer</li></ul>
+        </div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Atmospherics Builder</div>
+          <ul class="spec-list"><li>Lighting Designer</li><li>Weather Coordinator</li><li>Sound Designer</li></ul>
+        </div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Dressing Builder</div>
+          <ul class="spec-list"><li>Props Master</li><li>Set Dresser</li><li>VFX Supervisor</li></ul>
+        </div>
+      </div>
+
+      <div class="wing">
+        <div class="wing-header"><div class="wing-name">Editors</div><div class="wing-count">3 + 7</div></div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Timeline Editor</div>
+          <ul class="spec-list"><li>Editor</li><li>Transition Designer</li></ul>
+        </div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Pacing Editor</div>
+          <ul class="spec-list"><li>Pacing Doctor</li><li>Runtime Calculator</li></ul>
+        </div>
+        <div class="mgr-block">
+          <div class="mgr-name"><span class="mgr-badge">MGR</span>Assembly Editor</div>
+          <ul class="spec-list"><li>Trailer Cutter</li><li>Polish Pass</li><li>Music Supervisor</li></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════ HOW IT WORKS ═════════════════════════════ -->
+<section id="how">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <div class="section-kicker">· How it works ·</div>
+      <h2 class="section-title">Five stages. One paste.</h2>
+      <p class="section-sub">Drop a script into the textarea. The crew runs in parallel. Every field in the output is editable inline.</p>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Paste</div>
+        <div class="step-desc">Drop your script — raw Fountain, Final Draft, a Google Doc paste. The Script Normalizer strips page numbers, revision marks, CONTINUEDs.</div>
+        <div class="step-meta">Instant</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Lock vision</div>
+        <div class="step-desc">Three Directors run in parallel. Vision Director sets tone and palette. Story Director maps beats. Visual Director writes the grammar.</div>
+        <div class="step-meta">~10 seconds</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Build the world</div>
+        <div class="step-desc">Nine builders fan out: characters sculpted, voices locked, environments built, atmospherics layered, dressing set. In parallel.</div>
+        <div class="step-meta">~25 seconds</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-title">Break shots</div>
+        <div class="step-desc">Scene Architect breaks coverage. Cinematographer fills gaps. Prompt Smith writes the AI-ready prompt for every single shot.</div>
+        <div class="step-meta">~40 seconds</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-title">Ship it</div>
+        <div class="step-desc">Assembly Editor runs the final checklist. Continuity Supervisor flags any drift. You get a complete, editable, production-ready breakdown.</div>
+        <div class="step-meta">~15 seconds</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════ PRICING ═════════════════════════════ -->
+<section id="pricing" style="background: var(--bg-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <div class="section-kicker">· Pricing ·</div>
+      <h2 class="section-title">All 50 agents.<br/>Every subscription.</h2>
+      <p class="section-sub">No per-agent fees. No rationing. The crew runs as many times as you need. Credits are only charged for AI video and image generation — the agents themselves are free on every plan.</p>
+    </div>
+    <div class="pricing-grid reveal">
+      <div class="tier">
+        <div class="tier-name">Creator</div>
+        <div class="tier-price">$14.99<small> / mo</small></div>
+        <div class="tier-credits">500 generation credits / month</div>
+        <hr class="tier-divider" />
+        <ul class="tier-features">
+          <li>All 50 agents, unlimited runs</li>
+          <li>Up to 10 projects</li>
+          <li>Flux image generation</li>
+          <li>WaveSpeed video generation</li>
+          <li>Standard export formats</li>
+        </ul>
+        <a href="/app.html#signup-creator" class="btn btn-ghost">Start Creator →</a>
+      </div>
+      <div class="tier featured">
+        <div class="tier-flag">Most popular</div>
+        <div class="tier-name">Studio</div>
+        <div class="tier-price">$29.99<small> / mo</small></div>
+        <div class="tier-credits">1,500 generation credits / month</div>
+        <hr class="tier-divider" />
+        <ul class="tier-features">
+          <li>All 50 agents, unlimited runs</li>
+          <li>Unlimited projects</li>
+          <li>Flux Pro image generation</li>
+          <li>All WaveSpeed models</li>
+          <li>EDL, DOCX, CSV exports</li>
+          <li>Character studio with lock</li>
+        </ul>
+        <a href="/app.html#signup-studio" class="btn btn-gold">Start Studio →</a>
+      </div>
+      <div class="tier">
+        <div class="tier-name">Production</div>
+        <div class="tier-price">$59.99<small> / mo</small></div>
+        <div class="tier-credits">3,000 generation credits / month</div>
+        <hr class="tier-divider" />
+        <ul class="tier-features">
+          <li>All 50 agents, unlimited runs</li>
+          <li>Unlimited projects + teams</li>
+          <li>Priority generation queue</li>
+          <li>Trailer cut automation</li>
+          <li>Full Media Hub</li>
+          <li>Timeline editor + render</li>
+        </ul>
+        <a href="/app.html#signup-production" class="btn btn-ghost">Start Production →</a>
+      </div>
+      <div class="tier">
+        <div class="tier-name">Enterprise</div>
+        <div class="tier-price">$99.99<small> / mo</small></div>
+        <div class="tier-credits">5,000 generation credits / month</div>
+        <hr class="tier-divider" />
+        <ul class="tier-features">
+          <li>Everything in Production</li>
+          <li>Team workspaces</li>
+          <li>SSO + audit logs</li>
+          <li>Custom agent tuning</li>
+          <li>Dedicated support</li>
+          <li>API access (beta)</li>
+        </ul>
+        <a href="/app.html#signup-enterprise" class="btn btn-ghost">Start Enterprise →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════ FINAL CTA ═════════════════════════════ -->
+<div class="final-cta">
+  <div class="final-cta-inner reveal">
+    <h2>Stop clicking through<br/><span class="gold">30 scenes by hand.</span></h2>
+    <p>Your crew is waiting. One paste. 90 seconds. A complete, editable, production-ready film breakdown.</p>
+    <a href="#pricing" class="btn btn-gold btn-lg">Start your 7-day trial →</a>
+  </div>
+</div>
+
+<!-- ═════════════════════════════ FOOTER ═════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="logo" style="margin-bottom: 12px;"><span class="logo-mark">S</span>SHOTBREAK</div>
+      <div class="footer-meta">© 2026 SSK Holdings. Built with Anthropic Claude 4.7.</div>
+    </div>
+    <div class="footer-links">
+      <a href="/app.html">App</a>
+      <a href="#crew">The crew</a>
+      <a href="#pricing">Pricing</a>
+      <a href="mailto:hello@shotbreak.app">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveals
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Live demo timer
+  const timer = document.getElementById('run-timer');
+  let sec = 84;
+  if (timer) setInterval(() => {
+    sec += 1;
+    const m = Math.floor(sec / 60).toString().padStart(2, '0');
+    const s = (sec % 60).toString().padStart(2, '0');
+    timer.textContent = `00:${m}:${s}`;
+  }, 1000);
+
+  // Live crew row state rotation — makes the "working" status feel alive
+  const rows = document.querySelectorAll('#crew-live .crew-row');
+  let tick = 0;
+  setInterval(() => {
+    tick = (tick + 1) % rows.length;
+    rows.forEach((row, i) => {
+      const statusEl = row.querySelector('.crew-status');
+      if (!statusEl) return;
+      if (statusEl.classList.contains('queued')) return;
+      if (statusEl.classList.contains('working') && Math.random() < 0.12) {
+        statusEl.classList.remove('working');
+        statusEl.classList.add('done');
+        statusEl.innerHTML = '✓ done';
+      }
+    });
+  }, 1200);
+</script>
+
+<!-- Tutorial system -->
+<script src="/tutorial/tours.js"></script>
+<script src="/tutorial/tutorial.js"></script>
+<script>
+  // First-visit intro tour (auto-fires once, dismissible). Help FAB always visible.
+  window.addEventListener('load', () => {
+    SB_Tutorial.installHelpButton('home');
+    // Install homepage coachmarks after demo has rendered
+    setTimeout(() => {
+      if (window.SB_Tours && window.SB_Tours.coachmarks && window.SB_Tours.coachmarks.home) {
+        SB_Tutorial.installCoachmarks(SB_Tours.coachmarks.home);
+      }
+    }, 800);
+    // Auto-fire intro the first time only (seen flag prevents re-firing)
+    setTimeout(() => SB_Tutorial.startTour('home_intro'), 1400);
+  });
+</script>
+</body>
+</html>

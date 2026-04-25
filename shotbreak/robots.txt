@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /app.html
+
+Sitemap: https://capable-froyo-218eed.netlify.app/sitemap.xml

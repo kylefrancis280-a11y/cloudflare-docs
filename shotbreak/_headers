@@ -1,0 +1,68 @@
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# ═══════════════════════════════════════════════════════════════════════
+# CACHE BUSTING — prevents stale JS/HTML after every deploy.
+# JS, CSS, and HTML must revalidate on every load. Without these rules,
+# browsers cache app.html and workflow.js for the default TTL (often days)
+# and users see old behavior for hours/days after a Netlify deploy.
+# ═══════════════════════════════════════════════════════════════════════
+/*.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/*.css
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/workflow/*
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/agents/*
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# FFmpeg.wasm needs these headers for SharedArrayBuffer threading on /app.html.
+/app.html
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+
+# Editor page also uses ffmpeg.wasm for client-side rendering of the timeline.
+/editor/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+
+# Workflow shell — shares auth/fetch behavior with app.html.
+/workflow/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+
+# Self-hosted FFmpeg files — pin Content-Type explicitly so X-Content-Type-
+# Options: nosniff (set globally above) can't reject importScripts(), and use
+# CORP cross-origin so blob workers (which appear cross-origin to CORP checks
+# in some Chromium versions) can load them.
+/static/ffmpeg/*.js
+  Content-Type: application/javascript; charset=utf-8
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+/static/ffmpeg/*.wasm
+  Content-Type: application/wasm
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+/static/ffmpeg/*
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+/index.html
+  Cache-Control: public, max-age=3600
+
+/*.png
+  Cache-Control: public, max-age=31536000
+
+/*.ico
+  Cache-Control: public, max-age=31536000

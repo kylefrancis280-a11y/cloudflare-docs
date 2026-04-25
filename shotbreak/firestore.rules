@@ -1,0 +1,60 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // "System user" = any of the three owner emails. The backend signs in
+    // as one of them (via SYSTEM_EMAIL / SYSTEM_PASSWORD env vars) and uses
+    // that idToken to do privileged writes — user tier/credits, agent job
+    // records, webhook updates.
+    function isSystemUser() {
+      return request.auth != null
+          && request.auth.token.email in [
+               'kyle@shotbreak.io',
+               'scott@shotbreak.io',
+               'steve@shotbreak.io'
+             ];
+    }
+    function isOwnerEmail() {
+      return isSystemUser();
+    }
+
+    // ── users collection ────────────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isSystemUser()
+                  || (request.auth != null && request.auth.uid == userId);
+
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && (!('credits' in request.resource.data)
+                        || request.resource.data.credits == 0)
+                    && (request.resource.data.tier == 'free'
+                        || (request.resource.data.tier == 'owner' && isOwnerEmail()));
+
+      allow update: if isSystemUser()
+                    || (request.auth != null
+                        && request.auth.uid == userId
+                        && !request.resource.data.diff(resource.data).affectedKeys()
+                           .hasAny([
+                             'tier','credits','stripeCustomerId',
+                             'stripeSubscriptionId','subscriptionStatus',
+                             'subscriptionStartedAt','subscriptionEndedAt',
+                             'lastRenewalAt','lastCreditPackAt'
+                           ]));
+
+      allow delete: if isSystemUser();
+    }
+
+    // ── agent_jobs collection ───────────────────────────────────────────
+    match /agent_jobs/{jobId} {
+      allow read: if request.auth != null
+                  && (resource.data.uid == request.auth.uid || isSystemUser());
+      allow create, update, delete: if isSystemUser();
+    }
+
+    // ── deny everything else ────────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
