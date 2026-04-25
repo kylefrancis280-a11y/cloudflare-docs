@@ -2,16 +2,64 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#050507" />
+<meta name="color-scheme" content="dark" />
 <title>SHOTBREAK — The AI film crew. 50 agents. One script.</title>
 <meta name="description" content="Paste your script. The full 50-agent crew — directors, writers, builders, editors — breaks it down in 90 seconds. Every shot prompted, every character locked, every scene production-ready. AI filmmaking, finally cinematic." />
+<meta name="keywords" content="ai filmmaking, script breakdown, ai film production, video generation, ai screenwriter, shot list generator, ai cinematographer, claude ai, film pre-production, ai director" />
+<meta name="author" content="SHOTBREAK" />
+<link rel="canonical" href="https://shotbreak.io/" />
+
+<!-- Open Graph -->
 <meta property="og:title" content="SHOTBREAK — The AI film crew. 50 agents. One script." />
-<meta property="og:description" content="Paste your script. 50 AI agents do the full breakdown in 90 seconds." />
-<meta property="og:image" content="/og-image.png" />
+<meta property="og:description" content="Paste your script. 50 AI agents do the full breakdown in 90 seconds. Directors, writers, character builders, editors — the full crew, instantly." />
+<meta property="og:image" content="https://shotbreak.io/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="SHOTBREAK — 50 AI agents organized into a film production crew" />
 <meta property="og:type" content="website" />
+<meta property="og:url" content="https://shotbreak.io/" />
+<meta property="og:site_name" content="SHOTBREAK" />
+<meta property="og:locale" content="en_US" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="SHOTBREAK — The AI film crew. 50 agents. One script." />
+<meta name="twitter:description" content="Paste your script. 50 AI agents break it down in 90 seconds. Every shot prompted, every character locked." />
+<meta name="twitter:image" content="https://shotbreak.io/og-image.png" />
+<meta name="twitter:image:alt" content="SHOTBREAK — AI film production crew" />
+
+<!-- Favicons -->
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="shortcut icon" href="/favicon.ico" />
+
+<!-- Structured data for rich search results -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "SHOTBREAK",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Web",
+  "url": "https://shotbreak.io/",
+  "description": "AI film production crew — 50 agents that break down a script into a fully-prompted shot list, locked characters, and production-ready scenes in 90 seconds.",
+  "image": "https://shotbreak.io/og-image.png",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "description": "Free tier available; paid plans starting at the Creator tier."
+  },
+  "creator": {
+    "@type": "Organization",
+    "name": "SHOTBREAK",
+    "url": "https://shotbreak.io/"
+  }
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -56,7 +104,7 @@
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     padding: 20px 40px; display: flex; align-items: center; justify-content: space-between;
-    background: rgba(5, 5, 7, 0.7); backdrop-filter: blur(16px);
+    background: rgba(5, 5, 7, 0.7); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--line);
   }
   .logo {
@@ -289,15 +337,43 @@
   /* ─────────────────── UTIL ─────────────────── */
   .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.8s, transform 0.8s; }
   .reveal.in { opacity: 1; transform: translateY(0); }
+  @media (max-width: 860px) {
+    .nav-links { display: none; }
+  }
   @media (max-width: 720px) {
     nav { padding: 16px 20px; }
-    .nav-links { display: none; }
     .hero { padding: 120px 20px 60px; }
     section { padding: 80px 20px; }
     .final-cta { padding: 80px 20px; }
     footer { padding: 40px 20px 30px; }
     .hero-stats { gap: 28px; margin-top: 48px; padding-top: 32px; }
     .stat-num { font-size: 32px; }
+  }
+
+  /* ─── Narrow phones (≤ 480px) ─── */
+  @media (max-width: 480px) {
+    nav { padding: 14px 16px; }
+    .logo { font-size: 18px; gap: 8px; }
+    .logo-mark { width: 26px; height: 26px; font-size: 15px; }
+    .nav-cta-group { gap: 8px; }
+    /* Hide ghost "Sign in" — gold CTA still visible. Sign in is reachable
+       from any /app.html link. */
+    .nav-cta-group .btn-ghost { display: none; }
+    .nav-cta-group .btn { padding: 9px 14px; font-size: 13px; }
+    .hero { padding: 100px 16px 56px; }
+    section { padding: 64px 16px; }
+    .final-cta { padding: 64px 16px; }
+    footer { padding: 32px 16px 24px; }
+    .hero-stats { gap: 20px; }
+    .stat-num { font-size: 28px; }
+    .eyebrow { font-size: 11px; padding: 8px 14px; }
+  }
+
+  /* ─── iPhone SE / older Android (≤ 360px) ─── */
+  @media (max-width: 360px) {
+    .logo span:not(.logo-mark) { display: none; } /* show only the S mark */
+    .nav-cta-group .btn { padding: 8px 12px; font-size: 12px; }
+    h1.hero-title { font-size: 40px; }
   }
 </style>
 </head>

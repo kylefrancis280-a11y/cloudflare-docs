@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
+# Authed-only pages — keep out of search index
 Disallow: /app.html
+Disallow: /workflow/
+Disallow: /editor/
 
-Sitemap: https://capable-froyo-218eed.netlify.app/sitemap.xml
+Sitemap: https://shotbreak.io/sitemap.xml
