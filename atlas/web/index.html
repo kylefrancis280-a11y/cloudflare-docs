@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#eef0f5" media="(prefers-color-scheme: light)">
+<meta name="description" content="Atlas Analysis — institutional-grade AI stock research across Mining, AI, Tech, Biotech, Energy, Defense, Media. Live prices, multi-stage analysis, backtested track record. Starting at CA$29.99/mo.">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Atlas Analysis">
+<link rel="canonical" href="https://atlasanalysis.net">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://atlasanalysis.net">
+<meta property="og:title" content="Atlas Analysis — AI-Powered Stock Research">
+<meta property="og:description" content="Institutional-grade AI research with backtested track record and live prices. Starting at CA$29.99/mo.">
+<meta property="og:image" content="https://atlasanalysis.net/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Atlas Analysis">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Atlas Analysis — AI-Powered Stock Research">
+<meta name="twitter:description" content="Institutional-grade AI research with backtested track record and live prices.">
+<meta name="twitter:image" content="https://atlasanalysis.net/og-image.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><polygon points='16,2 30,28 2,28' fill='%234f8fff'/></svg>">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Playfair+Display:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Playfair+Display:wght@700;800;900&display=swap" media="all">
+<link rel="stylesheet" href="/atlas.css">
+<title>Atlas Analysis — AI-Powered Stock Research & Analysis Platform</title>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Atlas Analysis","applicationCategory":"FinanceApplication","operatingSystem":"Web","url":"https://atlasanalysis.net","offers":[{"@type":"Offer","name":"Atlas Core","price":"29.99","priceCurrency":"CAD"},{"@type":"Offer","name":"Atlas Pro","price":"49.99","priceCurrency":"CAD"},{"@type":"Offer","name":"Atlas Institutional","price":"99.99","priceCurrency":"CAD"}]}
+</script>
+<!-- Critical: theme + loader settings BEFORE first paint to avoid flash -->
+<script>
+(function(){
+  try{
+    var t=localStorage.getItem('atlas_t');
+    if(!t){ t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'; }
+    document.documentElement.setAttribute('data-theme', t);
+  }catch(e){ document.documentElement.setAttribute('data-theme','dark'); }
+})();
+</script>
+</head>
+<body>
+<div id="loader" aria-hidden="true">
+  <svg width="56" height="56" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs><linearGradient id="lgl" x1="0" y1="0" x2="48" y2="48"><stop offset="0%" stop-color="#4f8fff"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+    <polygon points="24,2 46,42 2,42" fill="url(#lgl)"/>
+    <polygon points="24,14 34,36 14,36" fill="var(--bg-0)" opacity=".85"/>
+    <line x1="24" y1="2" x2="24" y2="14" stroke="#fff" stroke-width="2" opacity=".5"/>
+  </svg>
+  <div class="loader-brand">ATLAS ANALYSIS</div>
+  <div class="loader-tag">LOADING PLATFORM</div>
+  <div class="loader-bar"><div></div></div>
+</div>
+
+<div id="app" data-route="">
+  <!-- Static skeleton — replaced surgically by atlas.js, never via innerHTML on data updates -->
+  <div id="route-loading" class="route-loading">
+    <div class="skel-card"></div><div class="skel-card"></div><div class="skel-card"></div>
+  </div>
+</div>
+
+<script type="module" src="/atlas.js"></script>
+<noscript><div style="padding:40px;text-align:center;font-family:system-ui">Atlas Analysis requires JavaScript. Please enable it to continue.</div></noscript>
+</body>
+</html>
