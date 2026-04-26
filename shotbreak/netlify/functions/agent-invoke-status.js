@@ -19,7 +19,7 @@
 const { verifyToken, getSystemToken } = require('./lib/auth');
 
 const CORS = {
-  'Access-Control-Allow-Origin':  '*',
+  'Access-Control-Allow-Origin':  'https://shotbreak.io',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Content-Type':                 'application/json',

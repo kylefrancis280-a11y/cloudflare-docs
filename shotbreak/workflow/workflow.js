@@ -2866,7 +2866,7 @@ function renderCoverageScene(scene, p, healthLevel){
         <span style="margin-left:auto">${badge}</span>
       </div>
       <div class="scene-body" style="max-height:140px">
-        ${esc(truncate(scene.action || '', 300))}
+        ${esc(truncate(scene.raw || scene.action || '', 300))}
       </div>
       ${errBanner}
       <div class="scene-actions">
@@ -3716,6 +3716,7 @@ function renderDeliverStep(p){
             <button class="btn btn-ghost" id="btn-music">✨ Score direction (5 credits)</button>
           </div>
           <div id="sound-out"></div>
+          <div id="music-out"></div>
         </div>
 
         <div class="card">
@@ -3797,7 +3798,7 @@ function wireDeliverStep(p){
   agentCall('btn-music', 'music-supervisor',
     { vision: p.vision, shot_list: p.shot_list },
     'Score direction — genre, tempo, cue points. Return {overall_direction, genre, bpm_range, cue_points: [{seconds, intent}]}.',
-    'Score direction', 'sound-out');
+    'Score direction', 'music-out');
 
   agentCall('btn-colorist', 'colorist',
     { vision: p.vision, shot_list: p.shot_list, timeline: p.timeline },
