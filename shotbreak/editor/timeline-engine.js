@@ -527,6 +527,31 @@
     logAgent(`Project saved locally: ${payload.project}`, 'ok');
   });
 
+  $('btn-load').addEventListener('click', () => {
+    const PREFIX = 'shotbreak_editor_';
+    const names = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(PREFIX)) names.push(k.slice(PREFIX.length));
+    }
+    if (names.length === 0) { logAgent('No saved projects found.', 'err'); return; }
+    names.sort();
+    const choice = window.prompt(`Saved projects:\n  ${names.join('\n  ')}\n\nType the project name to load:`, names[0]);
+    if (!choice) return;
+    const raw = localStorage.getItem(PREFIX + choice);
+    if (!raw) { logAgent(`Not found: ${choice}`, 'err'); return; }
+    let payload;
+    try { payload = JSON.parse(raw); }
+    catch (e) { logAgent(`Corrupt save: ${e.message}`, 'err'); return; }
+    state.bin = Array.isArray(payload.bin) ? payload.bin : [];
+    state.timeline = Array.isArray(payload.timeline) ? payload.timeline : [];
+    state.selectedClipId = null;
+    state.playhead = 0;
+    $('project-name').value = payload.project || choice;
+    renderAll();
+    logAgent(`Loaded project: ${choice} (${state.bin.length} clips, ${state.timeline.length} on timeline)`, 'ok');
+  });
+
   $('btn-export').addEventListener('click', () => {
     const edl = exportEDL();
     const blob = new Blob([JSON.stringify(edl, null, 2)], { type: 'application/json' });
