@@ -1876,9 +1876,18 @@ function renderScenesList(p){
 }
 
 function renderSceneBodyDisplay(scene){
+  // Render from scene.raw — it's the source of truth and stays accurate
+  // after tighten/apply patches the scene in-place (parsed fields like
+  // scene.action / scene.dialogue are stale until a full re-normalize).
+  const raw = scene.raw || '';
+  if (raw) {
+    const preview = raw.length > 800 ? raw.slice(0, 800) + '…' : raw;
+    return '<div style="white-space:pre-wrap;font-family:inherit;font-size:13px">' + esc(preview) + '</div>';
+  }
+  // Fallback for legacy saves that never stored raw.
   let html = '';
   if (scene.action) html += '<b>' + esc(scene.action.slice(0, 500)) + (scene.action.length > 500 ? '...' : '') + '</b>\n\n';
-  scene.dialogue.forEach(d => {
+  (scene.dialogue || []).forEach(d => {
     html += esc(d.character) + (d.parenthetical ? ' <i>(' + esc(d.parenthetical) + ')</i>' : '') + '\n' + esc(d.line) + '\n\n';
   });
   return html;
