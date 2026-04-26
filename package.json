@@ -1,21 +1,12 @@
 {
 	"name": "shotbreak-root",
 	"private": true,
-	"type": "module",
 	"scripts": {
-		"build": "npx astro build",
-		"dev": "npx astro dev",
-		"preview": "npx astro preview",
-		"start": "npx astro dev",
-		"sync": "npx astro sync",
+		"build": "cd shotbreak && node bin/build.js && node -e \"require('fs').cpSync('dist','../dist',{recursive:true,force:true})\"",
 		"test": "cd shotbreak && node test/integration.js"
-	},
-	"devDependencies": {
-		"astro": "5.13.7"
 	},
 	"engines": {
 		"npm": "10.x",
 		"node": "22.x"
-	},
-	"packageManager": "npm@10.9.4+sha512.3a7506f37e85c1ba1021baad79f0cd9724748131f321fc117c4dc3ba235ec01be7327584a41d15117c01945560aa9373220628fcc1e1dddd877a5fe9b336a900"
+	}
 }
