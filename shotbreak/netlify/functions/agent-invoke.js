@@ -99,19 +99,20 @@ async function callAnthropic(agent, input, context) {
   // Netlify timeout and return 502 to the client with no context.
   //
   // Two-tier timeout strategy on the Netlify 26s ceiling:
-  //   · Sonnet primary: 17s. Healthy Sonnet finishes in 8-12s, well within
-  //     this. If a pod stalls, we flip to Haiku with budget intact.
-  //   · Haiku fallback: ~8s remaining (set dynamically below).
-  //   · Total: 25s with 1s safety margin.
+  //   · Sonnet primary: 12s. Healthy Sonnet finishes in 8-12s; this catches
+  //     stalled pods fast and hands off to Haiku with 14s remaining.
+  //   · Haiku fallback: ~13.5s (set dynamically below). Haiku typically
+  //     responds in 2-5s, so even one retry fits easily.
+  //   · Total: ~25.5s with ~0.5s safety margin.
   // If you need longer Sonnet calls, raise SONNET_TIMEOUT_MS — but you'll
   // also need to drop FALLBACK_MIN_BUDGET_MS proportionally or move to
   // a background-function architecture.
-  const SONNET_TIMEOUT_MS = 17000;
+  const SONNET_TIMEOUT_MS = 12000;
 
   // ULTRA-AGGRESSIVE FALLBACK (v64):
-  //   · 1 attempt on Sonnet 4.6
-  //   · If 429/529/503: flip to Haiku 4.5 immediately (different infra)
-  //   · On Haiku: 2 retries with 1s/2s backoff
+  //   · 1 attempt on Sonnet 4.6 (12s limit)
+  //   · If 429/529/503/stall: flip to Haiku 4.5 immediately (different infra)
+  //   · On Haiku: 2 retries with 1s/2s backoff, ~13s budget
   //   · Total Sonnet time budget: ~one call (~10s typical)
   //   · Total Haiku budget: ~14s remaining
   // This fails fast on dying Sonnet instead of burning 3 retries * 10s each.
@@ -200,9 +201,9 @@ async function callAnthropic(agent, input, context) {
     // Give Haiku the remaining budget minus a 500ms safety margin for
     // response parsing + any back-pressure.
     const haikuBudget = Math.max(FALLBACK_MIN_BUDGET_MS, remaining - 500);
-    // 1 retry on Haiku (its own pod might also be busy) but only if the
-    // first call returns quickly — the retry uses the leftover budget.
-    res = await tryModel(FALLBACK_MODEL, 1, haikuBudget);
+    // 2 retries on Haiku (its own pod might also be busy). With 12s Sonnet
+    // timeout we now have ~13.5s for Haiku — enough for 3 attempts at 4s each.
+    res = await tryModel(FALLBACK_MODEL, 2, haikuBudget);
     if (res._stalled === true) {
       throw new Error(`Anthropic stalled on both Sonnet and Haiku — agent ${agent.id} timed out twice. Anthropic may be experiencing a major incident; check status.anthropic.com.`);
     }
