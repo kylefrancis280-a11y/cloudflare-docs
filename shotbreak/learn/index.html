@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Learn · SHOTBREAK</title>
+<meta name="description" content="Learn how SHOTBREAK's 50-agent film crew works. Getting started, the crew in detail, Script Drop-In, Media Hub, and a complete agent glossary." />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/tutorial/tutorial.css" />
+<style>
+  :root {
+    --bg: #050507; --bg-2: #0d0d11; --bg-3: #15151b; --surface: #1a1a22;
+    --ink: #f5f3ee; --ink-2: #b8b5ad; --ink-3: #6e6a63;
+    --gold: #d4a843; --gold-dark: #b8922e; --gold-soft: rgba(212, 168, 67, 0.15);
+    --line: rgba(245, 243, 238, 0.08); --line-strong: rgba(245, 243, 238, 0.18);
+    --display: 'Syne', Georgia, serif;
+    --ui: 'Inter', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--ink); font-family: var(--ui);
+    font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+  ::selection { background: var(--gold); color: var(--bg); }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    padding: 18px 40px; display: flex; align-items: center; justify-content: space-between;
+    background: rgba(5, 5, 7, 0.85); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .logo {
+    font-family: var(--display); font-weight: 800; font-size: 20px; letter-spacing: 0.04em;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-mark {
+    width: 26px; height: 26px; display: inline-grid; place-items: center;
+    background: var(--gold); color: var(--bg); border-radius: 3px;
+    font-family: var(--display); font-weight: 800; font-size: 15px;
+  }
+  .nav-links { display: flex; gap: 28px; font-size: 14px; color: var(--ink-2); }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    padding: 9px 18px; border-radius: 4px; background: var(--gold); color: var(--bg);
+    font-weight: 500; font-size: 13px; transition: background 0.2s;
+  }
+  .nav-cta:hover { background: #e8bc51; }
+
+  /* LAYOUT */
+  .layout {
+    max-width: 1240px; margin: 0 auto;
+    display: grid; grid-template-columns: 240px 1fr; gap: 60px;
+    padding: 60px 40px 120px;
+  }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; gap: 32px; padding: 40px 24px 80px; } }
+
+  /* SIDEBAR */
+  aside {
+    position: sticky; top: 80px; align-self: start;
+    height: calc(100vh - 110px); overflow-y: auto;
+    padding-right: 16px;
+  }
+  @media (max-width: 900px) { aside { position: static; height: auto; } }
+  .side-search {
+    position: relative; margin-bottom: 24px;
+  }
+  .side-search input {
+    width: 100%; padding: 10px 14px; font-family: var(--ui); font-size: 13px;
+    background: var(--bg-2); color: var(--ink);
+    border: 1px solid var(--line-strong); border-radius: 4px;
+    outline: none; transition: border-color 0.15s;
+  }
+  .side-search input:focus { border-color: var(--gold); }
+  .side-search input::placeholder { color: var(--ink-3); }
+  .side-group { margin-bottom: 24px; }
+  .side-group-label {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 10px;
+  }
+  .side-item {
+    display: block; padding: 7px 0; font-size: 13px; color: var(--ink-2);
+    border-left: 2px solid transparent; padding-left: 12px;
+    transition: all 0.12s;
+  }
+  .side-item:hover, .side-item.active {
+    color: var(--ink); border-left-color: var(--gold);
+  }
+
+  /* MAIN */
+  main { max-width: 760px; }
+  .kicker {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 16px;
+  }
+  h1 {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(36px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .lede { font-size: 19px; color: var(--ink-2); margin-bottom: 48px; line-height: 1.5; }
+  h2 {
+    font-family: var(--display); font-weight: 600;
+    font-size: 30px; letter-spacing: -0.01em;
+    margin: 56px 0 16px; padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  h2:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+  h3 {
+    font-family: var(--display); font-weight: 600;
+    font-size: 20px; letter-spacing: -0.005em;
+    margin: 32px 0 12px;
+  }
+  p { margin-bottom: 18px; color: var(--ink-2); line-height: 1.7; }
+  p strong { color: var(--ink); font-weight: 500; }
+  code {
+    font-family: var(--mono); font-size: 13px; padding: 2px 7px;
+    background: rgba(212, 168, 67, 0.1); color: var(--gold); border-radius: 3px;
+  }
+  ul, ol { margin: 0 0 18px; padding-left: 22px; color: var(--ink-2); }
+  li { padding: 4px 0; line-height: 1.65; }
+  blockquote {
+    border-left: 3px solid var(--gold); padding: 4px 20px; margin: 24px 0;
+    color: var(--ink-2); font-style: italic;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--bg-2); border: 1px solid var(--line); border-radius: 8px;
+    padding: 24px 28px; margin: 24px 0;
+  }
+  .card-kicker {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 10px;
+  }
+  .card-title { font-family: var(--display); font-size: 19px; font-weight: 600; margin-bottom: 8px; }
+  .card p:last-child { margin-bottom: 0; }
+
+  /* Wing tags in glossary */
+  .agent {
+    padding: 20px 24px; margin: 12px 0;
+    background: var(--bg-2); border: 1px solid var(--line); border-radius: 6px;
+    transition: border-color 0.15s;
+  }
+  .agent:target, .agent:hover { border-color: var(--gold-soft); }
+  .agent-head {
+    display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .agent-name { font-family: var(--display); font-weight: 600; font-size: 18px; color: var(--ink); }
+  .agent-tier {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+    padding: 2px 8px; border-radius: 3px; text-transform: uppercase;
+  }
+  .agent-tier.t1 { background: rgba(212, 168, 67, 0.15); color: var(--gold); }
+  .agent-tier.t2 { background: rgba(245, 243, 238, 0.08); color: var(--ink-2); }
+  .agent-wing {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+    color: var(--ink-3); text-transform: uppercase;
+  }
+  .agent-summary { font-size: 14px; color: var(--ink-2); line-height: 1.6; }
+
+  /* FAQ */
+  .faq-item {
+    border-bottom: 1px solid var(--line); padding: 20px 0;
+  }
+  .faq-q {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; background: none; border: none; color: var(--ink);
+    font-family: var(--display); font-size: 17px; font-weight: 500;
+    text-align: left; padding: 0; cursor: pointer;
+  }
+  .faq-q:hover { color: var(--gold); }
+  .faq-q-mark { color: var(--gold); font-family: var(--mono); font-size: 18px; transition: transform 0.2s; }
+  .faq-item.open .faq-q-mark { transform: rotate(45deg); }
+  .faq-a { display: none; padding-top: 16px; color: var(--ink-2); font-size: 15px; line-height: 1.6; }
+  .faq-item.open .faq-a { display: block; }
+
+  /* CTA box */
+  .cta-box {
+    background: linear-gradient(180deg, rgba(212, 168, 67, 0.08), var(--bg-2));
+    border: 1px solid var(--gold-soft); border-radius: 8px;
+    padding: 32px 36px; margin: 48px 0 0;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+  }
+  .cta-box-text { flex: 1; min-width: 240px; }
+  .cta-box-title { font-family: var(--display); font-weight: 600; font-size: 22px; margin-bottom: 6px; }
+  .cta-box-sub { font-size: 14px; color: var(--ink-2); }
+  .cta-btn {
+    padding: 12px 22px; border-radius: 4px; background: var(--gold); color: var(--bg);
+    font-weight: 500; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;
+  }
+
+  /* Utility */
+  .tag-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin: 20px 0; }
+  .tag {
+    padding: 8px 14px; background: var(--bg-2); border: 1px solid var(--line);
+    border-radius: 4px; font-size: 12px; color: var(--ink-2); font-family: var(--mono);
+  }
+  .tag strong { color: var(--gold); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo"><span class="logo-mark">S</span>SHOTBREAK</a>
+  <div class="nav-links">
+    <a href="/#watch">Watch it work</a>
+    <a href="/#crew">The crew</a>
+    <a href="/learn/" style="color: var(--ink);">Learn</a>
+    <a href="/#pricing">Pricing</a>
+  </div>
+  <a href="/app.html" class="nav-cta">Sign in</a>
+</nav>
+
+<div class="layout">
+
+  <!-- ─────────────── SIDEBAR ─────────────── -->
+  <aside>
+    <div class="side-search">
+      <input type="text" id="side-search" placeholder="Search docs and agents..." autocomplete="off" />
+    </div>
+    <div class="side-group">
+      <div class="side-group-label">Getting started</div>
+      <a href="#intro" class="side-item">What SHOTBREAK is</a>
+      <a href="#first-run" class="side-item">Your first run</a>
+      <a href="#subscription" class="side-item">What subscribers get</a>
+    </div>
+    <div class="side-group">
+      <div class="side-group-label">Under the hood</div>
+      <a href="#the-crew" class="side-item">The 50-agent crew</a>
+      <a href="#chain-of-command" class="side-item">Chain of command</a>
+      <a href="#vision-flow" class="side-item">How vision flows</a>
+      <a href="#models" class="side-item">Which AI models we use</a>
+    </div>
+    <div class="side-group">
+      <div class="side-group-label">Workflow</div>
+      <a href="#script-dropin" class="side-item">Script Drop-In</a>
+      <a href="#breakdown" class="side-item">Editing the breakdown</a>
+      <a href="#media-hub" class="side-item">Media Hub</a>
+      <a href="#editor" class="side-item">Editor &amp; export</a>
+    </div>
+    <div class="side-group">
+      <div class="side-group-label">Agent reference</div>
+      <a href="#glossary-directors" class="side-item">Directors wing</a>
+      <a href="#glossary-writers" class="side-item">Script Writers wing</a>
+      <a href="#glossary-characters" class="side-item">Characters wing</a>
+      <a href="#glossary-settings" class="side-item">Settings wing</a>
+      <a href="#glossary-editors" class="side-item">Editors wing</a>
+    </div>
+    <div class="side-group">
+      <div class="side-group-label">Also</div>
+      <a href="#faq" class="side-item">FAQ</a>
+      <a href="#keyboard" class="side-item">Keyboard shortcuts</a>
+    </div>
+  </aside>
+
+  <!-- ─────────────── MAIN ─────────────── -->
+  <main>
+
+    <div class="kicker">· Documentation ·</div>
+    <h1 id="intro">Everything about the crew.</h1>
+    <p class="lede">SHOTBREAK is fifty AI agents arranged as a real film production. This guide explains what each one does, how they talk to each other, and how to use them to break down a script in under two minutes.</p>
+
+    <h2 id="first-run">Your first run</h2>
+    <p>The shortest path to a full breakdown:</p>
+    <ol>
+      <li>Sign in at <code>/app.html</code>.</li>
+      <li>Click <strong>New project</strong> or the gold banner at the top.</li>
+      <li>Paste a script into the textarea. Anything from Fountain to a Google Doc paste works — the Script Normalizer scrubs the formatting.</li>
+      <li>Click <strong>Run the crew</strong>. The 50-agent org chart animates as each agent completes its work.</li>
+      <li>About 90 seconds later, you're scrolling through a complete, editable breakdown.</li>
+    </ol>
+    <p>Every field in the breakdown is a text input. Rename a character, rewrite a shot's prompt, swap a location — the agents that depend on that field re-run in scope.</p>
+
+    <h2 id="subscription">What a subscription gets you</h2>
+    <p>The crew is free on every paid plan. No per-agent fees. No per-run rationing. Credits only apply to actual video and image generation — calls to WaveSpeed and Flux — not to the agents themselves.</p>
+    <div class="tag-grid">
+      <div class="tag">Creator · <strong>$14.99/mo</strong></div>
+      <div class="tag">Studio · <strong>$29.99/mo</strong></div>
+      <div class="tag">Production · <strong>$59.99/mo</strong></div>
+      <div class="tag">Enterprise · <strong>$99.99/mo</strong></div>
+    </div>
+    <p>Free-tier accounts can browse the homepage, watch the walkthrough, and read these docs. The Script Drop-In is paywalled at the door.</p>
+
+    <h2 id="the-crew">The 50-agent crew</h2>
+    <p>Fifteen <strong>managers</strong> (Claude Opus) orchestrate. Thirty-five <strong>specialists</strong> (Claude Sonnet) execute. The split isn't cosmetic — it matches how a real film production divides labor between department heads and crew.</p>
+    <p>The crew is organized into five <strong>wings</strong>:</p>
+    <ul>
+      <li><strong>Directors</strong> — Vision, Story, Visual. Set the creative direction everyone else executes against.</li>
+      <li><strong>Script Writers</strong> — Dialogue, Action, Prompt. Turn your script into clean pages and AI-ready prompts.</li>
+      <li><strong>Characters</strong> — Visual, Psychological, Voice. Lock every character so they don't drift between shots.</li>
+      <li><strong>Settings</strong> — Environment, Atmospherics, Dressing. Build the worlds your scenes live in.</li>
+      <li><strong>Editors</strong> — Timeline, Pacing, Assembly. Cut, pace, and ship.</li>
+    </ul>
+
+    <h2 id="chain-of-command">Chain of command</h2>
+    <p>Every specialist has a manager. Every manager has a wing. Every manager reads the Vision Director's output before writing a single line. The orchestrator enforces this — specialists can't run until their manager has published a brief.</p>
+    <div class="card">
+      <div class="card-kicker">Example</div>
+      <div class="card-title">How lighting decisions flow</div>
+      <p>Vision Director declares the project is neo-noir with a sodium palette. Visual Director writes the visual grammar: "motivated sources only, heavy shadow, single key." Atmospherics Builder reads both, then briefs Lighting Designer: "Per-scene key/fill/rim. Respect the sodium palette. Single motivated source per shot."</p>
+      <p>Lighting Designer writes the plan for scene 1. It flows back up through Atmospherics Builder to the Visual Director, who either signs off or issues a revision. Then the plan becomes part of the context every Prompt Smith call reads when writing the final video prompts.</p>
+    </div>
+
+    <h2 id="vision-flow">How vision flows</h2>
+    <p>Every agent call carries the director's context — the vision statement, the genre tags, the character bible, the location library — bundled into a single structured object. The same context reaches Prompt Smith on shot 47 that reaches the Cinematographer on shot 3.</p>
+    <p>This is why a character's look doesn't drift between scenes 2 and 9. The canonical description from Character Sculptor is in context for every prompt. This is also why the palette stays coherent — the Color Theorist's master palette is in context for every generation.</p>
+
+    <h2 id="models">Which AI models power what</h2>
+    <p>The crew uses two model tiers:</p>
+    <ul>
+      <li><strong>Claude Opus 4.7</strong> — all 15 managers. Opus has the reasoning depth to reconcile specialists and make creative decisions.</li>
+      <li><strong>Claude Sonnet 4.6</strong> — all 35 specialists. Sonnet is fast and accurate for focused, single-role work.</li>
+    </ul>
+    <p>For video and image generation (after the breakdown is done):</p>
+    <ul>
+      <li><strong>WaveSpeed</strong> for video — Kling 3.0, Google Veo 3, Minimax Hailuo, Seedance Turbo.</li>
+      <li><strong>Flux</strong> for character reference images — Flux Schnell, Flux Dev, Flux Pro.</li>
+    </ul>
+
+    <h2 id="script-dropin">Script Drop-In</h2>
+    <p>The Script Drop-In is the entry point for every project. One textarea, one <strong>Run the crew</strong> button. No wizard, no step-by-step, no drop-downs for tone or genre — the Vision Director infers those from the script itself.</p>
+    <p>Formats that work:</p>
+    <ul>
+      <li>Pasted screenplay text (industry-standard formatting preferred but not required)</li>
+      <li>Fountain syntax</li>
+      <li>A Google Doc or Word paste with any amount of extra junk — the Script Normalizer handles it</li>
+      <li>Rough prose with scene headings (<code>INT. / EXT.</code>) and character cues</li>
+    </ul>
+
+    <h2 id="breakdown">Editing the breakdown</h2>
+    <p>When the crew finishes, you scroll through a document organized by scene. Each scene shows its shot list, and each shot shows its final prompt, characters in frame, duration target, lens, movement, lighting notes, sound direction.</p>
+    <p><strong>Every field is editable inline.</strong> Click into it, change the text, click out. The crew recognizes which agents' outputs depend on that field and re-runs only those.</p>
+    <blockquote>Renaming "Maya" to "Amara" doesn't just swap the string — Character Sculptor re-emits the canonical description with the new name, Prompt Smith rewrites every prompt that referenced her, Voice Builder updates her voice signature. In about 8 seconds.</blockquote>
+
+    <h2 id="media-hub">Media Hub</h2>
+    <p>The Media Hub generates the actual video clips from the breakdown's shot list. It's a separate surface because generation is slow (1-3 minutes per shot) and expensive (credits apply here).</p>
+    <p>From the breakdown, click <strong>Open Media Hub with these shots</strong>. Your shot list, prompts, character reference images, and model targets all travel with you. Generation can run in batches — queue 50 shots at once, check back in half an hour.</p>
+
+    <h2 id="editor">Editor &amp; export</h2>
+    <p>The Editor is a browser-based NLE (powered by FFmpeg.wasm) for arranging the generated clips. Drag clips from the Media Hub onto the timeline, trim, split, add transitions, render as MP4.</p>
+    <p>Once a timeline is saved, four editor-wing agents become available for review: <strong>Showrunner</strong> (Assembly Editor) for the full cut verdict, <strong>Editor</strong> for per-clip suggestions, <strong>Pacing Doctor</strong> for rhythm check, <strong>Transition Designer</strong> for cut-level recommendations.</p>
+
+    <!-- ─────────────── GLOSSARY ─────────────── -->
+    <h2 id="glossary-directors">Agent reference · Directors wing</h2>
+    <div id="glossary-root"></div>
+
+    <!-- ─────────────── FAQ ─────────────── -->
+    <h2 id="faq">FAQ</h2>
+    <div id="faq-list">
+      <div class="faq-item">
+        <button class="faq-q">How long does the crew take to break down a script?<span class="faq-q-mark">+</span></button>
+        <div class="faq-a">About 60–120 seconds for a 10-page script. The 15 managers run in parallel where possible, and most specialists fan out per-scene or per-shot in parallel too. Longer scripts scale roughly linearly.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Are the agents really free on every plan?<span class="faq-q-mark">+</span></button>
+        <div class="faq-a">Yes. Every plan includes unlimited runs of all 50 agents with no per-agent fees. Credits apply only to video generation (WaveSpeed) and image generation (Flux) — the actual media output. The breakdown itself is always free to produce, as many times as you want.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Can I edit the breakdown after the crew finishes?<span class="faq-q-mark">+</span></button>
+        <div class="faq-a">Every field in the breakdown is inline-editable. Changes trigger scoped re-runs — only the agents whose outputs depend on the edited field are re-invoked. A character rename takes about 8 seconds; a scene rewrite takes about 20.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">What happens if an agent fails?<span class="faq-q-mark">+</span></button>
+        <div class="faq-a">Specialists that fail are retried once. If they fail again, the manager above them issues a fallback (usually a simpler output schema). Managers that fail halt the stage and surface the error — you can retry that stage from the crew panel without restarting the whole run.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">How does character consistency work across shots?<span class="faq-q-mark">+</span></button>
+        <div class="faq-a">The Character Sculptor writes a canonical 50-word description per character. That description — along with visual anchors and a consistency phrase — is included in context for every prompt that features the character. For video generation, we recommend locking a reference image via Character Studio (Flux) and using image-to-video where the model supports it.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Can I use SHOTBREAK without running the full crew?<span class="faq-q-mark">+</span></button>
+        <div class="faq-a">Yes. Individual agents can be invoked directly from the breakdown — useful when you want to polish one character or rewrite one scene without re-running the full pipeline. The "Run the crew" auto-flow is optional but recommended for first passes.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Which video models does SHOTBREAK support?<span class="faq-q-mark">+</span></button>
+        <div class="faq-a">All major WaveSpeed models: Seedance Turbo (default, fastest), Kling 3.0, Google Veo 3, Minimax Hailuo. The Shot Calibrator produces per-model prompt variants automatically — same shot, optimized prompt per model, so you can try each and compare.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Is there an API?<span class="faq-q-mark">+</span></button>
+        <div class="faq-a">Enterprise plans include API access (beta). All 50 agents are addressable, plus the orchestration endpoints (auteur_plan, full_crew, custom_chain). Contact support for keys.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Can I run the crew on a script I don't own the rights to?<span class="faq-q-mark">+</span></button>
+        <div class="faq-a">The breakdown stays private to your workspace — SHOTBREAK doesn't train on customer input and doesn't share it. Rights to the source material are your responsibility; our terms require you represent that you have the rights to use the scripts you upload.</div>
+      </div>
+    </div>
+
+    <h2 id="keyboard">Keyboard shortcuts</h2>
+    <div class="tag-grid">
+      <div class="tag"><strong>Esc</strong> close tour or modal</div>
+      <div class="tag"><strong>→</strong> next step</div>
+      <div class="tag"><strong>←</strong> previous step</div>
+      <div class="tag"><strong>Space</strong> pause walkthrough</div>
+      <div class="tag"><strong>?</strong> open help menu</div>
+      <div class="tag"><strong>/ </strong>focus search</div>
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-box-text">
+        <div class="cta-box-title">Ready to run the crew?</div>
+        <div class="cta-box-sub">7-day trial. All 50 agents. Unlimited runs.</div>
+      </div>
+      <a href="/#pricing" class="cta-btn">Start trial →</a>
+    </div>
+  </main>
+</div>
+
+<!-- Tutorial engine available on docs too -->
+<script src="/tutorial/tours.js"></script>
+<script src="/tutorial/tutorial.js"></script>
+<script>
+  // ─── Render glossary grouped by wing ───
+  const wings = ['Directors', 'Script Writers', 'Characters', 'Settings', 'Editors'];
+  const wingAnchor = { 'Directors': 'glossary-directors', 'Script Writers': 'glossary-writers', 'Characters': 'glossary-characters', 'Settings': 'glossary-settings', 'Editors': 'glossary-editors' };
+  const root = document.getElementById('glossary-root');
+  const gloss = (window.SB_Tours && window.SB_Tours.glossary) || [];
+  const byWing = {};
+  gloss.forEach(a => { (byWing[a.wing] = byWing[a.wing] || []).push(a); });
+
+  let html = '';
+  wings.forEach((w, idx) => {
+    if (idx > 0) html += `<h2 id="${wingAnchor[w]}">Agent reference · ${w} wing</h2>`;
+    (byWing[w] || []).sort((a, b) => a.tier - b.tier).forEach(a => {
+      html += `
+        <div class="agent" id="agent-${a.id}">
+          <div class="agent-head">
+            <span class="agent-tier t${a.tier}">${a.tier === 1 ? 'Manager' : 'Specialist'}</span>
+            <span class="agent-name">${a.name}</span>
+            <span class="agent-wing">· ${a.wing}</span>
+          </div>
+          <div class="agent-summary">${a.summary}</div>
+        </div>
+      `;
+    });
+  });
+  root.innerHTML = html;
+
+  // ─── FAQ toggles ───
+  document.querySelectorAll('.faq-q').forEach(q => {
+    q.addEventListener('click', () => q.closest('.faq-item').classList.toggle('open'));
+  });
+
+  // ─── Search ───
+  const search = document.getElementById('side-search');
+  const searchable = [
+    ...document.querySelectorAll('.agent'),
+    ...document.querySelectorAll('.faq-item'),
+  ];
+  search.addEventListener('input', e => {
+    const q = e.target.value.trim().toLowerCase();
+    if (!q) { searchable.forEach(el => el.classList.remove('hidden')); return; }
+    searchable.forEach(el => {
+      const match = el.textContent.toLowerCase().includes(q);
+      el.classList.toggle('hidden', !match);
+    });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && document.activeElement !== search) { e.preventDefault(); search.focus(); }
+  });
+
+  // ─── Sidebar active highlighting on scroll ───
+  const sideLinks = document.querySelectorAll('.side-item');
+  const sectionIds = [...sideLinks].map(a => a.getAttribute('href').slice(1));
+  const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY + 140;
+    let activeId = sectionIds[0];
+    sections.forEach(s => { if (s.offsetTop <= y) activeId = s.id; });
+    sideLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + activeId));
+  }, { passive: true });
+
+  // ─── Help FAB ───
+  SB_Tutorial.installHelpButton('learn');
+</script>
+</body>
+</html>

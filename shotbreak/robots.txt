@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+# Authed-only pages — keep out of search index
+Disallow: /app.html
+Disallow: /workflow/
+Disallow: /editor/
+
+Sitemap: https://shotbreak.io/sitemap.xml

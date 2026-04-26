@@ -44,3 +44,7 @@ CLAUDE.md
 .github/prompts/
 .github/agents/
 agents/
+# Re-include the SHOTBREAK app's agents/ folder, which is part of the project
+# tree shipped to Netlify, not the AI tooling folder the rule above targets.
+!shotbreak/agents/
+!shotbreak/agents/**

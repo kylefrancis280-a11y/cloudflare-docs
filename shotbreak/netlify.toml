@@ -1,0 +1,21 @@
+[build]
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  # Bundle the shared lib directory + agent registry with every function so
+  # require('./lib/auth') and require('../../agents/registry') resolve in
+  # the Netlify runtime. agents/normalizers.js is kept here because it's a
+  # pure CommonJS helper that some functions may grow to need.
+  included_files = [
+    "netlify/functions/lib/**",
+    "agents/registry.js",
+    "agents/normalizers.js",
+  ]
+
+# Background functions: Netlify detects the -background.js suffix automatically
+# and grants a 15-minute execution budget per call. agent-invoke-background.js
+# uses this to run long-running multi-agent calls past the 26s sync ceiling.
+
+# Bootstrap: bootstrap-user.js is a thin sync function that creates the user's
+# Firestore doc on first sign-in. Called by client.js SB_Agents.bootstrap().
