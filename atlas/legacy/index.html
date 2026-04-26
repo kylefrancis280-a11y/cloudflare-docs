@@ -607,6 +607,7 @@ return[...new Set(tks)];
 }
 
 async function fetchLivePrices(){
+const wasLive=liveCount>0;
 try{
 const res=await fetch('/.netlify/functions/prices');
 if(!res.ok)throw new Error('HTTP '+res.status);
@@ -617,7 +618,7 @@ LIVE[tk]={price:p.price,prev:p.prev,change:p.change||0,pct:p.pct||0,hi:p.hi,lo:p
 });
 liveTS=Date.now();liveCount=Object.keys(LIVE).length;
 console.log('✓ Live prices:',liveCount,'tickers'+(data.cached?' (cached)':' (fresh)'));
-render();
+if(wasLive&&document.querySelector('[data-live-price]')){patchLivePrices();}else{render();}
 }
 }catch(e){
 console.warn('Price fetch error:',e.message,'— using cached data if available');
@@ -627,7 +628,7 @@ const cached=JSON.parse(LS.get('atlas_prices')||'null');
 if(cached&&cached.data){
 Object.assign(LIVE,cached.data);
 liveTS=cached.ts||Date.now();liveCount=Object.keys(LIVE).length;
-if(liveCount>0){console.log('✓ Cached prices:',liveCount,'tickers');render()}
+if(liveCount>0){console.log('✓ Cached prices:',liveCount,'tickers');if(wasLive&&document.querySelector('[data-live-price]')){patchLivePrices();}else{render();}}
 }
 }catch(e2){}
 }
@@ -637,6 +638,18 @@ if(liveCount>0)try{LS.set('atlas_prices',JSON.stringify({ts:liveTS,data:LIVE}))}
 
 function livePrice(ticker){return LIVE[ticker]||null}
 function isLive(){return liveCount>0&&(Date.now()-liveTS<600000)}
+
+function patchLivePrices(){
+document.querySelectorAll('[data-live-price]').forEach(el=>{
+const tk=el.getAttribute('data-live-price');
+const live=LIVE[tk];if(!live)return;
+el.textContent=fp(live.price);
+const chgEl=document.querySelector(`[data-live-chg="${tk}"]`);
+if(chgEl){chgEl.textContent=pct(live.pct);chgEl.style.color=live.pct>=0?'var(--green)':'var(--red)';}
+const dotEl=document.querySelector(`[data-live-dot="${tk}"]`);
+if(dotEl)dotEl.style.visibility='visible';
+});
+}
 
 /* ── Real Market Data — Server Cached (Finnhub → Firebase) ─────────── */
 const REAL_NEWS={};
@@ -1752,9 +1765,9 @@ return`<div class="card anim-fade d${i+1}" style="display:flex;flex-direction:co
 </div>
 </div>
 <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px">
-<span style="font-size:24px;font-weight:800;font-family:var(--mono)">${price}</span>
-<span style="font-size:14px;font-weight:700;font-family:var(--mono);color:${isUp?'var(--green)':'var(--red)'}">${chg}</span>
-${live?'<span style="font-size:10px;color:var(--green);font-family:var(--mono)">● LIVE</span>':''}
+<span data-live-price="${p.t}" style="font-size:24px;font-weight:800;font-family:var(--mono)">${price}</span>
+<span data-live-chg="${p.t}" style="font-size:14px;font-weight:700;font-family:var(--mono);color:${isUp?'var(--green)':'var(--red)'}">${chg}</span>
+<span data-live-dot="${p.t}" style="font-size:10px;color:var(--green);font-family:var(--mono);visibility:${live?'visible':'hidden'}">● LIVE</span>
 </div>
 </div>
 
@@ -1841,7 +1854,7 @@ el.innerHTML=`
 </div>
 <div style="font-size:14px;color:var(--tx-1);margin-top:4px">${stk.n}</div>
 <div style="font-size:12px;color:var(--tx-2);margin-top:2px">${stk.i} · Mkt Cap: ${stk.mc}</div>
-<div class="det-price"><span class="big">${fp(dispPrice)}</span><span class="chg" style="color:${dispUp?'var(--green)':'var(--red)'}">${pct(dispChg)}</span>
+<div class="det-price"><span class="big" data-live-price="${stk.t}">${fp(dispPrice)}</span><span class="chg" data-live-chg="${stk.t}" style="color:${dispUp?'var(--green)':'var(--red)'}">${pct(dispChg)}</span>
 <span style="font-size:12px;color:var(--tx-2);font-family:var(--mono)">${live?'<span style="color:var(--green)">● LIVE</span>':'as of '+fmtDate(td)}</span>
 <span style="margin-left:auto">
 ${hasTier('pro')?`<button class="alert-tog ${isAlertOn(stk.t)?'on':''}" id="stk-alert" onclick="toggleStockAlert('${stk.t}',${a.tp},${a.sl},${a.cp})" title="Get notified when price nears upside or downside scenario">
@@ -2265,7 +2278,7 @@ return`<div class="card card-glow stk-full" onclick="nav('/app/sector/${secKey}'
 <span class="tag" style="background:var(--bg-0);color:var(--tx-2)">${stk.x}</span>
 </div>
 <div style="display:flex;align-items:center;gap:12px">
-${live?`<span style="font-size:17px;font-weight:700;font-family:var(--mono)">${fp(live.price)}</span><span style="font-size:13px;font-weight:700;font-family:var(--mono);color:${live.pct>=0?'var(--green)':'var(--red)'}">${pct(live.pct)}</span>`:`<span style="font-size:17px;font-weight:700;font-family:var(--mono)">${fp(stk.p)}</span>`}
+${live?`<span data-live-price="${ticker}" style="font-size:17px;font-weight:700;font-family:var(--mono)">${fp(live.price)}</span><span data-live-chg="${ticker}" style="font-size:13px;font-weight:700;font-family:var(--mono);color:${live.pct>=0?'var(--green)':'var(--red)'}">${pct(live.pct)}</span>`:`<span data-live-price="${ticker}" style="font-size:17px;font-weight:700;font-family:var(--mono)">${fp(stk.p)}</span>`}
 <span onclick="event.stopPropagation();toggleWatch('${ticker}');render()" style="cursor:pointer;font-size:18px" title="Remove">⭐</span>
 </div>
 </div>
