@@ -25,13 +25,13 @@ export async function getMacro(env: Env): Promise<MacroSnapshot | null> {
   const fetched = await Promise.all(series.map(s => fetchFredLatest(env, s)));
   const m: MacroSnapshot = {
     asOf: new Date().toISOString(),
-    cpiYoY: yearOverYear(fetched[0]),
-    unemploymentRate: latestValue(fetched[1]),
-    fedFundsTarget: latestValue(fetched[2]),
-    treasury10y: latestValue(fetched[3]),
-    treasury2y: latestValue(fetched[4]),
+    cpiYoY: yearOverYear(fetched[0] ?? []),
+    unemploymentRate: latestValue(fetched[1] ?? []),
+    fedFundsTarget: latestValue(fetched[2] ?? []),
+    treasury10y: latestValue(fetched[3] ?? []),
+    treasury2y: latestValue(fetched[4] ?? []),
     yieldCurveSpread: null,
-    vix: latestValue(fetched[5]),
+    vix: latestValue(fetched[5] ?? []),
   };
   if (m.treasury10y != null && m.treasury2y != null) {
     m.yieldCurveSpread = +(m.treasury10y - m.treasury2y).toFixed(2);

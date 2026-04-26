@@ -59,7 +59,7 @@ export function sanitizeNewsItem(n: { headline?: unknown; source?: unknown; url?
     source: escapeHtml(n.source).slice(0, 60),
     url: safeUrl,
     ts: Number(n.ts) || 0,
-    sentiment: ['positive', 'negative', 'neutral'].includes(String(n.sentiment)) ? n.sentiment : 'neutral',
+    sentiment: (['positive', 'negative', 'neutral'].includes(String(n.sentiment)) ? String(n.sentiment) : 'neutral') as 'positive' | 'negative' | 'neutral',
   };
 }
 
