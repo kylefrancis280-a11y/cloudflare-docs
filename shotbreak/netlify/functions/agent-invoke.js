@@ -99,22 +99,24 @@ async function callAnthropic(agent, input, context) {
   // Netlify timeout and return 502 to the client with no context.
   //
   // Two-tier timeout strategy on the Netlify 26s ceiling:
-  //   · Sonnet primary: 12s. Healthy Sonnet finishes in 8-12s; this catches
-  //     stalled pods fast and hands off to Haiku with 14s remaining.
-  //   · Haiku fallback: ~13.5s (set dynamically below). Haiku typically
-  //     responds in 2-5s, so even one retry fits easily.
+  //   · Sonnet primary: 15s. Covers managers with max_tokens up to 2000
+  //     (1500 tok @ 150 tok/s = ~10s gen + ~2s TTFT = ~12s — fits cleanly).
+  //     Stalled pods get cut 2s faster than the old 17s, handing off to Haiku
+  //     with 11s remaining instead of 9s.
+  //   · Haiku fallback: ~10.5s (set dynamically below). Haiku at 450 tok/s
+  //     generates 2000 tokens in ~4.5s, so 2 retries fit easily.
   //   · Total: ~25.5s with ~0.5s safety margin.
   // If you need longer Sonnet calls, raise SONNET_TIMEOUT_MS — but you'll
   // also need to drop FALLBACK_MIN_BUDGET_MS proportionally or move to
   // a background-function architecture.
-  const SONNET_TIMEOUT_MS = 12000;
+  const SONNET_TIMEOUT_MS = 15000;
 
   // ULTRA-AGGRESSIVE FALLBACK (v64):
-  //   · 1 attempt on Sonnet 4.6 (12s limit)
+  //   · 1 attempt on Sonnet 4.6 (15s limit)
   //   · If 429/529/503/stall: flip to Haiku 4.5 immediately (different infra)
-  //   · On Haiku: 2 retries with 1s/2s backoff, ~13s budget
-  //   · Total Sonnet time budget: ~one call (~10s typical)
-  //   · Total Haiku budget: ~14s remaining
+  //   · On Haiku: 2 retries with 1s/2s backoff, ~10.5s budget
+  //   · Total Sonnet time budget: ~one call (~10s typical for 1500-token mgrs)
+  //   · Total Haiku budget: ~11s remaining
   // This fails fast on dying Sonnet instead of burning 3 retries * 10s each.
   const FALLBACK_MODEL = 'claude-haiku-4-5-20251001';
   let res, raw;
