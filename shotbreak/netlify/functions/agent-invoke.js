@@ -385,10 +385,9 @@ exports.handler = async function (event) {
     if (userCredits < agent.credits) {
       logTelemetry({ agent_id, agent_tier: agent.tier, uid: auth.uid, email: auth.email, status: 'rejected', http_status: 402, error_code: 'INSUFFICIENT_CREDITS', credits: agent.credits });
       return respond(402, {
-        error:             'Insufficient credits',
-        required:          agent.credits,
-        available:         userCredits,
-        credits_remaining: userCredits,
+        error:    'Insufficient credits',
+        required: agent.credits,
+        available: userCredits,
       });
     }
     // Deduct BEFORE the call (mirrors generate-video.js); refund on failure.

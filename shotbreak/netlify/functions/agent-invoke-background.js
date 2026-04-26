@@ -189,20 +189,22 @@ exports.handler = async (event) => {
 
   let payload;
   try { payload = JSON.parse(event.body || '{}'); }
-  catch { return { statusCode: 400 }; }
+  catch { return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON body' }) }; }
 
   const { agent_id, input, context, job_id: clientJobId } = payload;
-  if (!agent_id || input === undefined || !clientJobId) return { statusCode: 400 };
+  if (!agent_id)           return { statusCode: 400, body: JSON.stringify({ error: 'agent_id required' }) };
+  if (input === undefined) return { statusCode: 400, body: JSON.stringify({ error: 'input required' }) };
+  if (!clientJobId)        return { statusCode: 400, body: JSON.stringify({ error: 'job_id required' }) };
 
   let agent;
   try { agent = getAgent(agent_id); }
-  catch { return { statusCode: 404 }; }
+  catch (e) { return { statusCode: 404, body: JSON.stringify({ error: e.message || 'Agent not found' }) }; }
 
-  if (!VALID_DEDUCTIONS.has(agent.credits)) return { statusCode: 500 };
+  if (!VALID_DEDUCTIONS.has(agent.credits)) return { statusCode: 500, body: JSON.stringify({ error: 'Invalid agent credit cost: ' + agent.credits }) };
 
   let auth;
   try { auth = await verifyToken(event); }
-  catch { return { statusCode: 401 }; }
+  catch (e) { return { statusCode: 401, body: JSON.stringify({ error: e.message || 'AUTH_FAIL' }) }; }
 
   // Safe doc id: uid prefix prevents cross-user job_id collisions.
   const docId = `${auth.uid}_${String(clientJobId).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64)}`;
@@ -217,7 +219,7 @@ exports.handler = async (event) => {
     });
   } catch (e) {
     console.error('SB_BG_JOB_CREATE_FAIL', e.message);
-    return { statusCode: 500 };
+    return { statusCode: 500, body: JSON.stringify({ error: 'Job creation failed' }) };
   }
 
   // Credit check + deduction.
@@ -227,17 +229,17 @@ exports.handler = async (event) => {
     try { user = await getOrCreateUser(auth.uid); }
     catch (e) {
       await writeJob(docId, { status: 'error', error: 'Credit lookup failed: ' + e.message, completedAt: new Date() }).catch(() => {});
-      return { statusCode: 500 };
+      return { statusCode: 500, body: JSON.stringify({ error: 'Credit lookup failed: ' + e.message }) };
     }
     userCredits = user?.credits || 0;
     if (userCredits < agent.credits) {
       await writeJob(docId, { status: 'error', error: 'Insufficient credits', completedAt: new Date() }).catch(() => {});
-      return { statusCode: 402 };
+      return { statusCode: 402, body: JSON.stringify({ error: 'Insufficient credits', required: agent.credits, available: userCredits }) };
     }
     try { await setCredits(auth.uid, userCredits - agent.credits); }
     catch (e) {
       await writeJob(docId, { status: 'error', error: 'Credit deduction failed: ' + e.message, completedAt: new Date() }).catch(() => {});
-      return { statusCode: 500 };
+      return { statusCode: 500, body: JSON.stringify({ error: 'Credit deduction failed: ' + e.message }) };
     }
   }
 
@@ -250,7 +252,7 @@ exports.handler = async (event) => {
       try { await setCredits(auth.uid, userCredits); } catch (_) {}
     }
     await writeJob(docId, { status: 'error', error: e.message, completedAt: new Date() }).catch(() => {});
-    return { statusCode: 502 };
+    return { statusCode: 502, body: JSON.stringify({ error: 'Agent invocation failed', detail: e.message }) };
   }
 
   // Write success.

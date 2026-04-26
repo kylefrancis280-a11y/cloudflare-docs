@@ -155,7 +155,10 @@ function respond(statusCode, body) {
   return { statusCode, headers: CORS, body: JSON.stringify(body) };
 }
 
-const { verifyToken, getOrCreateUser, setCredits } = require('./lib/auth');
+const { verifyToken, getOrCreateUser, setCredits, getSystemToken } = require('./lib/auth');
+
+const FIRESTORE_BASE = () =>
+  `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
 // ── WaveSpeedAI API helpers ─────────────────────────────────────────────
 const WS_BASE        = "https://api.wavespeed.ai/api/v3";
