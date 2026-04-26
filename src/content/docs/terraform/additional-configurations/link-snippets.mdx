@@ -1,7 +1,0 @@
----
-pcx_content_type: navigation
-title: Snippets
-external_link: /rules/snippets/create-terraform/
-sidebar:
-  order: 12
----
