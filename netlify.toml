@@ -1,9 +1,14 @@
 # Root Netlify config — pins the deploy to /shotbreak/.
-# Without this, Netlify can auto-detect the placeholder Astro project at the
-# repo root and deploy an empty dist/ instead of the SHOTBREAK app.
-# `base = "shotbreak"` makes Netlify cd into shotbreak/ before doing anything,
-# so shotbreak/netlify.toml (functions, included_files) takes effect normally
-# and shotbreak/ becomes the publish root by default.
+#
+# `base = "shotbreak"` → Netlify cds into shotbreak/ before doing anything,
+# so shotbreak/netlify.toml (functions, included_files) takes effect and
+# shotbreak/ becomes the publish root.
+#
+# `command = "true"` → SHOTBREAK is pure static HTML + Netlify Functions; it
+# has no build step. We force a no-op here to override the Netlify UI's
+# default `npm run build`, which fails because shotbreak/package.json
+# defines no `build` script (only `test`).
 
 [build]
   base = "shotbreak"
+  command = "true"
