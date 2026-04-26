@@ -1755,8 +1755,8 @@ V._loadFFmpeg=async function(progressCb){
   // is now visible to us with a real error message.
   // ═══════════════════════════════════════════════════════════════════════
 
-  const CORE_URL="https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js";
-  const WASM_URL="https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm";
+  const CORE_URL="/static/ffmpeg/ffmpeg-core.js";
+  const WASM_URL="/static/ffmpeg/ffmpeg-core.wasm";
 
   if(progressCb)progressCb("Fetching ffmpeg-core (~30MB on first load, cached after)...");
 
