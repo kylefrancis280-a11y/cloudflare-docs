@@ -1,10 +1,11 @@
 // Fetches prices for TODAY'S featured stocks from Firebase rankings.
 // Dynamic — only fetches tickers the AI selected today.
 // Falls back to a default set if no rankings exist yet.
-// Cache TTL = 60 seconds → stays under Finnhub's 60/min limit.
+// Cache TTL = 60 seconds.
 
 const DB = 'https://atlas-intelligence-37d6d-default-rtdb.firebaseio.com';
 const SECRET = process.env.FIREBASE_DB_SECRET;
+const POLYGON_KEY = process.env.POLYGON_API_KEY;
 const FH_KEY = process.env.FINNHUB_KEY;
 const CACHE_TTL = 60000;
 
@@ -57,6 +58,37 @@ async function getTodaysTickers() {
   }
 }
 
+async function fetchPolygonPrices(tickers) {
+  const prices = {};
+  // Polygon snapshot API handles up to 250 tickers in one call
+  for (let i = 0; i < tickers.length; i += 100) {
+    const batch = tickers.slice(i, i + 100);
+    try {
+      const url = `https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?tickers=${batch.join(',')}&apiKey=${POLYGON_KEY}`;
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (!data.tickers) continue;
+      for (const t of data.tickers) {
+        const day = t.day || {};
+        const prev = t.prevDay || {};
+        if (day.c > 0) {
+          prices[t.ticker] = {
+            price: day.c,
+            prev: prev.c || day.c,
+            change: t.todaysChange || 0,
+            pct: t.todaysChangePerc || 0,
+            hi: day.h || day.c,
+            lo: day.l || day.c,
+            vol: day.v || 0,
+          };
+        }
+      }
+    } catch (e) {}
+  }
+  return prices;
+}
+
 async function fetchFinnhubPrices(tickers) {
   const prices = {};
   for (let i = 0; i < tickers.length; i += 6) {
@@ -90,7 +122,8 @@ exports.handler = async (event) => {
     
     // Get today's AI-selected tickers
     const tickers = await getTodaysTickers();
-    const prices = await fetchFinnhubPrices(tickers);
+    let prices = POLYGON_KEY ? await fetchPolygonPrices(tickers) : {};
+    if (Object.keys(prices).length === 0 && FH_KEY) prices = await fetchFinnhubPrices(tickers);
     const count = Object.keys(prices).length;
     
     if (count > 0) {
