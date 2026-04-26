@@ -19,6 +19,7 @@ export interface Env {
   STRIPE_WEBHOOK_SECRET: string;
   RESEND_API_KEY?: string;
   SESSION_PEPPER: string;
+  ADMIN_BOOTSTRAP_TOKEN?: string;
 }
 
 export type Role = 'admin' | 'analyst' | 'subscriber';

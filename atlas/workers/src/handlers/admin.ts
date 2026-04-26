@@ -15,7 +15,7 @@ export async function handleAdmin(req: Request, env: Env): Promise<Response> {
   let isBootstrap = false;
   if (!ctx) {
     const token = req.headers.get('X-Admin-Bootstrap');
-    const expected = (env as any).ADMIN_BOOTSTRAP_TOKEN;
+    const expected = env.ADMIN_BOOTSTRAP_TOKEN;
     if (!token || !expected || token !== expected) return err(401, 'auth required', req, env);
     const adminCount = await env.DB.prepare(`SELECT COUNT(*) AS n FROM users WHERE role = 'admin'`).first<{ n: number }>();
     if ((adminCount?.n ?? 0) > 0) return err(403, 'admin already exists; bootstrap disabled', req, env);
