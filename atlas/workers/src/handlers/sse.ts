@@ -2,6 +2,8 @@ import type { Env } from '../env';
 import { corsHeaders } from '../lib/http';
 import { getQuotesBatch } from '../data/quote';
 
+const TICKER_RE = /^[A-Z0-9.\-]{1,10}$/;
+
 // Server-Sent Events stream of price updates. Replaces the legacy 10s polling
 // loop that triggered full-page re-renders on the frontend.
 //
@@ -28,7 +30,7 @@ export async function handlePriceStream(req: Request, env: Env): Promise<Respons
   const u = new URL(req.url);
   const tickersParam = u.searchParams.get('t');
   if (!tickersParam) return new Response('t param required', { status: 400 });
-  const tickers = tickersParam.split(',').map(s => s.trim().toUpperCase()).filter(Boolean).slice(0, 60);
+  const tickers = tickersParam.split(',').map(s => s.trim().toUpperCase()).filter(s => TICKER_RE.test(s)).slice(0, 60);
 
   const intervalMs = isMarketOpen() ? 15_000 : 60_000;
   const maxDurationMs = 4 * 60_000; // safe under Worker 5min cap
@@ -76,6 +78,8 @@ export async function handlePriceStream(req: Request, env: Env): Promise<Respons
       'Cache-Control': 'no-cache, no-transform',
       'Connection': 'keep-alive',
       'X-Accel-Buffering': 'no',
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
     },
   });
 }

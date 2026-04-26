@@ -23,7 +23,7 @@ async function fbPatch(path, data) {
 }
 
 function verifySig(payload, sig) {
-  if (!STRIPE_WEBHOOK_SECRET) return true;
+  if (!STRIPE_WEBHOOK_SECRET) return false;
   try {
     const parts = sig.split(',');
     const ts = parts.find(p => p.startsWith('t=')).split('=')[1];
