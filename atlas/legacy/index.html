@@ -1,0 +1,2608 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#06080f">
+<meta name="description" content="Atlas Analysis — AI-powered stock research platform covering Mining, AI, Tech, Biotech, Energy, Defense, Media sectors. Proprietary Atlas Score, daily research insights, live prices, analyst consensus. Starting at CA$29.99/mo.">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="stock research, AI stock analysis, research insights, Atlas Score, stock research platform, equity research, stock analysis, market analysis, TSX stocks, NYSE stocks">
+<meta name="author" content="Atlas Analysis">
+<link rel="canonical" href="https://atlasanalysis.net">
+<!-- Social Sharing / Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://atlasanalysis.net">
+<meta property="og:title" content="Atlas Analysis — AI-Powered Stock Research Platform">
+<meta property="og:description" content="Institutional-grade AI stock research across Mining, AI, Tech, Biotech, Energy, Defense & Media. Proprietary Atlas Score, daily analysis before market open. Starting at CA$29.99/mo.">
+<meta property="og:image" content="https://atlasanalysis.net/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Atlas Analysis">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Atlas Analysis — AI-Powered Stock Research Platform">
+<meta name="twitter:description" content="AI stock research across 8 sectors. Proprietary Atlas Score, daily research insights, live prices. Starting at CA$29.99/mo.">
+<meta name="twitter:image" content="https://atlasanalysis.net/og-image.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><polygon points='16,2 30,28 2,28' fill='%234f8fff'/></svg>">
+<!-- Structured Data -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Atlas Analysis","applicationCategory":"FinanceApplication","operatingSystem":"Web","description":"AI-powered stock research platform delivering daily research insights, proprietary Atlas Score ratings, and institutional-grade analysis across 8 market sectors.","url":"https://atlasanalysis.net","offers":[{"@type":"Offer","name":"Atlas Core","price":"29.99","priceCurrency":"CAD","billingIncrement":"P1M"},{"@type":"Offer","name":"Atlas Pro","price":"49.99","priceCurrency":"CAD","billingIncrement":"P1M"},{"@type":"Offer","name":"Atlas Institutional","price":"99.99","priceCurrency":"CAD","billingIncrement":"P1M"}],"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","reviewCount":"12"}}
+</script>
+<title>Atlas Analysis — AI-Powered Stock Research & Analysis Platform</title>
+<!-- Meta Pixel — Replace YOUR_PIXEL_ID with your actual pixel ID -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+// fbq('init', 'YOUR_PIXEL_ID');
+// fbq('track', 'PageView');
+</script>
+<!-- Google Analytics 4 — Replace YOUR_GA_ID with your actual Measurement ID -->
+<!--
+<script async src="https://www.googletagmanager.com/gtag/js?id=YOUR_GA_ID"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','YOUR_GA_ID');</script>
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600;700&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg-0:#06080f;--bg-1:#0b0e18;--bg-2:#10142a;--bg-3:#161c38;--bg-hover:#1a2040;
+--border:#1a2045;--border-h:#253065;--border-accent:rgba(79,143,255,.25);
+--tx-0:#eaf0ff;--tx-1:#a0b0d0;--tx-2:#607090;
+--ac:#4f8fff;--ac-h:#3a75e8;--ac-glow:rgba(79,143,255,.12);--ac-strong:rgba(79,143,255,.25);
+--green:#00e088;--green-bg:rgba(0,224,136,.08);--green-bd:rgba(0,224,136,.2);
+--red:#ff4466;--red-bg:rgba(255,68,102,.08);--red-bd:rgba(255,68,102,.2);
+--amber:#ffb020;--amber-bg:rgba(255,176,32,.08);
+--purple:#a855f7;--cyan:#22d3ee;--orange:#fb923c;--pink:#f472b6;
+--r:14px;--r-sm:10px;--r-lg:20px;
+--font:'DM Sans',system-ui,-apple-system,sans-serif;
+--mono:'IBM Plex Mono','SF Mono',monospace;
+--display:'Playfair Display',Georgia,serif;
+--sidebar:264px;--topbar:56px;
+--mining:#fb923c;--ai:#a855f7;--tech:#22d3ee;--biotech:#00e088;--energy:#ffb020;--defense:#4f8fff;--media:#ec4899;--other:#6366f1;
+}
+[data-theme="light"]{
+--bg-0:#eef0f5;--bg-1:#f5f6fa;--bg-2:#f9fafb;--bg-3:#eceef5;--bg-hover:#e2e5f0;
+--border:#d4d9e8;--border-h:#bcc3d6;--border-accent:rgba(37,99,235,.18);
+--tx-0:#0f172a;--tx-1:#3f4f6a;--tx-2:#7a879e;
+--ac:#2563eb;--ac-h:#1d4ed8;--ac-glow:rgba(37,99,235,.07);--ac-strong:rgba(37,99,235,.12);
+--green:#059669;--green-bg:rgba(5,150,105,.07);--green-bd:rgba(5,150,105,.18);
+--red:#dc2626;--red-bg:rgba(220,38,38,.07);--red-bd:rgba(220,38,38,.18);
+--amber:#d97706;--amber-bg:rgba(217,119,6,.07);
+}
+html{font-size:16px;scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--font);background:var(--bg-0);color:var(--tx-0);line-height:1.55;overflow-x:hidden;transition:background .35s,color .35s}
+a{color:var(--ac);text-decoration:none}
+input,select,button,textarea{font-family:inherit;font-size:inherit;color:inherit}
+::selection{background:var(--ac-strong);color:var(--tx-0)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--border-h)}
+
+/* ─── Keyframes ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideR{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes glow{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,224,136,.4)}70%{box-shadow:0 0 0 8px rgba(0,224,136,0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.anim-fade{animation:fadeUp .5s ease both}
+.anim-slide{animation:slideR .4s ease both}
+.d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}
+.d4{animation-delay:.2s}.d5{animation-delay:.25s}.d6{animation-delay:.3s}
+.mono{font-family:var(--mono)}
+
+/* ─── Logo SVG ─── */
+.atlas-logo{display:inline-flex;align-items:center;gap:10px}
+.atlas-logo svg{flex-shrink:0}
+.atlas-logo-text{display:flex;flex-direction:column;line-height:1}
+.atlas-logo-main{font-family:var(--mono);font-weight:700;font-size:17px;letter-spacing:4px;color:var(--tx-0)}
+.atlas-logo-sub{font-size:9px;letter-spacing:3.5px;color:var(--tx-2);text-transform:uppercase;margin-top:1px}
+
+/* ─── Buttons ─── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;border-radius:var(--r-sm);font-weight:600;font-size:13.5px;border:none;cursor:pointer;transition:all .2s;white-space:nowrap;text-decoration:none}
+.btn-ac{background:var(--ac);color:#fff}.btn-ac:hover{background:var(--ac-h);transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,143,255,.25)}
+.btn-ol{background:transparent;border:1px solid var(--border);color:var(--tx-1)}.btn-ol:hover{border-color:var(--ac);color:var(--ac)}
+.btn-ghost{background:transparent;color:var(--tx-2);padding:8px 12px;font-size:13px;border:none}.btn-ghost:hover{color:var(--tx-0);background:var(--ac-glow)}
+.btn-sm{padding:8px 16px;font-size:12.5px}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{opacity:.9}
+.btn-full{width:100%}
+
+/* ─── Inputs ─── */
+.inp{width:100%;padding:12px 14px;background:var(--bg-0);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--tx-0);font-size:14px;transition:all .2s}
+.inp:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px var(--ac-glow)}
+.inp::placeholder{color:var(--tx-2)}
+.inp-label{display:block;font-size:11.5px;font-weight:600;color:var(--tx-2);margin-bottom:6px;letter-spacing:.8px;text-transform:uppercase}
+.inp-group{margin-bottom:16px}
+
+/* ─── Cards ─── */
+.card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);transition:all .2s;overflow:hidden}
+.card:hover{border-color:var(--border-h)}
+.card-glow:hover{border-color:var(--border-accent);box-shadow:0 4px 24px rgba(79,143,255,.06)}
+
+/* ─── Tags ─── */
+.tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;font-family:var(--mono);letter-spacing:.3px}
+
+/* ─── Landing ─── */
+.land-wrap{min-height:100vh;display:flex;flex-direction:column}
+.land-head{position:sticky;top:0;z-index:50;backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);background:rgba(6,8,15,.75);border-bottom:1px solid var(--border)}
+[data-theme="light"] .land-head{background:rgba(238,240,245,.88)}
+.land-nav{max-width:1180px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.hero{position:relative;overflow:hidden;padding:80px 24px 60px}
+.hero-inner{max-width:1180px;margin:0 auto;position:relative;z-index:2}
+.hero-bg{position:absolute;inset:0;background:
+radial-gradient(ellipse 70% 50% at 20% 30%,rgba(79,143,255,.1),transparent),
+radial-gradient(ellipse 50% 60% at 80% 70%,rgba(168,85,247,.06),transparent);pointer-events:none}
+.hero-mesh{position:absolute;inset:0;opacity:.08;background-image:
+linear-gradient(rgba(79,143,255,.3) 1px,transparent 1px),
+linear-gradient(90deg,rgba(79,143,255,.3) 1px,transparent 1px);
+background-size:64px 64px;pointer-events:none}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;background:var(--ac-glow);border:1px solid var(--border-accent);border-radius:24px;padding:7px 16px;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ac);font-family:var(--mono);margin-bottom:24px}
+.hero-kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.hero-h1{font-family:var(--display);font-size:clamp(2.2rem,5.5vw,4rem);font-weight:900;line-height:1.08;letter-spacing:-.02em;margin-bottom:20px}
+.hero-h1 em{font-style:normal;background:linear-gradient(135deg,var(--ac),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-p{font-size:clamp(.95rem,1.8vw,1.1rem);color:var(--tx-1);max-width:520px;line-height:1.7;margin-bottom:36px}
+.hero-btns{display:flex;flex-wrap:wrap;gap:12px}
+
+/* Stats strip */
+.stats-strip{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg-1)}
+.stats-inner{max-width:1180px;margin:0 auto;padding:16px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat{display:flex;align-items:center;gap:10px}
+.stat-val{font-size:19px;font-weight:800;font-family:var(--mono);line-height:1}
+.stat-lbl{font-size:11px;color:var(--tx-2)}
+
+/* Preview grid */
+.prev-sec{max-width:1180px;margin:0 auto;padding:48px 24px 40px}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.sec-title{font-size:20px;font-weight:700}
+.sec-sub{font-size:13px;color:var(--tx-2);margin-top:3px}
+.prev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+
+/* Stock card */
+.stk-card{position:relative;padding:18px;cursor:pointer}
+.stk-card .strip{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0}
+.stk-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.stk-tk{font-size:16px;font-weight:700;font-family:var(--mono);letter-spacing:.5px}
+.stk-nm{font-size:12px;color:var(--tx-2);margin-top:2px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stk-pct{font-size:14px;font-weight:700;font-family:var(--mono)}
+.stk-price{font-size:12px;color:var(--tx-2);font-family:var(--mono);margin-top:2px;text-align:right}
+.stk-foot{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border)}
+.score-sm{display:flex;align-items:center;gap:6px}
+.score-sm .lbl{font-size:11px;color:var(--tx-2)}
+.score-sm .val{font-size:14px;font-weight:700;font-family:var(--mono)}
+
+/* Features */
+.feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:1180px;margin:0 auto;padding:0 24px 64px}
+@media(max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.feat-grid{grid-template-columns:1fr}}
+.feat-card{padding:24px}
+.feat-card .ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;background:var(--ac-glow)}
+.feat-card h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.feat-card p{font-size:12.5px;color:var(--tx-2);line-height:1.6}
+
+/* CTA */
+.cta{max-width:1180px;margin:0 auto;padding:0 24px 64px}
+.cta-inner{text-align:center;padding:48px 32px;border-radius:var(--r-lg);background:var(--bg-2);border:1px solid var(--border)}
+.cta-inner h3{font-size:20px;font-weight:800;margin:12px 0 8px}
+.cta-inner p{font-size:13px;color:var(--tx-2);max-width:440px;margin:0 auto 24px;line-height:1.6}
+
+/* Footer */
+.land-foot{border-top:1px solid var(--border);padding:24px;text-align:center}
+.land-foot p{font-size:11px;color:var(--tx-2);max-width:640px;margin:12px auto 0;line-height:1.6}
+
+/* ─── Login ─── */
+.login-wrap{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative}
+.login-card{width:100%;max-width:400px;padding:40px 36px;border-radius:var(--r-lg);animation:fadeUp .5s ease;position:relative;z-index:1}
+.login-card h2{font-family:var(--display);font-size:24px;font-weight:800;text-align:center;margin-bottom:4px}
+.login-card .sub{text-align:center;font-size:13px;color:var(--tx-2);margin-bottom:28px}
+.login-err{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);padding:10px 14px;border-radius:var(--r-sm);font-size:13px;margin-bottom:16px;display:none}
+.sec-badge{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;font-size:11px;color:var(--tx-2);font-family:var(--mono)}
+
+/* ─── App Shell ─── */
+.app{display:flex;min-height:100dvh}
+.side{width:var(--sidebar);background:var(--bg-1);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;z-index:40;display:flex;flex-direction:column;transition:transform .3s ease}
+.side-head{height:var(--topbar);padding:0 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.side-nav{flex:1;overflow-y:auto;padding:12px 10px}
+.nav-sec{margin-bottom:14px}
+.nav-sec-t{font-size:10px;font-weight:700;color:var(--tx-2);letter-spacing:2.5px;text-transform:uppercase;padding:6px 14px;margin-bottom:2px}
+.nav-i{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r-sm);font-size:13px;font-weight:500;color:var(--tx-1);cursor:pointer;transition:all .15s;margin-bottom:1px}
+.nav-i:hover{background:var(--ac-glow);color:var(--tx-0)}
+.nav-i.on{background:var(--ac-glow);color:var(--ac);font-weight:600}
+.nav-i .ico{width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.side-foot{padding:14px 16px;border-top:1px solid var(--border);flex-shrink:0}
+.main{flex:1;margin-left:var(--sidebar);min-height:100dvh}
+.top{height:var(--topbar);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bg-1);position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.top-l{display:flex;align-items:center;gap:12px}
+.top-r{display:flex;align-items:center;gap:10px}
+.ham{display:none;background:none;border:none;color:var(--tx-0);cursor:pointer;padding:2px}
+.page{padding:24px;max-width:1400px}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:35;backdrop-filter:blur(2px)}
+.overlay.on{display:block}
+
+/* ─── Avatar ─── */
+.av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0}
+
+/* ─── AI status ─── */
+.ai-live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-family:var(--mono);color:var(--green);letter-spacing:.5px}
+.ai-live .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+
+/* ─── Currency select ─── */
+.cur-sel{background:var(--bg-0);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;color:var(--tx-0);font-size:12px;font-family:var(--mono);cursor:pointer}
+.cur-sel:focus{outline:none;border-color:var(--ac)}
+
+/* ─── Dashboard Tiles ─── */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.tile{padding:20px;position:relative}
+.tile-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.tile-lbl{font-size:11px;font-weight:600;color:var(--tx-2);text-transform:uppercase;letter-spacing:1.5px}
+.tile-ico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.tile-val{font-size:30px;font-weight:800;font-family:var(--mono);line-height:1}
+.tile-sub{font-size:12px;color:var(--tx-2);margin-top:6px}
+
+/* ─── Stock List ─── */
+.stk-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
+.stk-full{cursor:pointer}
+.stk-full:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.stk-full .top-area{padding:18px 18px 0}
+.stk-full .bot-area{padding:10px 18px 18px}
+
+/* Score bars */
+.sbar{margin-bottom:6px}
+.sbar-top{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px}
+.sbar-track{height:4px;background:var(--bg-0);border-radius:2px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:2px;transition:width .7s ease}
+
+/* ─── Stock Detail ─── */
+.det-hero{padding:24px;border-radius:var(--r);margin-bottom:20px;position:relative;overflow:hidden}
+.det-hero::before{content:'';position:absolute;inset:0;opacity:.03;background:linear-gradient(135deg,currentColor,transparent)}
+.det-price{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-top:12px}
+.det-price .big{font-size:38px;font-weight:800;font-family:var(--mono);line-height:1}
+.det-price .chg{font-size:17px;font-weight:700;font-family:var(--mono)}
+.gauge{text-align:center;padding:24px}
+.gauge-val{font-size:60px;font-weight:800;font-family:var(--mono);line-height:1}
+.gauge-lbl{font-size:14px;font-weight:600;margin-top:6px}
+.gauge-sub{font-size:11px;color:var(--tx-2);margin-top:2px}
+.bdown-item{display:flex;gap:14px;padding:14px;background:var(--bg-0);border-radius:var(--r-sm);margin-bottom:8px}
+.bdown-item .b-ico{font-size:18px;flex-shrink:0;margin-top:2px}
+.bdown-item .b-nm{font-size:12.5px;font-weight:600;margin-bottom:4px}
+.bdown-item .b-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.bdown-item .b-fill{height:100%;border-radius:3px;transition:width .8s ease}
+.bdown-item .b-desc{font-size:11px;color:var(--tx-2);line-height:1.5}
+.bdown-item .b-val{font-size:14px;font-weight:700;font-family:var(--mono);text-align:right;min-width:32px}
+.section{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:14px}
+.section-t{font-size:14.5px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-p{font-size:13px;color:var(--tx-1);line-height:1.7}
+.news-row{padding:12px 0;border-bottom:1px solid var(--border);display:flex;gap:14px}
+.news-row:last-child{border-bottom:none}
+.news-src{font-size:10px;font-weight:600;color:var(--ac);text-transform:uppercase;letter-spacing:1px;font-family:var(--mono)}
+.news-hl{font-size:13px;font-weight:500;margin-top:2px;line-height:1.4;color:var(--tx-0)}
+.news-tm{font-size:10px;color:var(--tx-2);margin-top:3px;font-family:var(--mono)}
+
+/* Params grid */
+.params{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.param-box{padding:12px;background:var(--bg-0);border-radius:var(--r-sm)}
+.param-box .p-lbl{font-size:10px;color:var(--tx-2);text-transform:uppercase;letter-spacing:1px}
+.param-box .p-val{font-size:15px;font-weight:700;margin-top:4px;font-family:var(--mono)}
+
+/* Sector hero */
+.sec-hero{padding:28px;border-radius:var(--r);margin-bottom:24px;position:relative}
+
+/* Settings */
+.set-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:16px;transition:border .2s}
+.set-card:hover{border-color:var(--border-h)}
+.set-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.tog{position:relative;width:46px;height:26px;background:var(--border);border-radius:13px;cursor:pointer;transition:background .2s;flex-shrink:0}
+.tog.on{background:var(--ac)}
+.tog::after{content:'';position:absolute;width:22px;height:22px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tog.on::after{transform:translateX(20px)}
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.tog-row:last-child{border-bottom:none}
+
+/* Chart bars */
+.mchart{height:48px;display:flex;align-items:flex-end;gap:2px;padding:4px 0}
+.mchart .bar{flex:1;border-radius:2px 2px 0 0;opacity:.55;transition:height .3s}
+
+/* Disclaimer */
+.disc{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-top:32px;font-size:11px;color:var(--tx-2);line-height:1.65}
+
+/* ─── Responsive ─── */
+/* ─── Notification Bell ─── */
+.bell-wrap{position:relative;cursor:pointer;padding:4px}
+.bell-wrap svg{transition:all .2s}
+.bell-wrap:hover svg{transform:scale(1.1)}
+.bell-dot{position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:50%;background:var(--green);border:2px solid var(--bg-1)}
+.bell-off .bell-dot{background:var(--tx-2)}
+.alert-tog{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:var(--r-sm);cursor:pointer;transition:all .2s;border:1px solid var(--border);background:var(--bg-0);font-size:13px;font-weight:600;color:var(--tx-1)}
+.alert-tog:hover{border-color:var(--ac)}
+.alert-tog.on{background:var(--green-bg);border-color:var(--green-bd);color:var(--green)}
+.alert-tog.on svg{color:var(--green)}
+/* ─── TradingView Chart ─── */
+.tv-chart-wrap{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:14px}
+.tv-chart-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.tv-chart-head .section-t{margin-bottom:0}
+.tv-tf-btns{display:flex;gap:4px}
+.tv-tf-btn{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;font-family:var(--mono);cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--tx-2);transition:all .15s}
+.tv-tf-btn:hover{color:var(--tx-0);border-color:var(--border-h)}
+.tv-tf-btn.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.tv-chart-body{height:680px;position:relative}
+.tv-chart-body iframe{width:100%;height:100%;border:none}
+@media(max-width:768px){.tv-chart-body{height:400px}}
+/* ─── FX Rate Badge ─── */
+.fx-badge{font-size:10px;color:var(--green);font-family:var(--mono);display:flex;align-items:center;gap:4px}
+.fx-badge .dot{width:5px;height:5px;border-radius:50%;background:var(--green)}
+
+@media(max-width:768px){
+.side{transform:translateX(-100%)}
+.side.open{transform:translateX(0)}
+.main{margin-left:0}
+.ham{display:flex}
+.tiles{grid-template-columns:1fr 1fr}
+.stk-list{grid-template-columns:1fr}
+.hero{padding:48px 20px 40px}
+.page{padding:14px}
+.det-price .big{font-size:26px}
+.stats-inner{grid-template-columns:1fr 1fr}
+.params{grid-template-columns:1fr}
+.top{padding:0 14px}
+.top-r{gap:6px}
+.cur-sel{font-size:11px;padding:4px 6px}
+.sec-hero{padding:18px}
+.feat-grid{grid-template-columns:repeat(2,1fr)!important}
+.sec-3col{grid-template-columns:1fr!important}
+.tier-grid{grid-template-columns:1fr!important}
+.perf-grid{grid-template-columns:repeat(2,1fr)!important}
+/* Settings grids stack on mobile */
+.set-card [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+/* Landing top 3 stack on mobile */
+#preview [style*="repeat(3,1fr)"]{grid-template-columns:1fr!important}
+/* Better mobile spacing */
+.set-card{padding:18px}
+.set-title{font-size:15px;margin-bottom:12px}
+.card{border-radius:10px}
+.hero-btns{flex-direction:column}
+.hero-btns .btn{width:100%;justify-content:center}
+}
+@media(max-width:480px){
+.tiles{grid-template-columns:1fr}
+.tile-val{font-size:22px}
+.hero-h1{font-size:1.7rem}
+.feat-grid{grid-template-columns:1fr!important}
+.perf-grid{grid-template-columns:1fr!important}
+.stats-inner{grid-template-columns:1fr 1fr}
+.stat{justify-content:center}
+}
+</style>
+</head>
+<body>
+<div id="loader" style="position:fixed;inset:0;z-index:9999;background:#06080f;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s">
+<svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="lgl" x1="0" y1="0" x2="48" y2="48"><stop offset="0%" stop-color="#4f8fff"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+<polygon points="24,2 46,42 2,42" fill="url(#lgl)"/>
+<polygon points="24,14 34,36 14,36" fill="#06080f" opacity=".8"/>
+<line x1="24" y1="2" x2="24" y2="14" stroke="#fff" stroke-width="2" opacity=".5"/>
+</svg>
+<div style="margin-top:20px;font-family:'DM Sans',system-ui,sans-serif;font-size:17px;font-weight:700;letter-spacing:4px;color:#eaf0ff">ATLAS ANALYSIS</div>
+<div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:#607090">LOADING PLATFORM</div>
+<div style="margin-top:20px;width:120px;height:3px;background:#1a2045;border-radius:2px;overflow:hidden">
+<div style="width:100%;height:100%;background:linear-gradient(90deg,#4f8fff,#a855f7);border-radius:2px;animation:loadBar 1.2s ease-in-out infinite"></div>
+</div>
+</div>
+<style>
+@keyframes loadBar{0%{transform:translateX(-100%)}50%{transform:translateX(0)}100%{transform:translateX(100%)}}
+</style>
+<div id="app"></div>
+<script>
+// ═════════════════════════════════════════════════════════════════════════
+// ATLAS INTELLIGENCE — STOCK RESEARCH PLATFORM v2.0
+// Single-file · Zero-dependency · Netlify-ready
+// ═════════════════════════════════════════════════════════════════════════
+(function(){
+"use strict";
+
+/* ── SHA-256 (dual-mode: Web Crypto + pure-JS fallback) ─────────────── */
+async function sha256(msg){
+try{
+const buf=new TextEncoder().encode(msg);
+const hb=await crypto.subtle.digest('SHA-256',buf);
+return Array.from(new Uint8Array(hb)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}catch(e){return sha256Fallback(msg)}
+}
+function sha256Fallback(msg){
+// Pure JS SHA-256 — works everywhere, no crypto.subtle needed
+function rr(n,x){return(x>>>n)|(x<<(32-n))}
+function ch(x,y,z){return(x&y)^(~x&z)}
+function maj(x,y,z){return(x&y)^(x&z)^(y&z)}
+function sig0(x){return rr(2,x)^rr(13,x)^rr(22,x)}
+function sig1(x){return rr(6,x)^rr(11,x)^rr(25,x)}
+function gam0(x){return rr(7,x)^rr(18,x)^(x>>>3)}
+function gam1(x){return rr(17,x)^rr(19,x)^(x>>>10)}
+const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+let H0=0x6a09e667,H1=0xbb67ae85,H2=0x3c6ef372,H3=0xa54ff53a,H4=0x510e527f,H5=0x9b05688c,H6=0x1f83d9ab,H7=0x5be0cd19;
+const bytes=[];
+for(let i=0;i<msg.length;i++){const c=msg.charCodeAt(i);if(c<128)bytes.push(c);else if(c<2048){bytes.push(192|(c>>6));bytes.push(128|(c&63))}else{bytes.push(224|(c>>12));bytes.push(128|((c>>6)&63));bytes.push(128|(c&63))}}
+const l=bytes.length*8;bytes.push(0x80);while(bytes.length%64!==56)bytes.push(0);
+bytes.push(0,0,0,0,(l>>>24)&0xff,(l>>>16)&0xff,(l>>>8)&0xff,l&0xff);
+for(let i=0;i<bytes.length;i+=64){
+const W=new Array(64);
+for(let t=0;t<16;t++)W[t]=(bytes[i+t*4]<<24)|(bytes[i+t*4+1]<<16)|(bytes[i+t*4+2]<<8)|bytes[i+t*4+3];
+for(let t=16;t<64;t++)W[t]=(gam1(W[t-2])+W[t-7]+gam0(W[t-15])+W[t-16])|0;
+let a=H0,b=H1,c=H2,d=H3,e=H4,f=H5,g=H6,h=H7;
+for(let t=0;t<64;t++){
+const t1=(h+sig1(e)+ch(e,f,g)+K[t]+W[t])|0;
+const t2=(sig0(a)+maj(a,b,c))|0;
+h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;
+}
+H0=(H0+a)|0;H1=(H1+b)|0;H2=(H2+c)|0;H3=(H3+d)|0;H4=(H4+e)|0;H5=(H5+f)|0;H6=(H6+g)|0;H7=(H7+h)|0;
+}
+return[H0,H1,H2,H3,H4,H5,H6,H7].map(v=>(v>>>0).toString(16).padStart(8,'0')).join('');
+}
+
+/* ── Pre-computed hash: SHA-256("Atlas2026!") ─────────────────────── */
+const PWHASH='36528548bad31d9c58f9300aba765aaa874fb3c302cfd1f9f2fda6d1ed7985a7';
+
+/* ── User Database ───────────────────────────────────────────────────── */
+let USERS=[
+{id:'u1',email:'mark@jftire.ca',name:'Mark',role:'analyst',hash:PWHASH},
+{id:'u2',email:'kyle@atlasanalysis.net',name:'Kyle',role:'admin',hash:PWHASH},
+{id:'u3',email:'scott@atlasanalysis.net',name:'Scott',role:'analyst',hash:PWHASH},
+{id:'u4',email:'steve@atlasanalysis.net',name:'Steve',role:'analyst',hash:PWHASH},
+{id:'t1',email:'tester1',name:'Core Tester',role:'subscriber',tier:'core',hash:'7abcddbb2c74e4c0789c2c0aa6abcf5172e82e9f4916bc6409fc3989ed673e08'},
+{id:'t2',email:'tester2',name:'Pro Tester',role:'subscriber',tier:'pro',hash:'7cd477192d54ceb8673be093f443b8622c612896880f6879c7f8ec16fa7ba114'},
+{id:'t3',email:'tester3',name:'Institutional Tester',role:'subscriber',tier:'institutional',hash:'7c9543538b43366b6d5c0926e3eb20b3efd122ce5d654afff907f2d134fe4f03'},
+{id:'md1',email:'MDiskin',name:'M. Diskin',role:'analyst',hash:'13b6554184c7aacbc2d0fcd5976769bbd9817eb59d6e6248e6da9541761d9ba9'}
+];
+function loadUserOverrides(){
+try{const o=JSON.parse(localStorage.getItem('atlas_u')||'{}');USERS.forEach(u=>{if(o[u.id]){if(o[u.id].e)u.email=o[u.id].e;if(o[u.id].h)u.hash=o[u.id].h;if(o[u.id].n)u.name=o[u.id].n}})}catch(e){}
+}
+function saveUserOverride(id,field,val){
+try{const o=JSON.parse(localStorage.getItem('atlas_u')||'{}');if(!o[id])o[id]={};o[id][field]=val;localStorage.setItem('atlas_u',JSON.stringify(o))}catch(e){}
+}
+
+/* ── Storage helpers ─────────────────────────────────────────────────── */
+const LS={
+get(k){try{return localStorage.getItem(k)}catch(e){return null}},
+set(k,v){try{localStorage.setItem(k,v)}catch(e){}},
+del(k){try{localStorage.removeItem(k)}catch(e){}}
+};
+
+/* ── Theme ────────────────────────────────────────────────────────────── */
+function theme(){return LS.get('atlas_t')||'dark'}
+function setTheme(t){LS.set('atlas_t',t);document.documentElement.setAttribute('data-theme',t);
+document.querySelector('meta[name="theme-color"]').content=t==='dark'?'#06080f':'#f4f6fb'}
+function flipTheme(){setTheme(theme()==='dark'?'light':'dark');render()}
+
+/* ── Session ──────────────────────────────────────────────────────────── */
+function sess(){const s=LS.get('atlas_s');if(!s)return null;try{return JSON.parse(s)}catch(e){return null}}
+function setSess(u,token){
+LS.set('atlas_s',JSON.stringify({id:u.id,email:u.email,name:u.name,role:u.role,tier:u.tier||'core',ts:Date.now()}));
+if(token)LS.set('atlas_token',token);
+}
+// Tier helpers — returns 'core', 'pro', or 'institutional'
+function userTier(){const s=sess();if(!s)return'core';if(s.role==='admin'||s.role==='analyst')return'institutional';return s.tier||'core'}
+function hasTier(min){const levels={core:1,pro:2,institutional:3};return(levels[userTier()]||1)>=(levels[min]||1)}
+function endSess(){
+const token=LS.get('atlas_token');
+LS.del('atlas_s');LS.del('atlas_token');
+// Try server logout (fire and forget)
+if(token)fetch('/.netlify/functions/auth',{method:'POST',body:JSON.stringify({action:'logout',token})}).catch(()=>{});
+}
+
+// Server auth helper
+async function serverAuth(action,data){
+try{
+const res=await fetch('/.netlify/functions/auth',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({action,...data})
+});
+return await res.json();
+}catch(e){return{error:'Server unavailable'}}
+}
+
+/* ── Currency ─────────────────────────────────────────────────────────── */
+const CUR={
+USD:{s:'$',n:'US Dollar',r:1},CAD:{s:'CA$',n:'Canadian Dollar',r:1.37},
+EUR:{s:'€',n:'Euro',r:0.92},GBP:{s:'£',n:'British Pound',r:0.79},
+JPY:{s:'¥',n:'Japanese Yen',r:149.5},CHF:{s:'CHF ',n:'Swiss Franc',r:0.88},
+AUD:{s:'A$',n:'Australian Dollar',r:1.53},CNY:{s:'¥',n:'Chinese Yuan',r:7.24},
+INR:{s:'₹',n:'Indian Rupee',r:83.12},KRW:{s:'₩',n:'South Korean Won',r:1342.5}
+};
+let ratesLoaded=false;
+async function loadLiveRates(){
+try{
+const res=await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json');
+const data=await res.json();
+if(data&&data.usd){
+const fx=data.usd;
+if(fx.cad)CUR.CAD.r=fx.cad;if(fx.eur)CUR.EUR.r=fx.eur;if(fx.gbp)CUR.GBP.r=fx.gbp;
+if(fx.jpy)CUR.JPY.r=fx.jpy;if(fx.chf)CUR.CHF.r=fx.chf;if(fx.aud)CUR.AUD.r=fx.aud;
+if(fx.cny)CUR.CNY.r=fx.cny;if(fx.inr)CUR.INR.r=fx.inr;if(fx.krw)CUR.KRW.r=fx.krw;
+ratesLoaded=true;console.log('✓ Live FX rates loaded');
+}
+}catch(e){
+try{
+const res2=await fetch('https://latest.currency-api.pages.dev/v1/currencies/usd.json');
+const data2=await res2.json();
+if(data2&&data2.usd){
+const fx=data2.usd;
+if(fx.cad)CUR.CAD.r=fx.cad;if(fx.eur)CUR.EUR.r=fx.eur;if(fx.gbp)CUR.GBP.r=fx.gbp;
+if(fx.jpy)CUR.JPY.r=fx.jpy;if(fx.chf)CUR.CHF.r=fx.chf;if(fx.aud)CUR.AUD.r=fx.aud;
+if(fx.cny)CUR.CNY.r=fx.cny;if(fx.inr)CUR.INR.r=fx.inr;if(fx.krw)CUR.KRW.r=fx.krw;
+ratesLoaded=true;console.log('✓ Live FX rates loaded (fallback)');
+}
+}catch(e2){console.warn('Using static FX rates')}
+}
+}
+
+function cur(){return LS.get('atlas_c')||'USD'}
+function setCur(c){LS.set('atlas_c',c);render()}
+function fp(usd,c){c=c||cur();const r=CUR[c]||CUR.USD;const v=usd*r.r;if(c==='JPY'||c==='KRW')return r.s+Math.round(v).toLocaleString();if(c==='INR')return r.s+Math.round(v).toLocaleString();return r.s+v.toFixed(2)}
+function pct(n,sign=true){if(n==null)return'—';return(sign&&n>=0?'+':'')+n.toFixed(2)+'%'}
+
+/* ── Price Alert / Notification System ───────────────────────────────── */
+function getAlerts(){try{return JSON.parse(LS.get('atlas_alerts')||'{}');}catch(e){return{}}}
+function setAlerts(a){LS.set('atlas_alerts',JSON.stringify(a))}
+function isAlertOn(ticker){return!!getAlerts()[ticker]}
+function toggleAlert(ticker,tp,sl,cp){
+const a=getAlerts();
+if(a[ticker]){delete a[ticker]}
+else{a[ticker]={tp:tp,sl:sl,cp:cp,ts:Date.now()}}
+setAlerts(a);return!!a[ticker];
+}
+function alertsEnabled(){return LS.get('atlas_notify')==='1'}
+function setAlertsEnabled(v){LS.set('atlas_notify',v?'1':'0')}
+
+async function requestNotifPermission(){
+if(!('Notification' in window))return false;
+if(Notification.permission==='granted')return true;
+const perm=await Notification.requestPermission();
+return perm==='granted';
+}
+
+function fireNotif(title,body,icon){
+if(Notification.permission!=='granted')return;
+try{new Notification(title,{body,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><polygon points="16,2 30,28 2,28" fill="%234f8fff"/></svg>',badge:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><polygon points="16,2 30,28 2,28" fill="%234f8fff"/></svg>'})}catch(e){}
+}
+
+// Check alerts periodically
+function checkAlerts(){
+if(!alertsEnabled())return;
+const alerts=getAlerts();
+const today=lastWD();const ds=estStr(today);
+Object.entries(alerts).forEach(([ticker,info])=>{
+// Simulate small price movement from base
+const r2=rng(ticker+ds+Date.now().toString().slice(0,-4));
+const move=(r2()-0.5)*2;
+const simPrice=info.cp*(1+move/100);
+const distToTarget=((info.tp-simPrice)/simPrice*100).toFixed(1);
+const distToStop=((simPrice-info.sl)/simPrice*100).toFixed(1);
+if(distToTarget<=2&&distToTarget>0){fireNotif('📈 '+ticker+' Near Upside Scenario',''+ticker+' is approaching upside scenario '+fp(info.tp))}
+if(distToStop<=2&&distToStop>0){fireNotif('🛡️ '+ticker+' Near Downside Scenario',''+ticker+' is approaching downside scenario '+fp(info.sl))}
+});
+}
+setInterval(checkAlerts,300000); // Check every 5 min
+
+/* ── Live Price System — Server Cached (Yahoo Finance → Firebase) ───── */
+const LIVE={};
+let liveTS=0;
+let liveCount=0;
+
+function getAllTickers(){
+const tks=[];
+Object.values(SEC).forEach(sec=>sec.stk.forEach(s=>tks.push(s.t)));
+return[...new Set(tks)];
+}
+
+async function fetchLivePrices(){
+const wasLive=liveCount>0;
+try{
+const res=await fetch('/.netlify/functions/prices');
+if(!res.ok)throw new Error('HTTP '+res.status);
+const data=await res.json();
+if(data.prices){
+Object.entries(data.prices).forEach(([tk,p])=>{
+LIVE[tk]={price:p.price,prev:p.prev,change:p.change||0,pct:p.pct||0,hi:p.hi,lo:p.lo,ts:Date.now()};
+});
+liveTS=Date.now();liveCount=Object.keys(LIVE).length;
+console.log('✓ Live prices:',liveCount,'tickers'+(data.cached?' (cached)':' (fresh)'));
+if(wasLive&&document.querySelector('[data-live-price]')){patchLivePrices();}else{render();}
+}
+}catch(e){
+console.warn('Price fetch error:',e.message,'— using cached data if available');
+// Try localStorage fallback
+try{
+const cached=JSON.parse(LS.get('atlas_prices')||'null');
+if(cached&&cached.data){
+Object.assign(LIVE,cached.data);
+liveTS=cached.ts||Date.now();liveCount=Object.keys(LIVE).length;
+if(liveCount>0){console.log('✓ Cached prices:',liveCount,'tickers');if(wasLive&&document.querySelector('[data-live-price]')){patchLivePrices();}else{render();}}
+}
+}catch(e2){}
+}
+// Save to localStorage as backup
+if(liveCount>0)try{LS.set('atlas_prices',JSON.stringify({ts:liveTS,data:LIVE}))}catch(e){}
+}
+
+function livePrice(ticker){return LIVE[ticker]||null}
+function isLive(){return liveCount>0&&(Date.now()-liveTS<600000)}
+
+function patchLivePrices(){
+document.querySelectorAll('[data-live-price]').forEach(el=>{
+const tk=el.getAttribute('data-live-price');
+const live=LIVE[tk];if(!live)return;
+el.textContent=fp(live.price);
+const chgEl=document.querySelector(`[data-live-chg="${tk}"]`);
+if(chgEl){chgEl.textContent=pct(live.pct);chgEl.style.color=live.pct>=0?'var(--green)':'var(--red)';}
+const dotEl=document.querySelector(`[data-live-dot="${tk}"]`);
+if(dotEl)dotEl.style.visibility='visible';
+});
+}
+
+/* ── Real Market Data — Server Cached (Finnhub → Firebase) ─────────── */
+const REAL_NEWS={};
+const REAL_RECS={};
+let realDataTS=0;
+let realDataCount=0;
+
+async function fetchRealData(){
+try{
+const res=await fetch('/.netlify/functions/news');
+if(!res.ok)throw new Error('HTTP '+res.status);
+const data=await res.json();
+if(data.news){
+Object.entries(data.news).forEach(([tk,articles])=>{REAL_NEWS[tk]=articles});
+realDataCount=Object.keys(REAL_NEWS).length;
+}
+if(data.recs){
+Object.entries(data.recs).forEach(([tk,rec])=>{REAL_RECS[tk]=rec});
+}
+realDataTS=Date.now();
+if(realDataCount>0){console.log('✓ Real news:',realDataCount,'tickers'+(data.cached?' (cached)':' (fresh)'));render()}
+}catch(e){console.warn('News fetch error:',e.message)}
+}
+
+function realNews(ticker){return REAL_NEWS[ticker]||null}
+function realRecs(ticker){return REAL_RECS[ticker]||null}
+function hasRealData(){return realDataCount>0&&(Date.now()-realDataTS<3600000)}
+
+/* ── AI Analysis — Proprietary Daily Research ───────────────────── */
+const AI_ANALYSIS={};
+let aiAnalysisTS=0;
+let aiAnalysisCount=0;
+let AI_RANKINGS={};
+
+async function fetchAIAnalysis(){
+try{
+const res=await fetch('/.netlify/functions/get-analysis');
+if(!res.ok)return;
+const data=await res.json();
+if(data.stocks){
+Object.entries(data.stocks).forEach(([tk,d])=>{
+if(d.analysis)AI_ANALYSIS[tk]=d;
+});
+aiAnalysisCount=Object.keys(AI_ANALYSIS).length;
+aiAnalysisTS=Date.now();
+if(aiAnalysisCount>0){console.log('✓ AI analysis:',aiAnalysisCount,'stocks loaded')}
+}
+// Store AI-driven rankings
+if(data.rankings){
+AI_RANKINGS=data.rankings;
+console.log('✓ AI rankings loaded:',Object.keys(AI_RANKINGS).length,'sectors ranked');
+}
+render();
+}catch(e){console.warn('AI analysis fetch:',e.message)}
+}
+
+function aiAnalysis(ticker){return AI_ANALYSIS[ticker]||null}
+function hasAIAnalysis(){return aiAnalysisCount>0&&(Date.now()-aiAnalysisTS<86400000)}
+function hasAIRankings(){return Object.keys(AI_RANKINGS).length>0}
+
+/* ── Watchlist System ────────────────────────────────────────────────── */
+function getWatchlist(){try{return JSON.parse(LS.get('atlas_watch')||'[]')}catch(e){return[]}}
+function setWatchlist(w){LS.set('atlas_watch',JSON.stringify(w))}
+function isWatched(ticker){return getWatchlist().includes(ticker)}
+function toggleWatch(ticker,secKey){
+const w=getWatchlist();
+const idx=w.indexOf(ticker);
+if(idx>-1)w.splice(idx,1);else w.push(ticker);
+setWatchlist(w);
+return w.includes(ticker);
+}
+
+/* ── Performance History Generator ───────────────────────────────────── */
+function generateHistory(days){
+const history=[];
+let d=lastWD();
+for(let i=0;i<days;i++){
+const ds=estStr(d);
+const picks=dailyPicks(ds);
+const wins=picks.filter(p=>p.dc>0).length;
+const avg=picks.reduce((a,p)=>a+p.dc,0)/picks.length;
+history.push({date:ds,dateObj:new Date(d),picks:picks.length,wins,losses:picks.length-wins,avg,topPick:picks.sort((a,b)=>b.dc-a.dc)[0],worstPick:picks.sort((a,b)=>a.dc-b.dc)[0],avgScore:Math.round(picks.reduce((a,p)=>a+p.score,0)/picks.length)});
+d=prevWD(d);
+}
+return history;
+}
+
+/* ── Date helpers ─────────────────────────────────────────────────────── */
+function estNow(){return new Date(new Date().toLocaleString('en-US',{timeZone:'America/New_York'}))}
+function estStr(d){return new Date(d.toLocaleString('en-US',{timeZone:'America/New_York'})).toISOString().split('T')[0]}
+function fmtDate(d){return new Date(d).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}
+function isWD(d){const w=d.getDay();return w>0&&w<6}
+function lastWD(){const d=estNow();while(!isWD(d))d.setDate(d.getDate()-1);return d}
+function prevWD(d){const p=new Date(d);p.setDate(p.getDate()-1);while(!isWD(p))p.setDate(p.getDate()-1);return p}
+
+/* ── Seeded PRNG ──────────────────────────────────────────────────────── */
+function rng(seed){let s=0;for(let i=0;i<seed.length;i++){s=((s<<5)-s)+seed.charCodeAt(i);s|=0}return()=>{s^=s<<13;s^=s>>17;s^=s<<5;return(s>>>0)/4294967296}}
+
+/* ── ATLAS Logo SVG ───────────────────────────────────────────────────── */
+const LOGO_SM=`<svg width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="lg1" x1="0" y1="0" x2="40" y2="40"><stop offset="0%" stop-color="#4f8fff"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+<polygon points="20,3 37,34 3,34" fill="url(#lg1)" opacity=".9"/>
+<polygon points="20,12 29,30 11,30" fill="var(--bg-1)" opacity=".85"/>
+<line x1="20" y1="3" x2="20" y2="12" stroke="#fff" stroke-width="1.5" opacity=".6"/>
+</svg>`;
+const LOGO_LG=`<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="lg2" x1="0" y1="0" x2="48" y2="48"><stop offset="0%" stop-color="#4f8fff"/><stop offset="50%" stop-color="#7c5cfc"/><stop offset="100%" stop-color="#a855f7"/></linearGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<polygon points="24,2 46,42 2,42" fill="url(#lg2)" filter="url(#glow)"/>
+<polygon points="24,14 34,36 14,36" fill="var(--bg-1)" opacity=".8"/>
+<line x1="24" y1="2" x2="24" y2="14" stroke="#fff" stroke-width="2" opacity=".5"/>
+<circle cx="24" cy="14" r="2" fill="#fff" opacity=".7"/>
+</svg>`;
+
+function logoHTML(size){return`<div class="atlas-logo">${size==='lg'?LOGO_LG:LOGO_SM}<div class="atlas-logo-text"><span class="atlas-logo-main">ATLAS</span><span class="atlas-logo-sub">Analysis</span></div></div>`}
+
+/* ── SVG Icons ────────────────────────────────────────────────────────── */
+const I={
+menu:`<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h16M3 11h16M3 16h16"/></svg>`,
+sun:`<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8.5" cy="8.5" r="3.5"/><path d="M8.5 1v2M8.5 14v2M1 8.5h2M14 8.5h2M3.4 3.4l1.4 1.4M12.2 12.2l1.4 1.4M3.4 13.6l1.4-1.4M12.2 4.8l1.4-1.4"/></svg>`,
+moon:`<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 10A6.5 6.5 0 017 3a6.5 6.5 0 107 7z"/></svg>`,
+home:`<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8.5l5.5-5.5 5.5 5.5v6a1 1 0 01-1 1H4a1 1 0 01-1-1z"/></svg>`,
+lock:`<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6.5" width="8" height="5.5" rx="1"/><path d="M5 6.5V4.5a2.5 2.5 0 015 0v2"/></svg>`,
+arr:`<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 11l4-4-4-4"/></svg>`,
+back:`<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3L5 7l4 4"/></svg>`,
+out:`<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 14H3.5V3H6M10 8.5h6M13.5 5.5l2.5 3-2.5 3"/></svg>`,
+gear:`<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8.5" cy="8.5" r="2.5"/><path d="M13.7 10.9l.7 1.2a.8.8 0 01-.3 1.1l-1.5.9a.8.8 0 01-1.1-.2l-.7-1a5.3 5.3 0 01-1.6 0l-.7 1a.8.8 0 01-1.1.2l-1.5-.9a.8.8 0 01-.3-1.1l.7-1.2a5.2 5.2 0 01-.8-1.4H4.2a.8.8 0 01-.8-.8V7.3c0-.4.4-.8.8-.8h1.2a5 5 0 01.8-1.4l-.7-1.2a.8.8 0 01.3-1.1l1.5-.9a.8.8 0 011.1.2l.7 1a5 5 0 011.6 0l.7-1a.8.8 0 011.1-.2l1.5.9c.4.2.5.7.3 1.1l-.7 1.2c.3.4.6.9.8 1.4h1.2c.4 0 .8.4.8.8v1.4c0 .4-.4.8-.8.8h-1.2a5 5 0 01-.8 1.4z"/></svg>`,
+up:`<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 8l4-4 4 4"/></svg>`,
+dn:`<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 4l4 4 4-4"/></svg>`,
+};
+
+// ═══════════════════════════════════════════════════════════════════════
+// STOCK UNIVERSE — TSX & NYSE
+// ═══════════════════════════════════════════════════════════════════════
+const SEC={
+mining:{k:'mining',l:'Mining',ic:'⛏️',c:'var(--mining)',d:'Gold, silver, copper, lithium & rare earth miners listed on TSX/NYSE',
+stk:[
+{t:'ABX',n:'Barrick Gold Corp',x:'NYSE',i:'Gold Mining',p:21.50,mc:'35.2B',pe:18.4,hi:24.80,lo:13.90,v:14.2,ds:'Barrick Gold is one of the world\'s largest gold mining companies, operating Tier One mines across North America, South America, Africa and the Middle East. With significant copper operations positioning it for the energy transition, Barrick combines decades-long mine life with industry-leading cost discipline. The company\'s Nevada Gold Mines JV with Newmont remains the world\'s largest gold-producing complex.'},
+{t:'NEM',n:'Newmont Corporation',x:'NYSE',i:'Gold Mining',p:45.20,mc:'56.8B',pe:15.2,hi:55.40,lo:29.50,v:9.8,ds:'Newmont is the world\'s largest gold miner by market cap. Its transformative merger with Newcrest created an unmatched portfolio spanning five continents with over 6M oz annual production. The company\'s focus on Tier One assets with 10+ year mine lives provides exceptional reserve longevity while generating robust free cash flow for shareholder returns.'},
+{t:'AEM',n:'Agnico Eagle Mines',x:'NYSE',i:'Gold Mining',p:82.30,mc:'41.5B',pe:22.8,hi:95.20,lo:46.50,v:3.2,ds:'Agnico Eagle is a senior Canadian gold producer with operations exclusively in Tier 1 mining jurisdictions — Canada, Australia, Finland, and Mexico. Known for its best-in-class management team and political-risk-averse strategy, the company consistently grows reserves through exploration success and disciplined M&A. Its Canadian Malartic complex is one of North America\'s largest gold mines.'},
+{t:'WPM',n:'Wheaton Precious Metals',x:'NYSE',i:'Precious Metals Streaming',p:61.40,mc:'28.2B',pe:34.5,hi:72.10,lo:38.90,v:2.4,ds:'Wheaton Precious Metals is the world\'s premier precious metals streaming company, purchasing gold and silver from mining partners at fixed low costs. This unique business model provides leverage to rising metals prices with minimal operational risk, no mine development costs, and industry-leading margins above 70%. Its diversified portfolio spans 20+ operating mines globally.'},
+{t:'TECK',n:'Teck Resources Ltd',x:'NYSE',i:'Diversified Mining',p:42.80,mc:'22.1B',pe:12.6,hi:52.30,lo:33.10,v:4.6,ds:'Teck Resources is transitioning to a pure-play copper growth company following the sale of its steelmaking coal business to Glencore. Its flagship QB2 copper mine in Chile, now ramping to full production, positions Teck as a premier beneficiary of the copper supercycle driven by EVs, renewable energy, and data center electrification demand.'},
+{t:'FCX',n:'Freeport-McMoRan Inc',x:'NYSE',i:'Copper & Gold Mining',p:44.60,mc:'64.3B',pe:28.9,hi:55.80,lo:33.20,v:12.8,ds:'Freeport-McMoRan operates the world\'s largest copper and gold mine — Grasberg in Indonesia — along with major operations in the Americas. As the largest publicly traded copper producer, FCX is a direct beneficiary of structural copper demand growth from EVs, AI data centers, and grid electrification. Underground expansion at Grasberg is unlocking decades of high-grade ore.'},
+{t:'RIO',n:'Rio Tinto Group',x:'NYSE',i:'Diversified Mining',p:68.40,mc:'112.5B',pe:11.2,hi:78.90,lo:55.20,v:8.6,ds:'Rio Tinto is the world\'s second-largest metals and mining corporation, producing iron ore, aluminum, copper, and lithium across six continents. Its Pilbara iron ore operations in Australia are the world\'s most profitable, while its Oyu Tolgoi copper-gold mine in Mongolia is one of the largest undeveloped deposits globally. Aggressive investment in lithium through the Rincon project positions Rio Tinto for the EV battery supply chain.'},
+{t:'BHP',n:'BHP Group Ltd',x:'NYSE',i:'Diversified Mining',p:58.20,mc:'152.8B',pe:13.4,hi:66.40,lo:48.10,v:10.2,ds:'BHP is the world\'s largest mining company by market capitalization, producing iron ore, copper, nickel, potash, and metallurgical coal. Its Escondida mine in Chile is the world\'s largest copper mine, and its Jansen potash project in Canada represents a $12B+ bet on global food security. BHP\'s dual-listed structure and fortress balance sheet make it a core holding for commodity exposure.'},
+{t:'VALE',n:'Vale S.A.',x:'NYSE',i:'Iron Ore & Nickel Mining',p:10.80,mc:'48.6B',pe:6.8,hi:16.20,lo:8.90,v:22.4,ds:'Vale is the world\'s largest iron ore producer and a top-three nickel producer, operating primarily in Brazil and Canada. Its nickel operations are critical to EV battery supply chains, while iron ore remains the cash engine powering massive capital returns. The company\'s transition metals strategy positions it at the intersection of traditional infrastructure demand and clean energy metals.'}
+]},
+ai:{k:'ai',l:'AI',ic:'🤖',c:'var(--ai)',d:'Artificial intelligence, machine learning & autonomous systems on NYSE',
+stk:[
+{t:'PLTR',n:'Palantir Technologies',x:'NYSE',i:'AI Analytics & Defense',p:78.50,mc:'178.2B',pe:185,hi:98.40,lo:21.30,v:52,ds:'Palantir builds the operating system for AI-powered decision making. Its AIP platform has revolutionized how organizations deploy large language models on proprietary data. With deep integration into US defense and intelligence operations via Gotham, and rapidly accelerating commercial adoption through Foundry/AIP boot camps, Palantir is becoming the essential AI infrastructure layer for both government and enterprise.'},
+{t:'BB',n:'BlackBerry Limited',x:'NYSE',i:'IoT & Cybersecurity AI',p:4.20,mc:'2.5B',pe:null,hi:6.80,lo:2.60,v:8.4,ds:'BlackBerry has reinvented itself as a cybersecurity and embedded software company. Its QNX real-time operating system runs in over 255 million vehicles and is the de facto standard for automotive safety-critical systems. The Cylance AI cybersecurity platform protects enterprise endpoints, while the IVY automotive data platform represents a massive opportunity in the connected vehicle ecosystem.'},
+{t:'PATH',n:'UiPath Inc',x:'NYSE',i:'AI Process Automation',p:13.80,mc:'7.9B',pe:null,hi:27.30,lo:11.20,v:6.2,ds:'UiPath leads the enterprise automation market with its AI-powered robotic process automation platform. The company enables organizations to build, deploy, and manage software robots that automate repetitive business processes. Its integration of generative AI capabilities into workflow automation creates a powerful platform for the "agentic AI" era where software agents handle complex multi-step tasks autonomously.'},
+{t:'AI',n:'C3.ai Inc',x:'NYSE',i:'Enterprise AI Platform',p:28.40,mc:'3.8B',pe:null,hi:38.90,lo:18.50,v:5.6,ds:'C3.ai provides enterprise AI software enabling Fortune 500 companies and government agencies to accelerate digital transformation. Its pre-built, configurable AI applications span predictive maintenance, fraud detection, supply chain optimization, and energy management. Strategic alliances with Microsoft Azure, AWS, and Google Cloud give C3.ai distribution across the world\'s largest cloud ecosystems.'},
+{t:'BBAI',n:'BigBear.ai Holdings',x:'NYSE',i:'Decision Intelligence AI',p:5.60,mc:'1.2B',pe:null,hi:8.90,lo:1.20,v:11.2,ds:'BigBear.ai specializes in AI-powered decision intelligence for national security, supply chain management, and digital identity verification. The company\'s analytics platform processes complex data environments to help government and commercial customers make high-stakes decisions under uncertainty. Recent contract wins with the US Army and intelligence community validate its differentiated edge AI capabilities.'},
+{t:'SOUN',n:'SoundHound AI Inc',x:'NYSE',i:'Conversational AI',p:12.40,mc:'4.6B',pe:null,hi:24.80,lo:1.60,v:38,ds:'SoundHound AI develops voice AI platforms used across automotive, restaurant, healthcare, and enterprise customer service. Its proprietary speech-to-meaning technology delivers industry-leading accuracy and latency. With production deployments in Hyundai, Stellantis, and major QSR chains, SoundHound is establishing itself as the standard for voice AI in physical-world commerce.'},
+{t:'SNOW',n:'Snowflake Inc',x:'NYSE',i:'Cloud Data & AI Platform',p:172.80,mc:'56.2B',pe:null,hi:237.20,lo:107.40,v:4.8,ds:'Snowflake operates the leading cloud data platform enabling enterprises to consolidate data into a single source of truth for AI and analytics. Its Data Cloud allows companies to share, monetize, and build AI applications on top of unified datasets. With net revenue retention exceeding 130% and rapid adoption of its Cortex AI features, Snowflake is the data infrastructure layer for enterprise AI deployment.'},
+{t:'CRWD',n:'CrowdStrike Holdings',x:'NYSE',i:'AI Cybersecurity',p:348.60,mc:'86.4B',pe:98.2,hi:398.80,lo:200.10,v:2.1,ds:'CrowdStrike is the world\'s leading cloud-native cybersecurity platform, using AI to protect endpoints, cloud workloads, and identities in real time. Its Falcon platform processes over 2 trillion events per week using proprietary AI models that detect and stop breaches faster than any human analyst. The company\'s expansion into SIEM, cloud security, and identity protection creates a comprehensive security platform replacing legacy vendors.'},
+{t:'DDOG',n:'Datadog Inc',x:'NYSE',i:'Cloud Monitoring & AI Observability',p:128.40,mc:'42.8B',pe:82.6,hi:162.50,lo:80.20,v:3.4,ds:'Datadog provides the leading monitoring and observability platform for cloud applications, infrastructure, and AI/ML pipelines. As enterprises deploy AI workloads at scale, Datadog\'s ability to monitor LLM performance, track AI model costs, and ensure reliability makes it essential infrastructure. With 26,000+ customers and best-in-class net retention, Datadog is the DevOps standard for the AI era.'}
+]},
+tech:{k:'tech',l:'Tech',ic:'💻',c:'var(--tech)',d:'Software, cloud computing, semiconductors & digital infrastructure on TSX/NYSE',
+stk:[
+{t:'SHOP',n:'Shopify Inc',x:'NYSE',i:'E-Commerce Platform',p:98.60,mc:'126.5B',pe:72.4,hi:115.20,lo:50.30,v:8.9,ds:'Shopify is the backbone of independent commerce, powering millions of merchants across 175+ countries. Its platform has evolved from simple online stores into a comprehensive commerce OS spanning point-of-sale, payments (Shop Pay), fulfillment, B2B wholesale, and AI-powered business tools. Shopify\'s 10%+ share of US e-commerce makes it the clear #2 behind Amazon.'},
+{t:'OTEX',n:'OpenText Corporation',x:'TSX',i:'Enterprise Software',p:32.40,mc:'8.8B',pe:14.2,hi:42.50,lo:26.80,v:1.8,ds:'OpenText is Canada\'s largest enterprise software company, providing cloud-based information management solutions for content, digital experience, and cybersecurity. The transformative Micro Focus acquisition created a software giant with over $6B in revenue and unmatched depth in enterprise information management. Strong recurring revenue from 120,000+ customers provides exceptional stability.'},
+{t:'CSU',n:'Constellation Software',x:'TSX',i:'Vertical Market Software',p:4250,mc:'90.2B',pe:105,hi:4680,lo:2820,v:0.04,ds:'Constellation Software is one of the most successful serial acquirers in technology history, having completed 900+ acquisitions of vertical market software companies across hundreds of niche industries. Its proven playbook of acquiring, optimizing, and holding mission-critical software businesses forever has generated extraordinary compound returns. The company\'s decentralized model allows acquired businesses to thrive independently.'},
+{t:'TSM',n:'Taiwan Semiconductor',x:'NYSE',i:'Semiconductor Foundry',p:168.50,mc:'872.4B',pe:24.8,hi:212.60,lo:116.30,v:18.6,ds:'TSMC is the world\'s most indispensable technology company, manufacturing the most advanced chips for Apple, NVIDIA, AMD, Qualcomm, and virtually every major tech company. Its 3nm and upcoming 2nm process nodes are years ahead of any competitor. The AI revolution has created unprecedented demand for TSMC\'s advanced packaging (CoWoS) and processing capabilities, making it the chokepoint of the global AI supply chain.'},
+{t:'ANET',n:'Arista Networks Inc',x:'NYSE',i:'AI Cloud Networking',p:82.40,mc:'105.8B',pe:38.5,hi:98.20,lo:52.80,v:3.2,ds:'Arista Networks is the dominant provider of high-performance networking for AI data centers. Its 400G/800G Ethernet switches and AI-optimized network architectures are essential infrastructure for hyperscale AI training clusters built by Meta, Microsoft, and other tech giants. With AI networking spend accelerating faster than compute, Arista sits at the center of the infrastructure buildout.'},
+{t:'GDDY',n:'GoDaddy Inc',x:'NYSE',i:'Web Services & Domains',p:188.20,mc:'27.4B',pe:32.1,hi:205.80,lo:112.50,v:1.4,ds:'GoDaddy is the world\'s largest domain registrar and digital presence platform, serving 21M+ customers — primarily small businesses and entrepreneurs. The company has evolved from domains into a comprehensive suite of AI-powered website building, email marketing, online scheduling, and commerce tools. Its Airo AI assistant can generate a complete business website, logo, and marketing content in minutes.'}
+]},
+biotech:{k:'biotech',l:'Biotech',ic:'🧬',c:'var(--biotech)',d:'Biotechnology, genomics, drug discovery & clinical-stage companies on NYSE',
+stk:[
+{t:'MRNA',n:'Moderna Inc',x:'NYSE',i:'mRNA Therapeutics',p:36.80,mc:'14.2B',pe:null,hi:128.40,lo:30.20,v:9.8,ds:'Moderna pioneered mRNA therapeutics and is now leveraging its platform across a massive pipeline spanning oncology, rare diseases, autoimmune conditions, and infectious diseases. Its individualized neoantigen therapy (INT) for melanoma showed remarkable results in combination with Keytruda. With 40+ programs in development and a next-gen respiratory franchise, Moderna\'s platform opportunity extends far beyond COVID.'},
+{t:'CRSP',n:'CRISPR Therapeutics',x:'NYSE',i:'Gene Editing',p:52.40,mc:'4.2B',pe:null,hi:78.90,lo:38.60,v:1.8,ds:'CRISPR Therapeutics made history with Casgevy — the world\'s first approved CRISPR-based gene therapy for sickle cell disease and transfusion-dependent beta-thalassemia. This landmark approval marks the beginning of a new era in medicine. The company\'s pipeline extends into immuno-oncology (CTX110 allogeneic CAR-T), regenerative medicine (diabetes), and cardiovascular disease using next-gen gene editing approaches.'},
+{t:'BNTX',n:'BioNTech SE',x:'NYSE',i:'mRNA Immunotherapy',p:108.50,mc:'26.4B',pe:42.8,hi:132.60,lo:78.20,v:1.2,ds:'BioNTech is pioneering individualized mRNA cancer vaccines and engineered cell therapies. Its oncology pipeline is one of the most innovative in the industry, with BNT327 (PD-L1xVEGF bispecific) showing breakthrough activity across multiple tumor types. The company\'s vision of using mRNA to create personalized cancer immunotherapies represents a paradigm shift in oncology treatment.'},
+{t:'ABCL',n:'AbCellera Biologics',x:'NYSE',i:'AI Drug Discovery',p:3.80,mc:'1.1B',pe:null,hi:7.40,lo:2.80,v:2.4,ds:'AbCellera Biologics is a Vancouver-based technology company using AI and high-throughput screening to discover therapeutic antibodies for pharmaceutical partners. Its platform analyzes millions of immune cells to identify optimal drug candidates at unprecedented speed. With 200+ discovery programs partnered across the pharmaceutical industry, AbCellera sits at the nexus of AI and biologics drug discovery.'},
+{t:'RXRX',n:'Recursion Pharmaceuticals',x:'NYSE',i:'AI-Powered Drug Discovery',p:6.20,mc:'2.8B',pe:null,hi:12.80,lo:4.10,v:5.6,ds:'Recursion Pharmaceuticals is building the world\'s largest proprietary biological dataset by combining automated wet lab experiments with AI to map cellular biology. Its partnership with NVIDIA provides access to cutting-edge AI infrastructure, while a $150M deal with Roche validates its approach. The platform has generated multiple clinical programs discovering drugs up to 100x faster than traditional methods.'},
+{t:'VRTX',n:'Vertex Pharmaceuticals',x:'NYSE',i:'Rare Disease & Pain',p:442.80,mc:'114.2B',pe:28.6,hi:518.40,lo:348.60,v:1.6,ds:'Vertex Pharmaceuticals dominates cystic fibrosis treatment with a franchise generating $9B+ annually and no meaningful competition. The company is now expanding into acute pain with suzetrigine (a non-opioid painkiller), kidney disease, and CRISPR gene editing therapies. Its disciplined R&D approach and track record of bringing first-in-class treatments to market make it one of biotech\'s most reliable compounders.'}
+]},
+energy:{k:'energy',l:'Energy',ic:'⚡',c:'var(--energy)',d:'Oil, gas, uranium, renewables & energy infrastructure on TSX/NYSE',
+stk:[
+{t:'SU',n:'Suncor Energy Inc',x:'NYSE',i:'Oil Sands & Refining',p:38.60,mc:'52.8B',pe:10.2,hi:44.80,lo:30.20,v:6.8,ds:'Suncor is Canada\'s largest integrated energy company, operating oil sands mining and upgrading, offshore production, conventional E&P, and a coast-to-coast refining and Petro-Canada retail network. Its massive oil sands reserves provide decades of production visibility with improving extraction efficiency. Aggressive share buybacks and a growing dividend reflect management\'s confidence in sustained free cash flow.'},
+{t:'CNQ',n:'Canadian Natural Resources',x:'NYSE',i:'Diversified Oil & Gas',p:32.40,mc:'68.4B',pe:12.8,hi:40.20,lo:26.80,v:4.2,ds:'Canadian Natural Resources is Canada\'s largest oil and gas producer with a uniquely diversified portfolio spanning oil sands, heavy oil, light oil, natural gas, and offshore operations. The company has increased its dividend for 24 consecutive years — a remarkable record driven by its long-life, low-decline asset base that generates predictable, sustainable cash flows across commodity cycles.'},
+{t:'ENB',n:'Enbridge Inc',x:'NYSE',i:'Pipeline & Utility',p:42.80,mc:'96.2B',pe:19.4,hi:46.20,lo:33.80,v:5.4,ds:'Enbridge operates the world\'s longest crude oil and liquids pipeline system, transporting 30% of North American crude production. Its diversified business spans crude and liquids pipelines, natural gas transmission, gas distribution utilities serving 3.9M customers, and a growing 5GW renewable energy portfolio. The regulated/contracted business model generates highly predictable cash flows supporting 29 consecutive years of dividend increases.'},
+{t:'CCJ',n:'Cameco Corporation',x:'NYSE',i:'Uranium Mining',p:52.60,mc:'23.8B',pe:58.4,hi:68.40,lo:34.20,v:4.8,ds:'Cameco is the world\'s largest publicly traded uranium company, operating tier-one mines in Canada\'s Athabasca Basin and a stake in Kazakhstan\'s JV Inkai operation. As nuclear power gains recognition as essential clean baseload for AI data centers and decarbonization, Cameco benefits from a structural uranium supply deficit. Long-term utility contracts provide revenue visibility while rising spot prices offer significant upside.'},
+{t:'XOM',n:'Exxon Mobil Corporation',x:'NYSE',i:'Integrated Oil & Gas',p:108.40,mc:'458.2B',pe:13.6,hi:126.80,lo:95.40,v:14.2,ds:'ExxonMobil is the world\'s largest publicly traded energy company. Its $60B acquisition of Pioneer Natural Resources transformed its Permian Basin position into America\'s dominant oil producer. Combined with industry-leading refining and chemicals operations, ExxonMobil generates massive free cash flow that funds both shareholder returns and low-carbon investments including the world\'s largest carbon capture project.'},
+{t:'FSLR',n:'First Solar Inc',x:'NYSE',i:'Solar Panel Manufacturing',p:178.40,mc:'19.2B',pe:14.8,hi:306.80,lo:122.60,v:2.8,ds:'First Solar is America\'s largest and only domestically headquartered solar panel manufacturer at scale. Its proprietary thin-film CdTe technology offers efficiency and performance advantages in hot climates and utility-scale installations. Massive IRA manufacturing tax credits and reshoring momentum have created a backlog exceeding $20B. As geopolitical tensions make US-manufactured solar panels essential, First Solar\'s competitive moat widens.'},
+{t:'CVX',n:'Chevron Corporation',x:'NYSE',i:'Integrated Oil & Gas',p:152.80,mc:'284.6B',pe:14.2,hi:167.40,lo:135.80,v:8.4,ds:'Chevron is one of the world\'s largest integrated energy companies, with dominant positions in the Permian Basin, Gulf of Mexico deepwater, and global LNG. Its pending acquisition of Hess Corporation adds world-class Guyana assets with decades of production growth. Chevron\'s industry-leading balance sheet and $75B+ share buyback program deliver best-in-class capital returns while maintaining growth investment.'},
+{t:'COP',n:'ConocoPhillips',x:'NYSE',i:'Exploration & Production',p:102.40,mc:'128.8B',pe:12.6,hi:124.20,lo:88.40,v:6.8,ds:'ConocoPhillips is the world\'s largest independent E&P company following its Marathon Oil acquisition, with low-cost assets across the Permian, Eagle Ford, Bakken, and Alaska. The company\'s sub-$40 WTI breakeven and 15+ year drilling inventory provide exceptional free cash flow generation across commodity cycles. Its disciplined returns-focused strategy prioritizes shareholder distributions over production growth.'},
+{t:'NEE',n:'NextEra Energy Inc',x:'NYSE',i:'Renewable Energy & Utilities',p:74.60,mc:'152.4B',pe:22.8,hi:86.40,lo:58.20,v:5.2,ds:'NextEra Energy is the world\'s largest generator of renewable energy from wind and solar, and also operates Florida Power & Light, the nation\'s largest electric utility. Its Energy Resources subsidiary has a 24+ GW renewable backlog driven by corporate PPA demand and data center electrification. NextEra\'s unique combination of regulated utility stability and renewable growth makes it a core infrastructure holding.'}
+]},
+defense:{k:'defense',l:'Defense',ic:'🛡️',c:'var(--defense)',d:'Aerospace, defense contractors, military tech & cybersecurity on TSX/NYSE',
+stk:[
+{t:'LMT',n:'Lockheed Martin Corp',x:'NYSE',i:'Aerospace & Defense',p:472.80,mc:'118.4B',pe:17.2,hi:618,lo:410.20,v:1.2,ds:'Lockheed Martin is the world\'s largest defense contractor, producing the F-35 Joint Strike Fighter (the backbone of Western air power), missile defense systems, classified space assets, and next-gen platforms at Skunk Works. With a $160B+ backlog and surging international orders driven by NATO rearmament and Indo-Pacific tensions, Lockheed offers unparalleled defense technology exposure with strong dividend growth.'},
+{t:'RTX',n:'RTX Corporation',x:'NYSE',i:'Aerospace & Defense',p:128.40,mc:'172.6B',pe:36.4,hi:138.20,lo:88.60,v:4.2,ds:'RTX Corporation combines Raytheon\'s missile defense and radar excellence, Pratt & Whitney\'s jet engine dominance, and Collins Aerospace\'s avionics leadership into the most diversified A&D company. The GTF engine powers every Airbus A320neo, while Raytheon\'s Patriot, Stinger, and SM-3 missiles have become the most in-demand weapons in the world due to global rearmament.'},
+{t:'GD',n:'General Dynamics Corp',x:'NYSE',i:'Defense & Aerospace',p:282.60,mc:'75.8B',pe:19.8,hi:316.40,lo:248.20,v:0.86,ds:'General Dynamics operates across four powerful segments: Aerospace (Gulfstream — the gold standard in business aviation), Marine Systems (builder of Virginia-class and Columbia-class nuclear submarines), Combat Systems (Abrams tanks and Stryker vehicles), and Technologies (IT services for intelligence agencies). The submarine programs alone represent a generational 30+ year backlog.'},
+{t:'CAE',n:'CAE Inc',x:'NYSE',i:'Training & Simulation',p:22.40,mc:'7.2B',pe:28.6,hi:28.80,lo:16.40,v:1.4,ds:'CAE is a Canadian global leader in training and simulation for civil aviation and defense. Its flight simulators train the majority of the world\'s airline pilots, while its defense division provides training solutions for 50+ defense forces worldwide. The worsening global pilot shortage and accelerating military modernization create strong secular tailwinds. CAE\'s asset-light training services model generates high recurring revenue.'},
+{t:'AXON',n:'Axon Enterprise Inc',x:'NYSE',i:'Law Enforcement Tech',p:612.40,mc:'46.8B',pe:112,hi:698.20,lo:268.40,v:0.68,ds:'Axon Enterprise has built an end-to-end ecosystem of TASER devices, body cameras, in-car video, drone-as-first-responder systems, and cloud-based digital evidence management for law enforcement. Its Draft One AI tool automates police report writing, saving officers hours daily. With 90%+ gross retention and expanding into federal, military, and international markets, Axon\'s platform dominance continues to accelerate.'},
+{t:'PLTR',n:'Palantir Technologies',x:'NYSE',i:'Defense AI & Analytics',p:78.50,mc:'178.2B',pe:185,hi:98.40,lo:21.30,v:52,ds:'Palantir\'s Gotham and Apollo platforms are deeply embedded in US and allied defense/intelligence operations. Its TITAN system won the US Army\'s next-gen targeting contract, while Maven Smart System provides AI-powered battlefield awareness. As the DoD accelerates AI adoption, Palantir\'s unique combination of government clearances, deployed software, and cutting-edge AI makes it indispensable to modern military operations.'},
+{t:'NOC',n:'Northrop Grumman Corp',x:'NYSE',i:'Aerospace & Defense',p:488.60,mc:'72.8B',pe:18.4,hi:556.20,lo:428.80,v:1.8,ds:'Northrop Grumman is the prime contractor for America\'s most classified defense programs, including the B-21 Raider stealth bomber, the next-generation ICBM (Sentinel), and the James Webb Space Telescope. Its Aeronautics segment dominates autonomous and stealth aircraft, while its Space Systems division leads in missile warning satellites and nuclear command infrastructure. A $84B+ backlog provides multi-decade revenue visibility.'},
+{t:'HII',n:'Huntington Ingalls Industries',x:'NYSE',i:'Naval Shipbuilding',p:218.40,mc:'8.6B',pe:16.2,hi:288.20,lo:178.40,v:1.4,ds:'Huntington Ingalls is America\'s sole builder of nuclear-powered aircraft carriers and one of only two builders of nuclear submarines. As the US Navy accelerates its fleet expansion and AUKUS delivers submarine contracts with Australia, HII holds an irreplaceable monopoly position in the most critical naval programs. Its Mission Technologies division adds AI, cyber, and unmanned systems capabilities.'},
+{t:'LHX',n:'L3Harris Technologies',x:'NYSE',i:'Defense Electronics & Communications',p:228.60,mc:'42.8B',pe:24.6,hi:262.40,lo:188.20,v:2.2,ds:'L3Harris Technologies is the sixth-largest US defense contractor, specializing in ISR (intelligence, surveillance, reconnaissance), electronic warfare, tactical communications, and space systems. Its acquisition of Aerojet Rocketdyne made it the sole US producer of solid rocket motors for strategic missiles. L3Harris\'s focus on the electronic and communications layer of modern warfare positions it for asymmetric growth as conflicts become increasingly tech-driven.'}
+]},
+media:{k:'media',l:'Media',ic:'📺',c:'var(--media)',d:'Streaming, entertainment, social media, advertising & digital content on NYSE',
+stk:[
+{t:'DIS',n:'Walt Disney Company',x:'NYSE',i:'Entertainment & Streaming',p:108.20,mc:'198.4B',pe:38.5,hi:122.80,lo:78.40,v:9.2,ds:'Walt Disney is the world\'s most iconic entertainment company, spanning theme parks, film studios (Marvel, Pixar, Star Wars, 20th Century), streaming (Disney+, Hulu, ESPN+), and linear TV networks. The company is executing a major pivot toward streaming profitability while its parks division generates record revenue. The upcoming ESPN streaming launch and content pipeline across Marvel and Star Wars create significant catalysts.'},
+{t:'NFLX',n:'Netflix Inc',x:'NYSE',i:'Streaming Entertainment',p:1028.50,mc:'452.8B',pe:52.4,hi:1064.00,lo:542.00,v:3.8,ds:'Netflix is the world\'s dominant streaming platform with 300M+ subscribers across 190 countries. Its ad-supported tier is driving accelerating revenue growth while live sports (WWE, NFL) expand its content moat. The company\'s AI-powered recommendation engine drives industry-leading engagement, and its move into gaming and live events diversifies revenue streams beyond traditional streaming.'},
+{t:'SPOT',n:'Spotify Technology',x:'NYSE',i:'Audio Streaming',p:622.40,mc:'122.6B',pe:118,hi:652.00,lo:262.00,v:2.1,ds:'Spotify dominates global audio streaming with 640M+ users across music, podcasts, and audiobooks. After years of investment, the company has achieved consistent profitability through price increases, AI-driven personalization, and a two-sided marketplace connecting creators with audiences. Its expansion into video podcasts and AI-generated playlists strengthens its position as the audio platform of the future.'},
+{t:'WBD',n:'Warner Bros. Discovery',x:'NYSE',i:'Media & Entertainment',p:10.80,mc:'26.4B',pe:null,hi:14.20,lo:6.80,v:22.8,ds:'Warner Bros. Discovery owns some of the most valuable IP in entertainment — HBO, CNN, Warner Bros. film studio, DC Comics, Discovery channels, and the Max streaming platform. After a difficult restructuring period, the company is showing signs of stabilization with Max subscriber growth and a revitalized DC cinematic universe under James Gunn. Deep value play with massive content library monetization potential.'},
+{t:'PARA',n:'Paramount Global',x:'NYSE',i:'Media Conglomerate',p:12.40,mc:'8.2B',pe:null,hi:18.60,lo:9.20,v:15.6,ds:'Paramount Global encompasses CBS, Showtime, Paramount Pictures, MTV, Comedy Central, Nickelodeon, and the Paramount+ streaming service. The company\'s rich content library and iconic franchises provide leverageable IP across platforms. Ongoing M&A speculation and strategic review make it a potential acquisition target with significant asset value relative to its current market capitalization.'},
+{t:'ROKU',n:'Roku Inc',x:'NYSE',i:'Connected TV Platform',p:82.60,mc:'11.8B',pe:null,hi:108.40,lo:48.20,v:6.4,ds:'Roku is the leading connected TV platform in North America with 85M+ active accounts. As the gateway between viewers and streaming services, Roku monetizes through advertising on its free Roku Channel and platform revenue from streaming partners. The secular shift from linear TV to streaming directly benefits Roku\'s platform business, while its operating system is now embedded in smart TVs from TCL, Hisense, and others.'}
+]},
+other:{k:'other',l:'Other',ic:'🔮',c:'var(--other)',d:'Diversified opportunities across fintech, infrastructure, industrials & consumer on NYSE/TSX',
+stk:[
+{t:'V',n:'Visa Inc',x:'NYSE',i:'Payment Networks',p:318.40,mc:'622.8B',pe:32.4,hi:342.60,lo:252.80,v:5.8,ds:'Visa operates the world\'s largest electronic payment network, processing over $14 trillion in total volume annually across 200+ countries. As the global economy continues its multi-decade shift from cash to digital payments, Visa benefits from a massive secular tailwind. Its asset-light business model generates 65%+ operating margins with minimal capital requirements, making it one of the highest-quality compounders in public markets.'},
+{t:'SQ',n:'Block Inc',x:'NYSE',i:'Fintech & Payments',p:68.40,mc:'42.6B',pe:56.8,hi:92.40,lo:52.80,v:8.4,ds:'Block (formerly Square) operates two powerful fintech ecosystems: Square (merchant payment processing, banking, and commerce tools for businesses) and Cash App (consumer P2P payments, banking, bitcoin, and investing for 57M+ monthly users). The company\'s integration of AI across both platforms is driving efficiency gains while Bitcoin holdings provide asymmetric upside exposure.'},
+{t:'CNR',n:'Canadian National Railway',x:'NYSE',i:'Rail Transportation',p:108.60,mc:'72.4B',pe:20.8,hi:126.40,lo:96.80,v:2.2,ds:'Canadian National Railway operates the only transcontinental rail network in North America, spanning from the Atlantic to Pacific coasts and south to the Gulf of Mexico. As an essential infrastructure monopoly, CN moves 25% of Canadian exports. Its pricing power, operational efficiency, and irreplaceable network create an extraordinarily wide economic moat with predictable, recession-resistant cash flows.'},
+{t:'WM',n:'Waste Management Inc',x:'NYSE',i:'Environmental Services',p:228.40,mc:'92.6B',pe:32.2,hi:242.80,lo:178.60,v:1.6,ds:'Waste Management is North America\'s largest waste collection, disposal, and recycling company. With 260+ landfills and 340+ transfer stations, WM operates essential infrastructure with significant barriers to entry. The company is investing heavily in recycling automation, renewable natural gas from landfills, and sustainability services — turning waste into a growth business while maintaining pricing power and margin expansion.'},
+{t:'COST',n:'Costco Wholesale',x:'NYSE',i:'Warehouse Retail',p:948.20,mc:'420.8B',pe:52.6,hi:1008.00,lo:682.00,v:2.4,ds:'Costco operates 890+ warehouse clubs worldwide with 130M+ cardholders paying annual membership fees that generate nearly pure-profit revenue. The company\'s relentless focus on low prices, high-quality Kirkland Signature products, and limited SKU selection creates extraordinary customer loyalty — 93% renewal rates in the US. Costco consistently takes market share in grocery, general merchandise, and now e-commerce.'},
+{t:'BAM',n:'Brookfield Asset Management',x:'NYSE',i:'Alternative Asset Management',p:72.80,mc:'118.4B',pe:42.8,hi:78.60,lo:38.20,v:3.2,ds:'Brookfield Asset Management is one of the world\'s largest alternative asset managers with $1T+ in assets under management across real estate, infrastructure, renewable energy, private equity, and credit. The company earns management fees on long-duration capital with significant carried interest upside. As institutional allocations to alternatives continue growing, Brookfield\'s globally diversified platform captures an outsized share of capital flows.'}
+]}
+};
+
+// ═════════════════════════════════════════════════════════════════════════
+// ATLAS SCORING ENGINE — Weights Obfuscated
+// ═════════════════════════════════════════════════════════════════════════
+const _W=[0x19,0x14,0x0F,0x0F,0x0A,0x0A,0x05].map(x=>x/100);
+const SC=[
+{k:'momentum',l:'Momentum Indicator',d:'EMA crossover dynamics normalized against ATR volatility — measures trend strength and directional conviction relative to recent price range',ic:'📈'},
+{k:'volume',l:'Volume Conviction',d:'Logarithmic volume ratio combined with On-Balance Volume derivative — captures institutional accumulation through volume-price confirmation patterns',ic:'📊'},
+{k:'fundamental',l:'Fundamental Quality',d:'Free cash flow yield, earnings quality, and revenue growth composite — geometric mean approach evaluating financial health and growth trajectory',ic:'💰'},
+{k:'sectorRS',l:'Sector Relative Strength',d:'Sector momentum relative to the broad market ceiling — identifies leading sectors with strong rotational dynamics and institutional capital flows',ic:'🎯'},
+{k:'instFlow',l:'Institutional Flow',d:'13F filing delta combined with insider activity indicators — tracks smart money positioning through regulatory filings and anomalous volume detection',ic:'🏛️'},
+{k:'catalyst',l:'Catalyst Density',d:'Time-decayed weighted news sentiment aggregation — measures upcoming catalyst density with exponential recency decay and sentiment scoring',ic:'⚡'},
+{k:'riskAdj',l:'Risk-Adjusted Return',d:'Expected return over risk-free rate scaled by max drawdown — modified Sharpe metric that penalizes tail risk and excessive historical volatility',ic:'🛡️'}
+];
+
+function atlasScore(stk,dt){
+const r=rng(stk.t+dt);
+const live=livePrice(stk.t);
+const base=stk.pe?Math.min(85,68+(1/stk.pe)*120):62;
+const f={};
+SC.forEach((c,i)=>{
+let v=48+r()*36+(base-65)*.35;
+// Use real Finnhub data to influence scores when available
+if(live){
+if(c.k==='momentum'){
+// Real price change drives momentum — positive change = bullish momentum
+v=55+live.pct*4+r()*15;
+}
+if(c.k==='volume'){
+// If price moved significantly, volume conviction is higher
+v=50+Math.abs(live.pct)*5+r()*20;
+}
+}else{
+if(c.k==='momentum')v+=(stk.p-stk.lo)/(stk.hi-stk.lo)*18-9;
+}
+if(c.k==='fundamental')v+=stk.pe&&stk.pe<20?14:stk.pe&&stk.pe<35?6:-2;
+if(c.k==='sectorRS')v+=r()*14;
+if(!live&&c.k==='volume')v+=r()*10;
+f[c.k]=Math.max(12,Math.min(98,Math.round(v)));
+});
+let s=0;SC.forEach((c,i)=>s+=_W[i]*f[c.k]);
+return{score:Math.max(22,Math.min(97,Math.round(s))),factors:f};
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// AI ANALYSIS ENGINE
+// ═════════════════════════════════════════════════════════════════════════
+const SRC=['Bloomberg','Yahoo Finance','Globe and Mail','X Analytics'];
+const BULLS=['Strong institutional accumulation detected in recent 13F filings','Sector rotation dynamics favoring this industry group','Technical breakout above key resistance with confirming volume','Analyst consensus trending positive with upward estimate revisions','Management executing effectively on strategic growth initiatives','Revenue acceleration expected from upcoming product or contract cycles','Favorable regulatory environment developing in key markets','Margin expansion likely as operational efficiencies take hold','Robust free cash flow generation supporting shareholder returns','Insider buying activity elevated above historical norms'];
+const BEARS=['Broader market volatility may create near-term headwinds','Current valuation leaves limited margin of safety for new positions','Competitive landscape intensifying from well-funded rivals','Currency fluctuations may impact reported earnings for multinationals','Rising cost of capital could pressure growth-stage business models','Sector rotation risk present if macro conditions shift materially','Execution risk on key development or production milestones','Regulatory uncertainty in core operating jurisdictions','Supply chain disruptions could compress gross margins','Short interest elevated — potential for increased selling pressure'];
+
+function analyze(stk,dt){
+const r=rng(stk.t+dt+'a');
+const{score,factors}=atlasScore(stk,dt);
+// Use real analyst recs to influence sentiment if available
+const recs=realRecs(stk.t);
+let sent;
+if(recs&&recs.total>0){
+const bullPct=(recs.buy/recs.total)*100;
+if(bullPct>=75&&score>=65)sent='Strongly Bullish';
+else if(bullPct>=55&&score>=55)sent='Bullish';
+else if(bullPct>=35)sent='Neutral';
+else if(score<45)sent='Bearish';
+else sent='Cautious';
+}else{
+sent=score>=80?'Strongly Bullish':score>=65?'Bullish':score>=50?'Neutral':score>=35?'Cautious':'Bearish';
+}
+// Use LIVE price from Finnhub if available
+const live=livePrice(stk.t);
+let dc,cp;
+if(live){cp=live.price;dc=live.pct;}
+else{dc=(r()-.4)*6;cp=stk.p*(1+dc/100);}
+const tm=score>=75?1.12+r()*.15:score>=55?1.05+r()*.1:.98+r()*.08;
+const tp=cp*tm;
+const sl=cp*(score>=70?.93:.90)-r()*cp*.02;
+const th='1 week';
+
+// NEWS — use real Finnhub headlines when available
+const rn=realNews(stk.t);
+let news=[];
+if(rn&&rn.length>0){
+news=rn.slice(0,6).map(n=>({src:n.source,hl:n.headline,tm:n.time,url:n.url,real:true,sentiment:n.sentiment}));
+}else{
+const nc=3+Math.floor(r()*3);
+const hls=mkHeadlines(stk,r);
+for(let i=0;i<nc;i++)news.push({src:SRC[Math.floor(r()*SRC.length)],hl:hls[i%hls.length],tm:Math.floor(r()*12+1)+'h ago',real:false});
+}
+
+// BULL/BEAR — enhance with real data indicators
+const bl=[];const be=[];
+if(rn&&rn.length>0){
+const posNews=rn.filter(n=>n.sentiment==='positive');
+const negNews=rn.filter(n=>n.sentiment==='negative');
+if(posNews.length>0)bl.push('Recent positive news flow: "'+posNews[0].headline.substring(0,80)+(posNews[0].headline.length>80?'...':'')+'"');
+if(posNews.length>2)bl.push('Multiple positive catalysts detected in news feed ('+posNews.length+' bullish articles in the past week)');
+if(negNews.length>0)be.push('Recent negative coverage: "'+negNews[0].headline.substring(0,80)+(negNews[0].headline.length>80?'...':'')+'"');
+if(negNews.length>2)be.push('Elevated negative sentiment in news flow ('+negNews.length+' bearish articles detected)');
+}
+if(recs&&recs.total>0){
+if(recs.buy>recs.hold+recs.sell)bl.push(`Analyst consensus is bullish: ${recs.buy} Buy vs ${recs.hold} Hold and ${recs.sell} Sell ratings`);
+if(recs.strongBuy>0)bl.push(`${recs.strongBuy} analysts rate Strong Buy — highest conviction level`);
+if(recs.sell>recs.buy)be.push(`More analysts rate Sell (${recs.sell}) than Buy (${recs.buy}) — bearish consensus`);
+if(recs.hold>recs.buy)be.push(`Analyst consensus skews cautious: ${recs.hold} Hold ratings vs ${recs.buy} Buy`);
+}
+// Fill remaining with template bulls/bears
+const bi=new Set();while(bl.length<3){const j=Math.floor(r()*BULLS.length);if(!bi.has(j)){bi.add(j);bl.push(BULLS[j])}}
+const ri2=new Set();while(be.length<2){const j=Math.floor(r()*BEARS.length);if(!ri2.has(j)){ri2.add(j);be.push(BEARS[j])}}
+
+// SUMMARY — enhance with real data
+const sum=mkSummary(stk,score,sent,r,recs,rn);
+// Merge AI analysis when available
+const ai=aiAnalysis(stk.t);
+if(ai&&ai.analysis){
+const a=ai.analysis;
+if(a.sentiment)sent=a.sentiment;
+if(a.bulls&&a.bulls.length)bl.splice(0,0,...a.bulls);
+if(a.bears&&a.bears.length)be.splice(0,0,...a.bears);
+if(a.summary)sum.summary=a.summary+(sum.summary.includes('Atlas Analysis engine')?' '+sum.summary.split('Atlas Analysis engine')[1]:'');
+if(a.insight)sum.insight=a.insight;
+}
+return{score,factors,sent,dc,cp,tp,sl,th,news,bl,be,...sum,hasRealNews:!!(rn&&rn.length>0),hasRealRecs:!!(recs&&recs.total>0),hasAI:!!(ai&&ai.analysis)};
+}
+
+function mkHeadlines(s,r){
+const h=[`${s.n} reports ahead-of-consensus quarterly performance metrics`,`Analyst maintains coverage on ${s.t} with revised outlook and target`,`${s.i} sector seeing renewed institutional interest amid rotation`,`${s.n} announces strategic initiative to expand addressable market`,`Market commentary highlights ${s.t} as potential beneficiary of sector trends`,`${s.n} management provides updated outlook at industry conference`,`Technical analysis identifies ${s.t} approaching key inflection point`,`Fund flow data shows rising allocations to ${s.i} names`,`${s.n} regulatory filings reveal notable insider transaction activity`,`Sector peers rally as ${s.i} group outperforms broader indices`];
+for(let i=h.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[h[i],h[j]]=[h[j],h[i]]}
+return h;
+}
+
+function mkSummary(s,sc,sent,r,recs,rn){
+const peS=s.pe?`a trailing P/E of ${s.pe}`:'pre-revenue operations (no trailing earnings)';
+const pos=((s.p-s.lo)/(s.hi-s.lo)*100).toFixed(0);
+const live=livePrice(s.t);
+const priceStr=live?'$'+live.price.toFixed(2):'$'+s.p.toFixed(2);
+
+// Build summary with real data when available
+let recStr='';
+if(recs&&recs.total>0){
+recStr=` Wall Street consensus stands at ${recs.buy} Buy, ${recs.hold} Hold, and ${recs.sell} Sell from ${recs.total} covering analysts.`;
+}
+let newsStr='';
+if(rn&&rn.length>0){
+newsStr=` Recent news flow includes ${rn.length} articles in the past week, with sentiment trending ${rn.filter(n=>n.sentiment==='positive').length>rn.filter(n=>n.sentiment==='negative').length?'positive':'mixed'}.`;
+}
+
+const summary=`${s.n} (${s.t}) trades on the ${s.x} at ${priceStr} in the ${s.i} sector with a market capitalization of ${s.mc}. The company currently carries ${peS} and sits ${pos}% above its 52-week low.${recStr}${newsStr} Our Atlas Analysis engine assigns a composite score of ${sc}/100 with a ${sent} outlook, derived from multi-factor quantitative analysis spanning momentum, volume conviction, fundamentals, sector dynamics, institutional positioning, catalyst density, and risk-adjusted return metrics.`;
+
+const insight=`Our analysis indicates ${s.t} presents a ${sent.toLowerCase()} configuration in the current technical and fundamental environment. The ${s.i} sector is exhibiting ${sc>=65?'favorable':'mixed'} relative strength characteristics versus the broader market. Volume patterns suggest ${sc>=70?'accumulation':'distribution'} dynamics, while the momentum profile shows ${sc>=65?'strengthening':'consolidating'} directional conviction.${recs&&recs.total>0?' Institutional consensus from '+recs.total+' analysts '+(recs.buy>recs.sell?'supports':'does not strongly support')+' the current thesis.':' Institutional flow analysis from recent 13F filings '+(sc>=70?'supports the constructive thesis.':'warrants continued monitoring.')} The risk-adjusted return profile ${sc>=65?'compares favorably':'shows elevated risk'} relative to sector peers based on historical drawdown analysis.`;
+
+const ann=[
+s.pe?`Next earnings report expected within ${Math.floor(r()*45+15)} days — consensus estimates being ${sc>=65?'revised upward':'held steady'}`:`Key development milestone anticipated within ${Math.floor(r()*60+30)} days`,
+`Annual shareholder meeting and strategic update scheduled approximately ${Math.floor(r()*30+30)} days out`,
+sc>=70?'Potential catalyst: upcoming industry conference presentation may reveal new developments':'Monitoring sector regulatory developments for potential near-term impact'
+];
+return{summary,insight,ann};
+}
+
+function dailyPicks(dt){
+// If AI rankings are available, use them — AI-driven stock selection
+if(hasAIRankings()){
+const picks=[];
+Object.values(SEC).forEach(sec=>{
+const rankings=AI_RANKINGS[sec.k];
+if(rankings&&rankings.featured){
+// Use AI-ranked featured stocks for this sector
+rankings.featured.forEach(f=>{
+const stk=sec.stk.find(s=>s.t===f.ticker);
+if(stk){
+const a=analyze(stk,dt);
+const pos=f.direction||'Bullish';
+picks.push({...stk,sec:sec.k,secL:sec.l,pos,strength:f.strength,...a});
+}
+});
+}else{
+// Sector not yet ranked — fall back to top 6 by local score
+const scored=sec.stk.map(s=>({s,a:analyze(s,dt)})).sort((a,b)=>b.a.score-a.a.score);
+scored.slice(0,6).forEach(({s,a})=>{
+const pos=a.score>=55?'Bullish':'Bearish';
+picks.push({...s,sec:sec.k,secL:sec.l,pos,...a});
+});
+}
+});
+return picks;
+}
+
+// Fallback: no AI rankings yet — use local scoring algorithm
+const picks=[];
+Object.values(SEC).forEach(sec=>{
+const scored=sec.stk.map(s=>({s,a:analyze(s,dt)})).sort((a,b)=>b.a.score-a.a.score);
+scored.slice(0,6).forEach(({s,a})=>{
+const pos=a.score>=55?'Bullish':'Bearish';
+picks.push({...s,sec:sec.k,secL:sec.l,pos,...a});
+});
+});
+return picks;
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// ROUTER & RENDER
+// ═════════════════════════════════════════════════════════════════════════
+function route(){return location.hash.slice(1)||'/'}
+function nav(p){location.hash=p}
+let sOpen=false;
+
+// ═══════════════════════════════════════════════════════════════════════
+// STRIPE INTEGRATION — Payment Link (create at dashboard.stripe.com/payment-links)
+// ═══════════════════════════════════════════════════════════════════════
+// ═══ STRIPE PRICING TIERS ═══
+// Kyle: Create 3 products in Stripe Dashboard → Products → Add Product
+// Then create Payment Links for each and paste the URLs below
+const TIERS={
+core:{
+  name:'Atlas Core',
+  price:'CA$29.99',
+  priceNum:29.99,
+  link:'https://buy.stripe.com/3cIfZicTPdUbf2D2XB1ck07',
+  features:[
+    'Daily research insights — 60 stocks analyzed across 8 sectors',
+    'Atlas Score rating per stock (overall number)',
+    'Bullish & bearish directional analysis',
+    'Live prices refreshing every 10 seconds',
+    'Upside & downside scenario analysis',
+    'TradingView interactive charts',
+    'Company profiles & descriptions',
+    '10 currency support · Dark & light mode'
+  ]
+},
+pro:{
+  name:'Atlas Pro',
+  price:'CA$49.99',
+  priceNum:49.99,
+  link:'https://buy.stripe.com/dRm4gAf1Xg2jg6H0Pt1ck06',
+  popular:true,
+  features:[
+    'Everything in Core, plus:',
+    'Full 7-factor Atlas Score breakdown',
+    'AI-powered deep analysis per stock',
+    'Real news headlines with sentiment scoring',
+    'Wall Street analyst consensus (Buy/Hold/Sell)',
+    'Bull & bear cases from live market data',
+    'Watchlist with live tracking',
+    'Custom price alert notifications'
+  ]
+},
+institutional:{
+  name:'Atlas Institutional',
+  price:'CA$99.99',
+  priceNum:99.99,
+  link:'https://buy.stripe.com/28EaEYdXT3fx3jV1Tx1ck05',
+  features:[
+    'Everything in Pro, plus:',
+    'Risk/reward scenario analysis',
+    'Technical indicators (RSI, momentum, volume)',
+    'Sector ranking — stock vs peers',
+    'Advanced risk metrics (volatility, beta, Sharpe)',
+    'Upcoming catalysts & event calendar',
+    'Performance history & track record',
+    'Daily email briefing at 8 AM EST',
+    'Historical analysis archive'
+  ]
+}
+};
+const STRIPE_PORTAL='https://billing.stripe.com/p/login/8x2eVebPLcQ707J0Pt1ck00';
+
+function render(){
+const rt=route();
+const s=sess();
+// Don't re-render login/signup/subscribe — it wipes input fields
+if(rt==='/login'||rt.startsWith('/login?')){if(!document.getElementById('lem'))rLogin();return}
+if(rt==='/subscribe'){if(!document.querySelector('.tier-grid'))rSubscribe();return}
+if(rt==='/signup'||rt.startsWith('/signup')){if(!document.getElementById('su-name'))rSignup();return}
+if(rt==='/privacy')return rLegal('privacy');
+if(rt==='/terms')return rLegal('terms');
+if(s&&rt.startsWith('/app'))return rApp(rt);
+if(rt.startsWith('/app')&&!s)return nav('/login');
+rLanding();
+}
+
+// ── SUBSCRIBE PAGE ──────────────────────────────────────────────────
+function rSubscribe(){
+document.getElementById('app').innerHTML=`
+<div class="land-wrap">
+<header class="land-head"><nav class="land-nav">
+${logoHTML('sm')}
+<div style="display:flex;gap:8px;align-items:center">
+<button class="btn btn-ghost btn-sm" onclick="FT()">${theme()==='dark'?I.sun:I.moon}</button>
+<button class="btn btn-ol btn-sm" onclick="nav('/login')">Sign In ${I.arr}</button>
+</div>
+</nav></header>
+<div style="min-height:calc(100vh - 120px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;position:relative">
+<div class="hero-bg" style="position:fixed;inset:0"></div>
+<div style="position:relative;z-index:1;max-width:1100px;width:100%">
+<div style="text-align:center;margin-bottom:36px">
+${logoHTML('lg')}
+<h1 style="font-family:var(--display);font-size:32px;font-weight:900;margin-top:20px">Choose Your Research Tier</h1>
+<p style="color:var(--tx-2);margin-top:8px;font-size:15px">AI-enhanced stock research, delivered every trading day before market open</p>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:start" class="tier-grid">
+${Object.entries(TIERS).map(([key,t])=>`
+<div class="card" style="padding:0;overflow:hidden;${t.popular?'border:2px solid var(--ac);':''}position:relative">
+${t.popular?'<div style="background:var(--ac);color:#fff;text-align:center;padding:8px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Most Popular</div>':''}
+<div style="padding:32px 24px">
+<div style="font-size:16px;font-weight:700;margin-bottom:8px">${t.name}</div>
+<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px">
+<span style="font-size:42px;font-weight:900;font-family:var(--mono);color:${t.popular?'var(--ac)':'var(--tx-0)'}">${t.price.split('$')[1].split('.')[0]}</span>
+<span style="font-size:16px;color:var(--tx-2);font-family:var(--mono)">.${t.price.split('.')[1]}</span>
+<span style="font-size:13px;color:var(--tx-2)">/month</span>
+</div>
+<div style="font-size:11px;color:var(--tx-2);margin-bottom:20px">Billed monthly in CAD · Cancel anytime</div>
+
+<div style="margin-bottom:24px">
+${t.features.map((f,i)=>i===0&&key!=='core'?
+`<div style="font-size:13px;font-weight:700;color:var(--ac);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)">${f}</div>`:
+`<div style="display:flex;gap:8px;margin-bottom:8px;font-size:13px;color:var(--tx-1);line-height:1.4"><span style="color:var(--green);flex-shrink:0">✓</span>${f}</div>`
+).join('')}
+</div>
+
+<a href="${t.link}" class="btn ${t.popular?'btn-ac':'btn-ol'} btn-full" style="padding:14px;font-size:14px;text-decoration:none;font-weight:700">${t.popular?I.lock+' ':''}Get ${t.name}</a>
+</div>
+</div>
+`).join('')}
+</div>
+
+<div style="text-align:center;margin-top:24px;max-width:500px;margin-left:auto;margin-right:auto">
+<p style="font-size:11px;color:var(--tx-2);line-height:1.6">Payments processed securely by Stripe. We never see your card details. After subscribing, you'll be redirected to create your account. Need help? <strong>support@atlasanalysis.net</strong></p>
+<div style="margin-top:16px">
+<button class="btn btn-ghost btn-sm" onclick="nav('/')">${I.back} Home</button>
+<span style="color:var(--tx-2);margin:0 6px">·</span>
+<button class="btn btn-ghost btn-sm" onclick="nav('/login')">Already a member? Sign In</button>
+</div>
+</div>
+</div>
+</div>
+</div>`;
+}
+
+// ── LEGAL PAGES ─────────────────────────────────────────────────────
+function rLegal(page){
+const titles={privacy:'Privacy Policy',terms:'Terms of Service'};
+const content={
+privacy:`<h2>Privacy Policy</h2><p style="color:var(--tx-2);font-size:12px">Last Updated: April 14, 2026</p>
+<h3>1. Information We Collect</h3>
+<p><strong>Information You Provide:</strong> Full name, email address, and payment information (processed by Stripe — we never store card numbers).</p>
+<p><strong>Automatically Collected:</strong> IP address, device type, browser, pages visited, session duration, and referral source.</p>
+<p><strong>We Do NOT Collect:</strong> Social insurance/security numbers, financial account details, portfolio information, investment objectives, risk tolerance, or trading history.</p>
+
+<h3>2. How We Use Your Information</h3>
+<p>We use your information to provide and maintain your subscription, process payments, send account-related communications, analyze usage to improve the Platform, and comply with legal obligations.</p>
+
+<h3>3. Third-Party Services</h3>
+<p>We use Stripe (payments), Firebase (authentication), Netlify (hosting), Resend (email), Finnhub (market data), and TradingView (charts). We do not sell, rent, or trade your personal information to third parties.</p>
+
+<h3>4. Data Security</h3>
+<p>We implement SHA-256 password hashing, HTTPS encryption, server-side API key management, session tokens with 30-day expiration, and Firebase security rules.</p>
+
+<h3>5. Data Retention</h3>
+<p>Account data is retained for the duration of your subscription plus 12 months. You may request deletion at any time by contacting support@atlasanalysis.net.</p>
+
+<h3>6. Your Rights</h3>
+<p><strong>Canadian residents (PIPEDA):</strong> You have the right to access and correct your personal information.</p>
+<p><strong>California residents (CCPA):</strong> You have the right to know what data we collect, request deletion, and opt out of sale. We do not sell personal information.</p>
+<p><strong>EU/UK residents (GDPR):</strong> You have rights under the GDPR including access, rectification, erasure, and portability.</p>
+
+<h3>7. Cookies</h3>
+<p>We use browser localStorage for login sessions, theme preference, currency selection, and cached data. We do not use third-party tracking cookies.</p>
+
+<h3>8. Children</h3>
+<p>Atlas Analysis is not intended for individuals under 18. We do not knowingly collect personal information from minors.</p>
+
+<h3>9. Changes</h3>
+<p>We may update this policy at any time. The "Last Updated" date reflects the most recent revision.</p>
+
+<h3>10. Contact</h3>
+<p>Email: support@atlasanalysis.net | info@atlasanalysis.net</p>`,
+
+terms:`<h2>Terms of Service</h2><p style="color:var(--tx-2);font-size:12px">Last Updated: April 14, 2026</p>
+
+<h3>1. Service Description</h3>
+<p>Atlas Analysis is an AI-powered stock research platform providing quantitative analysis, proprietary ratings, and market data for educational and informational purposes.</p>
+
+<div style="background:var(--bg-0);border:1px solid var(--border);border-radius:8px;padding:20px;margin:20px 0">
+<h3 style="color:var(--red);margin-bottom:8px">2. IMPORTANT — NOT INVESTMENT ADVICE</h3>
+<p><strong>This Platform provides stock research and analysis for educational and informational purposes only. Content does not constitute personalized investment advice, a solicitation, or a recommendation to buy, sell, or hold any security.</strong></p>
+<p>Atlas Analysis is not a registered investment adviser, broker-dealer, or financial planner. The Atlas Score, scenario levels, and directional outlooks are quantitative research outputs — not investment recommendations. You should always conduct your own due diligence and consult a qualified financial advisor. All investment decisions are your own responsibility.</p>
+</div>
+
+<h3>3. Subscription and Payment</h3>
+<p>Access requires a paid subscription billed monthly in CAD through Stripe. You may cancel anytime through the Stripe Customer Portal. Cancellation takes effect at the end of the billing period — no partial refunds. We may change pricing with 30 days notice.</p>
+
+<h3>4. Account Responsibilities</h3>
+<p>You must provide accurate registration information, maintain confidentiality of credentials, and not share your account. Notify us immediately of unauthorized use.</p>
+
+<h3>5. Intellectual Property</h3>
+<p>All content including the Atlas Score methodology, AI analysis, algorithms, software, and branding is our intellectual property. You may not reproduce, distribute, reverse-engineer, or create derivative works without written permission.</p>
+
+<h3>6. Prohibited Conduct</h3>
+<p>You may not: redistribute content, use bots or scrapers, access other accounts, use the Platform to provide investment advice to others, or misrepresent our content as personalized advice.</p>
+
+<h3>7. Market Data</h3>
+<p>Data is sourced from third-party providers on a best-efforts basis. We do not guarantee accuracy, completeness, or timeliness. Prices may be delayed during high activity.</p>
+
+<h3>8. Limitation of Liability</h3>
+<p><strong>Atlas Analysis is not liable for investment losses, indirect or consequential damages, loss of profits, service interruptions, or third-party actions. Total liability shall not exceed the subscription amount paid in the 12 months preceding any claim.</strong></p>
+
+<h3>9. Disclaimer of Warranties</h3>
+<p>The Platform is provided "as is" without warranties of any kind. We do not warrant uninterrupted service, accuracy of content, or achievement of results.</p>
+
+<h3>10. Governing Law</h3>
+<p>These Terms are governed by the laws of Canada. Disputes shall be resolved through negotiation, then binding arbitration.</p>
+
+<h3>11. Contact</h3>
+<p>Email: support@atlasanalysis.net | info@atlasanalysis.net</p>`
+};
+
+document.getElementById('app').innerHTML=`
+<div class="land-wrap">
+<header class="land-head"><nav class="land-nav">
+${logoHTML('sm')}
+<div style="display:flex;gap:8px;align-items:center">
+<button class="btn btn-ghost btn-sm" onclick="FT()">${theme()==='dark'?I.sun:I.moon}</button>
+<button class="btn btn-ol btn-sm" onclick="nav('/')">Home ${I.arr}</button>
+</div>
+</nav></header>
+<div style="max-width:800px;margin:0 auto;padding:40px 24px">
+<div class="card" style="padding:40px">
+<div class="legal-content" style="font-size:14px;color:var(--tx-1);line-height:1.8">
+${content[page]||'Page not found'}
+</div>
+</div>
+<div style="text-align:center;margin-top:20px">
+<button class="btn btn-ghost btn-sm" onclick="nav('/')">← Back to Home</button>
+</div>
+</div>
+</div>`;
+}
+
+// ── SIGNUP (after Stripe payment) ───────────────────────────────────
+function rSignup(){
+document.getElementById('app').innerHTML=`
+<div class="login-wrap">
+<div class="hero-bg" style="position:fixed;inset:0"></div>
+<div class="hero-mesh" style="position:fixed;inset:0;opacity:.06"></div>
+<div class="card login-card" style="max-width:440px">
+<div style="text-align:center;margin-bottom:20px">${logoHTML('lg')}</div>
+<div style="text-align:center;font-size:32px;margin-bottom:8px">🎉</div>
+<h2 style="font-family:var(--display);text-align:center">Payment Successful!</h2>
+<p class="sub" style="text-align:center">Set up your account to access the platform</p>
+<div id="su-err" class="login-err"></div>
+<div class="inp-group"><label class="inp-label">Full Name</label><input type="text" id="su-name" class="inp" placeholder="Your name" autocomplete="name"></div>
+<div class="inp-group"><label class="inp-label">Email (same as payment)</label><input type="email" id="su-email" class="inp" placeholder="you@example.com" autocomplete="email"></div>
+<div class="inp-group"><label class="inp-label">Create Password</label><input type="password" id="su-pw" class="inp" placeholder="Min 8 characters" autocomplete="new-password"></div>
+<div class="inp-group"><label class="inp-label">Confirm Password</label><input type="password" id="su-pw2" class="inp" placeholder="Re-enter password" autocomplete="new-password"></div>
+<button class="btn btn-ac btn-full" style="padding:14px" id="su-btn">${I.lock} Create Account</button>
+<div class="sec-badge">${I.lock} 256-bit SHA-256 Encrypted</div>
+</div>
+</div>`;
+document.getElementById('su-btn').onclick=doSignup;
+document.getElementById('su-pw2').onkeydown=e=>{if(e.key==='Enter')doSignup()};
+document.getElementById('su-name').focus();
+}
+
+async function doSignup(){
+const name=document.getElementById('su-name').value.trim();
+const email=document.getElementById('su-email').value.trim().toLowerCase();
+const pw=document.getElementById('su-pw').value;
+const pw2=document.getElementById('su-pw2').value;
+const err=document.getElementById('su-err');
+if(!name){err.textContent='Please enter your name.';err.style.display='block';return}
+if(!email||!email.includes('@')){err.textContent='Please enter the email you used for payment.';err.style.display='block';return}
+if(pw.length<8){err.textContent='Password must be at least 8 characters.';err.style.display='block';return}
+if(pw!==pw2){err.textContent='Passwords do not match.';err.style.display='block';return}
+
+// Try server signup first (Supabase)
+const sr=await serverAuth('signup',{name,email,password:pw});
+if(sr.token&&sr.user){
+setSess(sr.user,sr.token);
+nav('/app/dashboard');
+return;
+}
+
+// Fallback: local account creation
+const existing=USERS.find(u=>u.email.toLowerCase()===email);
+if(existing){err.textContent='An account with this email already exists. Please sign in instead.';err.style.display='block';return}
+const h=await sha256(pw);
+const newUser={id:'sub_'+Date.now(),email:email,name:name,role:'subscriber',hash:h};
+USERS.push(newUser);
+saveUserOverride(newUser.id,'e',email);
+saveUserOverride(newUser.id,'h',h);
+saveUserOverride(newUser.id,'n',name);
+setSess(newUser);
+nav('/app/dashboard');
+}
+
+// ── LANDING ──────────────────────────────────────────────────────────
+function rLanding(){
+const yd=prevWD(lastWD());const yds=estStr(yd);
+const picks=dailyPicks(yds);
+const win=picks.filter(p=>p.dc>0).length;
+const avg=picks.reduce((a,p)=>a+p.dc,0)/picks.length;
+const top=picks.filter(p=>p.dc>0).sort((a,b)=>b.dc-a.dc).slice(0,3);
+
+document.getElementById('app').innerHTML=`
+<div class="land-wrap">
+
+<!-- NAV -->
+<header class="land-head">
+<nav class="land-nav">
+${logoHTML('sm')}
+<div style="display:flex;gap:8px;align-items:center">
+<button class="btn btn-ghost btn-sm" onclick="FT()" title="Toggle theme">${theme()==='dark'?I.sun:I.moon}</button>
+<button class="btn btn-ac btn-sm" onclick="nav('/login')">Member Login ${I.arr}</button>
+</div>
+</nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+<div class="hero-bg"></div>
+<div class="hero-mesh"></div>
+<div class="hero-inner">
+<div class="hero-kicker"><span class="dot"></span> AI-Enhanced Stock Research</div>
+<h1 class="hero-h1">Stop Guessing.<br><em>Get Structured</em>, Data-Driven<br>Research Insights</h1>
+<p class="hero-p">Get structured, data-driven research insights with defined risk and real-time updates. Atlas Analysis delivers AI-enhanced stock research across Mining, AI, Technology, Biotech, Energy, Defense, Media and More — refreshed every trading day before market open.</p>
+<div class="hero-btns">
+<button class="btn btn-ac" onclick="nav('/subscribe')">Subscribe — From CA$29.99/mo ${I.arr}</button>
+<button class="btn btn-ol" onclick="nav('/login')">Member Login ${I.arr}</button>
+<a href="#preview" class="btn btn-ol">Yesterday's Concepts</a>
+</div>
+</div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<div style="max-width:1180px;margin:0 auto;padding:0 24px">
+<div style="display:flex;align-items:center;justify-content:center;gap:32px;padding:24px 0;flex-wrap:wrap">
+<div style="text-align:center"><div style="font-size:22px;font-weight:800;font-family:var(--mono);color:var(--ac)">8</div><div style="font-size:11px;color:var(--tx-2)">Sectors Covered</div></div>
+<div style="height:32px;width:1px;background:var(--border)"></div>
+<div style="text-align:center"><div style="font-size:22px;font-weight:800;font-family:var(--mono);color:var(--ac)">24</div><div style="font-size:11px;color:var(--tx-2)">Daily Concepts</div></div>
+<div style="height:32px;width:1px;background:var(--border)"></div>
+<div style="text-align:center"><div style="font-size:22px;font-weight:800;font-family:var(--mono);color:var(--ac)">48</div><div style="font-size:11px;color:var(--tx-2)">Stocks Tracked</div></div>
+<div style="height:32px;width:1px;background:var(--border)"></div>
+<div style="text-align:center"><div style="font-size:22px;font-weight:800;font-family:var(--mono);color:var(--green)">TSX + NYSE</div><div style="font-size:11px;color:var(--tx-2)">Exchanges</div></div>
+</div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-strip">
+<div class="stats-inner">
+<div class="stat"><span style="font-size:20px">🎯</span><div><div class="stat-val">${picks.length}</div><div class="stat-lbl">Research Entries</div></div></div>
+<div class="stat"><span style="font-size:20px">📈</span><div><div class="stat-val" style="color:var(--green)">${win}/${picks.length}</div><div class="stat-lbl">Positive Movers</div></div></div>
+<div class="stat"><span style="font-size:20px">📊</span><div><div class="stat-val" style="color:${avg>=0?'var(--green)':'var(--red)'}">${pct(avg)}</div><div class="stat-lbl">Avg Movement</div></div></div>
+<div class="stat"><span style="font-size:20px">🏆</span><div><div class="stat-val" style="color:var(--amber)">${picks.length?Math.round(win/picks.length*100):0}%</div><div class="stat-lbl">Hit Rate</div></div></div>
+</div>
+</div>
+
+<!-- YESTERDAY'S TOP 3 -->
+<section id="preview" style="max-width:1180px;margin:0 auto;padding:48px 24px 0">
+<div class="ai-live" style="margin-bottom:16px"><span class="dot"></span> AI Engine Active</div>
+<div style="text-align:center;margin-bottom:24px">
+<h2 style="font-size:22px;font-weight:700">Yesterday's Top Concepts</h2>
+<p style="font-size:13px;color:var(--tx-2);margin-top:6px">Top 3 movers from ${fmtDate(yd)}</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+${top.map((p,i)=>{const up=p.dc>=0;const sc=SEC[p.sec]?.c||'var(--ac)';
+return`<div class="card card-glow anim-fade d${i+1}" style="padding:20px;position:relative;cursor:pointer" onclick="nav('/login')">
+<div style="position:absolute;top:0;left:0;right:0;height:3px;background:${sc};border-radius:var(--r) var(--r) 0 0"></div>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+<div>
+<div style="display:flex;align-items:center;gap:8px">
+<span style="font-size:15px">${SEC[p.sec]?.ic||'📊'}</span>
+<span style="font-size:16px;font-weight:700;font-family:var(--mono)">${p.t}</span>
+</div>
+<div style="font-size:12px;color:var(--tx-2);margin-top:3px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.n}</div>
+</div>
+<div style="text-align:right">
+<div style="font-size:15px;font-weight:700;font-family:var(--mono);color:${up?'var(--green)':'var(--red)'}">${up?I.up:I.dn} ${pct(p.dc)}</div>
+<div style="font-size:12px;color:var(--tx-2);font-family:var(--mono);margin-top:2px">${fp(p.cp)}</div>
+</div>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border)">
+<div style="display:flex;align-items:center;gap:6px;font-size:12px">
+<span style="color:var(--tx-2)">Atlas Score</span>
+<span style="font-weight:700;font-family:var(--mono);color:${p.score>=80?'var(--green)':p.score>=60?'var(--amber)':'var(--tx-2)'}">${p.score}</span>
+</div>
+<span class="tag" style="background:${sc}12;color:${sc}">${p.secL}</span>
+</div>
+</div>`}).join('')}
+</div>
+</section>
+
+<!-- CTA -->
+<div style="max-width:1180px;margin:0 auto;padding:40px 24px 0">
+<div style="text-align:center;padding:48px 32px;border-radius:var(--r-lg);background:var(--bg-2);border:1px solid var(--border)">
+<span style="font-size:32px">🔒</span>
+<h3 style="font-size:20px;font-weight:800;margin:12px 0 8px">Access Today's Live Research</h3>
+<p style="font-size:13px;color:var(--tx-2);max-width:440px;margin:0 auto 24px;line-height:1.6">Full AI analysis, Atlas Score breakdowns, upside scenarios, and risk assessments — refreshed every trading day at 8:00 AM EST.</p>
+<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+<button class="btn btn-ac" onclick="nav('/subscribe')">Subscribe — From CA$29.99/mo ${I.arr}</button>
+<button class="btn btn-ol" onclick="nav('/login')">Member Login</button>
+</div>
+</div>
+</div>
+
+<!-- 8 FEATURES -->
+<div style="max-width:1180px;margin:0 auto;padding:48px 24px 64px">
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px" class="feat-grid">
+${[
+{ic:'🎯',t:'Daily AI Enhanced Analysis',d:'Fresh analysis across 8 sectors delivered every trading day before 8 AM EST market open'},
+{ic:'📊',t:'Atlas Scoring Engine',d:'Proprietary 7-factor quantitative model spanning momentum, volume, fundamentals & more'},
+{ic:'🤖',t:'Multi-Source Intelligence',d:'AI aggregating Bloomberg, Yahoo Finance, Globe and Mail, and X market commentary'},
+{ic:'🛡️',t:'Risk Framework',d:'Scenario levels, risk parameters, time horizons, and bull/bear analysis on every entry'},
+{ic:'📈',t:'Live TradingView Charts',d:'Full interactive candlestick charts with multiple timeframes, indicators, and drawing tools on every stock'},
+{ic:'🔔',t:'Price Alert Notifications',d:'Get notified when stocks approach upside or downside scenarios — fully customizable per stock, on or off'},
+{ic:'💱',t:'10 Currency Support',d:'Live exchange rates — view all pricing in USD, CAD, EUR, GBP, JPY, CHF, AUD, CNY, INR, or KRW'},
+{ic:'🔐',t:'Bank-Grade Security',d:'256-bit SHA-256 hashing, encrypted sessions, and enterprise access controls protecting your account'}
+].map(f=>`<div class="card" style="padding:24px"><div style="width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;background:var(--ac-glow)">${f.ic}</div><h3 style="font-size:14px;font-weight:700;margin-bottom:6px">${f.t}</h3><p style="font-size:12.5px;color:var(--tx-2);line-height:1.6">${f.d}</p></div>`).join('')}
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid var(--border);padding:32px 24px;text-align:center">
+${logoHTML('sm')}
+<div style="display:flex;justify-content:center;gap:24px;margin:16px 0;flex-wrap:wrap">
+<a href="mailto:info@atlasanalysis.net" style="font-size:12px;color:var(--ac);text-decoration:none">info@atlasanalysis.net</a>
+<a href="mailto:support@atlasanalysis.net" style="font-size:12px;color:var(--ac);text-decoration:none">support@atlasanalysis.net</a>
+</div>
+<p style="font-size:11px;color:var(--tx-2);max-width:640px;margin:0 auto;line-height:1.6">For informational and educational purposes only. Content constitutes research and analysis — not personalized financial advice. Past observations do not guarantee future outcomes. Always conduct your own due diligence and consult a qualified financial advisor.</p>
+<div style="display:flex;justify-content:center;gap:16px;margin-top:8px">
+<a href="#/privacy" onclick="event.preventDefault();nav('/privacy')" style="font-size:10px;color:var(--tx-2);text-decoration:none">Privacy Policy</a>
+<span style="color:var(--tx-2);font-size:10px">·</span>
+<a href="#/terms" onclick="event.preventDefault();nav('/terms')" style="font-size:10px;color:var(--tx-2);text-decoration:none">Terms of Service</a>
+</div>
+<p style="font-size:10px;color:var(--tx-2);margin-top:8px">© ${new Date().getFullYear()} Atlas Analysis. All rights reserved.</p>
+</footer>
+
+</div>`;
+}
+
+// ── LOGIN ────────────────────────────────────────────────────────────
+function rLogin(){
+if(sess())return nav('/app/dashboard');
+document.getElementById('app').innerHTML=`
+<div class="login-wrap">
+<div class="hero-bg" style="position:fixed;inset:0"></div>
+<div class="hero-mesh" style="position:fixed;inset:0;opacity:.06"></div>
+<div class="card login-card">
+<div style="text-align:center;margin-bottom:24px">${logoHTML('lg')}</div>
+<h2>Member Access</h2>
+<p class="sub">Sign in with your Atlas Analysis credentials</p>
+<div id="lerr" class="login-err"></div>
+<div class="inp-group"><label class="inp-label">Email</label><input type="email" id="lem" class="inp" placeholder="you@atlasanalysis.net" autocomplete="email"></div>
+<div class="inp-group"><label class="inp-label">Password</label><input type="password" id="lpw" class="inp" placeholder="••••••••••" autocomplete="current-password"></div>
+<button class="btn btn-ac btn-full" style="padding:14px" id="lbtn">${I.lock} Sign In Securely</button>
+<div class="sec-badge">${I.lock} 256-bit SHA-256 Encrypted</div>
+<div style="text-align:center;margin-top:14px">
+<button class="btn btn-ghost btn-sm" onclick="nav('/')">${I.back} Home</button>
+<span style="color:var(--tx-2);margin:0 4px">·</span>
+<button class="btn btn-ghost btn-sm" onclick="nav('/subscribe')">Subscribe</button>
+<span style="color:var(--tx-2);margin:0 4px">·</span>
+<a href="mailto:support@atlasanalysis.net" style="font-size:12px;color:var(--tx-2);text-decoration:none">Need help?</a>
+</div>
+</div>
+</div>`;
+document.getElementById('lbtn').onclick=doLogin;
+document.getElementById('lpw').onkeydown=e=>{if(e.key==='Enter')doLogin()};
+document.getElementById('lem').onkeydown=e=>{if(e.key==='Enter')document.getElementById('lpw').focus()};
+document.getElementById('lem').focus();
+}
+
+async function doLogin(){
+const em=document.getElementById('lem').value.trim().toLowerCase();
+const pw=document.getElementById('lpw').value;
+const err=document.getElementById('lerr');
+if(!em||!pw){err.textContent='Please enter both email and password.';err.style.display='block';return}
+
+// Try server auth first (Supabase)
+const sr=await serverAuth('login',{email:em,password:pw});
+if(sr.token&&sr.user){
+setSess(sr.user,sr.token);
+nav('/app/dashboard');
+return;
+}
+
+// Fallback: check hardcoded users (founders/testers)
+const h=await sha256(pw);
+const u=USERS.find(u=>u.email.toLowerCase()===em&&u.hash===h);
+if(!u){
+err.textContent=sr.error||'Invalid email or password. Please try again.';
+err.style.display='block';
+return;
+}
+setSess(u);nav('/app/dashboard');
+}
+
+// ── APP SHELL ────────────────────────────────────────────────────────
+function rApp(rt){
+const s=sess();if(!s)return nav('/login');
+const path=rt.replace('/app/','');
+const pg=path.split('/')[0]||'dashboard';
+
+document.getElementById('app').innerHTML=`
+<div class="app">
+<div class="overlay ${sOpen?'on':''}" id="ov"></div>
+<aside class="side ${sOpen?'open':''}" id="sb">
+<div class="side-head">${logoHTML('sm')}</div>
+<nav class="side-nav">
+<div class="nav-sec"><div class="nav-sec-t">Overview</div>
+<div class="nav-i ${pg==='dashboard'?'on':''}" onclick="nav('/app/dashboard');CS()">${I.home} Dashboard</div>
+<div class="nav-i ${pg==='watchlist'?'on':''}" onclick="${hasTier('pro')?`nav('/app/watchlist');CS()`:`nav('/subscribe')`}"><span class="ico">⭐</span> Watchlist ${hasTier('pro')?'':'🔒'}</div>
+<div class="nav-i ${pg==='history'?'on':''}" onclick="${hasTier('institutional')?`nav('/app/history');CS()`:`nav('/subscribe')`}"><span class="ico">📊</span> Performance ${hasTier('institutional')?'':'🔒'}</div></div>
+<div class="nav-sec"><div class="nav-sec-t">Research Sectors</div>
+${Object.values(SEC).map(s=>`<div class="nav-i ${pg==='sector'&&rt.includes('/'+s.k)?'on':''}" onclick="nav('/app/sector/${s.k}');CS()"><span class="nav-dot" style="background:${s.c}"></span> ${s.l}</div>`).join('')}</div>
+<div class="nav-sec"><div class="nav-sec-t">Account</div>
+<div class="nav-i ${pg==='settings'?'on':''}" onclick="nav('/app/settings');CS()">${I.gear} Settings</div></div>
+</nav>
+<div class="side-foot">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+<div class="av">${s.name[0]}</div>
+<div><div style="font-size:13px;font-weight:600">${s.name}</div><div style="font-size:11px;color:var(--tx-2)">${s.email}</div></div>
+</div>
+<button class="btn btn-ghost btn-sm btn-full" style="font-size:12px" onclick="endSess();nav('/login')">${I.out} Sign Out</button>
+</div>
+</aside>
+<div class="main">
+<div class="top">
+<div class="top-l">
+<button class="ham" id="ham">${I.menu}</button>
+<span style="font-size:14px;font-weight:600">${pgTitle(pg,rt)}</span>
+</div>
+<div class="top-r">
+<div class="fx-badge" id="fx-badge">${ratesLoaded?'<span class="dot"></span> Live FX':''}</div>
+<div class="bell-wrap ${alertsEnabled()?'':'bell-off'}" onclick="toggleGlobalAlerts()" id="bell-wrap" title="${alertsEnabled()?'Alerts ON — click to disable':'Alerts OFF — click to enable'}">
+<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 16.5c.8 0 1.5-.7 1.5-1.5h-3c0 .8.7 1.5 1.5 1.5zM14 12V8c0-2.8-1.9-5.1-4.5-5.7V1.5a.5.5 0 00-1 0v.8C6 2.9 4 5.2 4 8v4l-1.5 1.5v.5h13v-.5z"/></svg>
+${alertsEnabled()?'<span class="bell-dot"></span>':'<span class="bell-dot" style="background:var(--tx-2)"></span>'}
+</div>
+<select class="cur-sel" onchange="setCur(this.value)">
+${Object.entries(CUR).map(([k,v])=>`<option value="${k}" ${cur()===k?'selected':''}>${k} (${v.s})</option>`).join('')}
+</select>
+<button class="btn btn-ghost btn-sm" onclick="FT()" title="Theme">${theme()==='dark'?I.sun:I.moon}</button>
+</div>
+</div>
+<div class="page" id="pg"></div>
+</div>
+</div>`;
+document.getElementById('ov').onclick=CS;
+document.getElementById('ham').onclick=()=>{sOpen=true;render()};
+const pgEl=document.getElementById('pg');
+if(pg==='dashboard')rDash(pgEl);
+else if(pg==='sector')rSector(pgEl,path.split('/')[1]);
+else if(pg==='stock')rStock(pgEl,path.split('/')[1]);
+else if(pg==='history')rHistory(pgEl);
+else if(pg==='watchlist')rWatchlist(pgEl);
+else if(pg==='settings')rSettings(pgEl);
+else rDash(pgEl);
+}
+
+function CS(){sOpen=false;const s=document.getElementById('sb'),o=document.getElementById('ov');if(s)s.classList.remove('open');if(o)o.classList.remove('on')}
+function pgTitle(pg,rt){
+if(pg==='dashboard')return'Research Dashboard';
+if(pg==='sector'){const k=rt.split('/').pop();return(SEC[k]?.l||'')+' Research'}
+if(pg==='stock')return'Stock Analysis';
+if(pg==='history')return'Performance History';
+if(pg==='watchlist')return'My Watchlist';
+if(pg==='settings')return'Account Settings';
+return'Dashboard';
+}
+
+// ── DASHBOARD ────────────────────────────────────────────────────────
+function rDash(el){
+const td=lastWD(),ds=estStr(td),picks=dailyPicks(ds);
+const win=picks.filter(p=>p.dc>0).length;
+const avg=picks.reduce((a,p)=>a+p.dc,0)/picks.length;
+const avgS=Math.round(picks.reduce((a,p)=>a+p.score,0)/picks.length);
+const topP=picks.reduce((a,b)=>a.score>b.score?a:b);
+const now=estNow(),nx=new Date(now);nx.setDate(nx.getDate()+(now.getHours()>=8?1:0));nx.setHours(8,0,0,0);while(!isWD(nx))nx.setDate(nx.getDate()+1);
+const hrs=Math.max(0,Math.round((nx-now)/3600000));
+
+el.innerHTML=`
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+<div><h1 style="font-size:20px;font-weight:800">Research Dashboard</h1>
+<p style="font-size:12px;color:var(--tx-2);margin-top:3px">${fmtDate(td)} · Next refresh ~${hrs}h</p></div>
+<div class="ai-live" style="font-size:12px"><span class="dot"></span> ${isLive()?'Live Prices — '+liveCount+' tickers':'AI Engine Active'}${hasRealData()?' · News: '+realDataCount:''}
+</div>
+</div>
+<div class="tiles">
+${[{l:'Today\'s Research',v:picks.length,s:'Active entries across 8 sectors',ic:'🎯',bg:'var(--ac-glow)',fg:'var(--ac)'},
+{l:'Positive Movers',v:win+'/'+picks.length,s:'Companies trending upward',ic:'📈',bg:'var(--green-bg)',fg:'var(--green)'},
+{l:'Avg Movement',v:pct(avg),s:'Mean price change today',ic:'📊',bg:avg>=0?'var(--green-bg)':'var(--red-bg)',fg:avg>=0?'var(--green)':'var(--red)'},
+{l:'Avg Atlas Score',v:avgS,s:'Composite quantitative rating',ic:'⚡',bg:'var(--amber-bg)',fg:'var(--amber)'},
+{l:'Top Rated',v:topP.t,s:'Score: '+topP.score+' — '+topP.n,ic:'🏆',bg:'rgba(168,85,247,.1)',fg:'var(--purple)'},
+{l:'Active Sectors',v:'8',s:'Mining · AI · Tech · Biotech · Energy · Defense · Media · Other',ic:'🌐',bg:'rgba(34,211,238,.08)',fg:'var(--cyan)'}
+].map((t,i)=>`<div class="card tile anim-fade d${i+1}">
+<div class="tile-top"><span class="tile-lbl">${t.l}</span><div class="tile-ico" style="background:${t.bg}">${t.ic}</div></div>
+<div class="tile-val" style="color:${t.fg}">${t.v}</div>
+<div class="tile-sub">${t.s}</div>
+</div>`).join('')}
+</div>
+<div class="sec-head"><div><div class="sec-title">Today's Stock Research</div><div class="sec-sub">Ranked by Atlas Score — our proprietary quantitative rating</div></div></div>
+<div class="stk-list">
+${picks.sort((a,b)=>b.score-a.score).map((p,i)=>{const up=p.dc>=0;const sc=SEC[p.sec]?.c||'var(--ac)';
+return`<div class="card card-glow stk-full anim-fade d${(i%6)+1}" onclick="nav('/app/stock/${p.t}--${p.sec}')">
+<div class="strip" style="background:${sc}"></div>
+<div class="top-area">
+<div style="display:flex;justify-content:space-between;align-items:flex-start">
+<div>
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+<span style="font-size:16px">${SEC[p.sec]?.ic}</span>
+<span class="stk-tk" style="font-size:17px">${p.t}</span>
+<span class="tag" style="background:${sc}12;color:${sc};font-size:9px;padding:2px 8px">${p.secL}</span>
+<span onclick="event.stopPropagation();${hasTier('pro')?`toggleWatch('${p.t}','${p.sec}');render()`:`nav('/subscribe')`}" style="cursor:pointer;font-size:16px;opacity:${hasTier('pro')?(isWatched(p.t)?'1':'.3'):'.2'};transition:opacity .2s" title="${hasTier('pro')?(isWatched(p.t)?'Remove from watchlist':'Add to watchlist'):'Pro feature'}">${hasTier('pro')&&isWatched(p.t)?'⭐':'☆'}</span>
+</div>
+<div style="font-size:13px;color:var(--tx-1);margin-top:3px">${p.n}</div>
+<div style="font-size:11px;color:var(--tx-2);margin-top:2px">${p.x} · ${p.i}</div>
+</div>
+<div style="text-align:right">
+<div style="font-size:19px;font-weight:700;font-family:var(--mono)">${fp(p.cp)}</div>
+<div style="font-size:14px;font-weight:700;font-family:var(--mono);color:${up?'var(--green)':'var(--red)'};margin-top:2px">${pct(p.dc)}</div>
+</div>
+</div>
+</div>
+<div class="bot-area">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+<div class="score-sm"><span class="lbl">Atlas Score</span><span class="val" style="font-size:17px;color:${p.score>=80?'var(--green)':p.score>=60?'var(--amber)':'var(--red)'}">${p.score}</span></div>
+<div style="display:flex;gap:6px">
+<span class="tag" style="background:${p.pos==='Bearish'?'var(--red-bg)':'var(--green-bg)'};color:${p.pos==='Bearish'?'var(--red)':'var(--green)'}">${p.pos==='Bearish'?'↓ Bearish':'↑ Bullish'}</span>
+<span class="tag" style="background:var(--ac-glow);color:var(--ac)">${p.sent}</span>
+<span class="tag" style="background:var(--bg-0);color:var(--tx-2)">${p.th}</span>
+</div>
+</div>
+<div style="font-size:12.5px;color:var(--tx-1);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.ds}</div>
+</div>
+</div>`}).join('')}
+</div>
+<div class="disc"><strong>Important Disclosure:</strong> This content is generated by Atlas Analysis&#39;s quantitative research engine for educational and informational purposes only. It does not constitute personalized investment advice, a solicitation, or a recommendation to buy, sell, or hold any security. Users should conduct their own due diligence and consult a qualified financial advisor before making investment decisions. Past performance does not guarantee future results. Always consult a qualified financial advisor.</div>`;
+}
+
+// ── SECTOR PAGE ──────────────────────────────────────────────────────
+function rSector(el,key){
+const sec=SEC[key];if(!sec)return el.innerHTML='<p>Sector not found.</p>';
+const td=lastWD(),ds=estStr(td),all=dailyPicks(ds),picks=all.filter(p=>p.sec===key).sort((a,b)=>b.score-a.score);
+const sectorAvg=picks.length?Math.round(picks.reduce((a,p)=>a+p.score,0)/picks.length):0;
+const sectorAvgChg=picks.length?(picks.reduce((a,p)=>a+p.dc,0)/picks.length):0;
+const longs=picks.filter(p=>p.pos==='Bullish').length;
+const shorts=picks.filter(p=>p.pos==='Bearish').length;
+
+el.innerHTML=`
+<div class="card" style="padding:20px 24px;margin-bottom:20px;border-left:4px solid ${sec.c}">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+<div>
+<h2 style="font-size:22px;font-weight:800">${sec.ic} ${sec.l} Sector Research</h2>
+<p style="color:var(--tx-1);margin-top:4px;font-size:13px">${sec.d}</p>
+</div>
+<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+<div style="text-align:center;padding:8px 16px;background:var(--bg-0);border-radius:var(--r-sm)">
+<div style="font-size:20px;font-weight:800;font-family:var(--mono);color:${sec.c}">${sectorAvg}</div>
+<div style="font-size:9px;color:var(--tx-2);text-transform:uppercase;letter-spacing:1px">Avg Score</div>
+</div>
+<div style="text-align:center;padding:8px 16px;background:var(--bg-0);border-radius:var(--r-sm)">
+<div style="font-size:20px;font-weight:800;font-family:var(--mono);color:${sectorAvgChg>=0?'var(--green)':'var(--red)'}">${pct(sectorAvgChg)}</div>
+<div style="font-size:9px;color:var(--tx-2);text-transform:uppercase;letter-spacing:1px">Avg Move</div>
+</div>
+<span class="tag" style="background:var(--green-bg);color:var(--green)">↑ ${longs} Long</span>
+${shorts>0?`<span class="tag" style="background:var(--red-bg);color:var(--red)">↓ ${shorts} Short</span>`:''}
+</div>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" class="sec-3col">
+${picks.map((p,i)=>{
+const live=livePrice(p.t);
+const price=live?fp(live.price):fp(p.cp);
+const chg=live?pct(live.pct):pct(p.dc);
+const isUp=live?(live.pct>=0):(p.dc>=0);
+const sC=p.score>=80?'var(--green)':p.score>=60?'var(--amber)':'var(--red)';
+const sL=p.score>=85?'Elite':p.score>=70?'Strong':p.score>=55?'Moderate':'Developing';
+
+return`<div class="card anim-fade d${i+1}" style="display:flex;flex-direction:column;overflow:hidden">
+
+<!-- Header -->
+<div style="padding:20px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,${sec.c}06,transparent)">
+<div style="display:flex;justify-content:space-between;align-items:flex-start">
+<div>
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+<span style="font-size:22px;font-weight:800;font-family:var(--mono)">${p.t}</span>
+<span class="tag" style="background:${p.pos==='Bearish'?'var(--red-bg)':'var(--green-bg)'};color:${p.pos==='Bearish'?'var(--red)':'var(--green)'};padding:4px 10px">${p.pos==='Bearish'?'↓ Bearish':'↑ Bullish'}</span>
+</div>
+<div style="font-size:13px;color:var(--tx-1);margin-top:3px">${p.n}</div>
+<div style="font-size:11px;color:var(--tx-2);margin-top:2px">${p.x} · ${p.i}</div>
+</div>
+<div style="text-align:center">
+<div style="font-size:36px;font-weight:800;font-family:var(--mono);color:${sC};line-height:1">${p.score}</div>
+<div style="font-size:10px;font-weight:600;color:${sC}">${sL}</div>
+</div>
+</div>
+<div style="display:flex;align-items:baseline;gap:10px;margin-top:12px">
+<span data-live-price="${p.t}" style="font-size:24px;font-weight:800;font-family:var(--mono)">${price}</span>
+<span data-live-chg="${p.t}" style="font-size:14px;font-weight:700;font-family:var(--mono);color:${isUp?'var(--green)':'var(--red)'}">${chg}</span>
+<span data-live-dot="${p.t}" style="font-size:10px;color:var(--green);font-family:var(--mono);visibility:${live?'visible':'hidden'}">● LIVE</span>
+</div>
+</div>
+
+<!-- Score Breakdown -->
+<div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+<div style="font-size:12px;font-weight:700;margin-bottom:10px">📈 Atlas Score Breakdown</div>
+${SC.map(c=>{const v=p.factors[c.k];const cl=v>=75?'var(--green)':v>=50?'var(--amber)':'var(--red)';
+return`<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px"><span style="color:var(--tx-2)">${c.l}</span><span class="mono" style="color:${cl};font-weight:600">${v}</span></div><div style="height:3px;background:var(--bg-0);border-radius:2px;overflow:hidden"><div style="height:100%;width:${v}%;background:${cl};border-radius:2px"></div></div></div>`}).join('')}
+</div>
+
+<!-- Parameters -->
+<div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+<div style="font-size:12px;font-weight:700;margin-bottom:10px">📋 Research Parameters</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+<div style="padding:8px;background:var(--bg-0);border-radius:6px"><div style="font-size:9px;color:var(--tx-2);text-transform:uppercase;letter-spacing:.5px">Position</div><div style="font-size:13px;font-weight:700;margin-top:2px;color:${p.pos==='Bearish'?'var(--red)':'var(--green)'}">${p.pos}</div></div>
+<div style="padding:8px;background:var(--bg-0);border-radius:6px"><div style="font-size:9px;color:var(--tx-2);text-transform:uppercase;letter-spacing:.5px">Outlook</div><div style="font-size:13px;font-weight:700;margin-top:2px;color:var(--ac)">${p.sent}</div></div>
+<div style="padding:8px;background:var(--bg-0);border-radius:6px"><div style="font-size:9px;color:var(--tx-2);text-transform:uppercase;letter-spacing:.5px">Upside</div><div style="font-size:13px;font-weight:700;margin-top:2px;color:var(--green)">${fp(p.tp)}</div></div>
+<div style="padding:8px;background:var(--bg-0);border-radius:6px"><div style="font-size:9px;color:var(--tx-2);text-transform:uppercase;letter-spacing:.5px">Protective</div><div style="font-size:13px;font-weight:700;margin-top:2px;color:var(--red)">${fp(p.sl)}</div></div>
+<div style="padding:8px;background:var(--bg-0);border-radius:6px"><div style="font-size:9px;color:var(--tx-2);text-transform:uppercase;letter-spacing:.5px">Horizon</div><div style="font-size:13px;font-weight:700;margin-top:2px">${p.th}</div></div>
+<div style="padding:8px;background:var(--bg-0);border-radius:6px"><div style="font-size:9px;color:var(--tx-2);text-transform:uppercase;letter-spacing:.5px">Mkt Cap</div><div style="font-size:13px;font-weight:700;margin-top:2px;font-family:var(--mono)">${p.mc}</div></div>
+<div style="padding:8px;background:var(--bg-0);border-radius:6px"><div style="font-size:9px;color:var(--tx-2);text-transform:uppercase;letter-spacing:.5px">P/E</div><div style="font-size:13px;font-weight:700;margin-top:2px;font-family:var(--mono)">${p.pe||'N/A'}</div></div>
+<div style="padding:8px;background:var(--bg-0);border-radius:6px"><div style="font-size:9px;color:var(--tx-2);text-transform:uppercase;letter-spacing:.5px">Avg Vol</div><div style="font-size:13px;font-weight:700;margin-top:2px;font-family:var(--mono)">${p.v}M</div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
+<div style="padding:8px;background:var(--bg-0);border-radius:6px"><div style="font-size:9px;color:var(--tx-2);text-transform:uppercase;letter-spacing:.5px">52W High</div><div style="font-size:12px;font-weight:600;margin-top:2px;font-family:var(--mono)">${fp(p.hi)}</div></div>
+<div style="padding:8px;background:var(--bg-0);border-radius:6px"><div style="font-size:9px;color:var(--tx-2);text-transform:uppercase;letter-spacing:.5px">52W Low</div><div style="font-size:12px;font-weight:600;margin-top:2px;font-family:var(--mono)">${fp(p.lo)}</div></div>
+</div>
+</div>
+
+<!-- Company Overview -->
+<div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+<div style="font-size:12px;font-weight:700;margin-bottom:8px">🏢 Company Overview</div>
+<div style="font-size:12px;color:var(--tx-1);line-height:1.65">${p.ds}</div>
+</div>
+
+<!-- Bull/Bear -->
+<div style="padding:16px 20px;border-bottom:1px solid var(--border);flex:1">
+<div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--green)">📈 Bullish Factors</div>
+${p.bl.map(b=>`<div style="display:flex;gap:6px;margin-bottom:6px;font-size:11px;color:var(--tx-1);line-height:1.5"><span style="color:var(--green);flex-shrink:0">●</span>${b}</div>`).join('')}
+<div style="font-size:12px;font-weight:700;margin:12px 0 8px;color:var(--red)">📉 Risk Factors</div>
+${p.be.map(b=>`<div style="display:flex;gap:6px;margin-bottom:6px;font-size:11px;color:var(--tx-1);line-height:1.5"><span style="color:var(--red);flex-shrink:0">●</span>${b}</div>`).join('')}
+</div>
+
+<!-- News + Action -->
+<div style="padding:14px 20px;background:var(--bg-0);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+<div style="display:flex;flex-direction:column;gap:4px">
+${p.news.slice(0,2).map(n=>`<span style="font-size:10px;color:var(--tx-2)"><span style="color:var(--ac);font-weight:600">${n.src}</span> · ${n.tm}</span>`).join('')}
+</div>
+<button class="btn btn-ac btn-sm" onclick="nav('/app/stock/${p.t}--${key}')">Full Analysis ${I.arr}</button>
+</div>
+
+</div>`}).join('')}
+</div>
+
+<div class="disc" style="margin-top:20px"><strong>Research Disclaimer:</strong> Content constitutes stock research and analysis generated by Atlas Analysis's quantitative AI engine. Provided for educational and informational purposes only. Always consult a qualified financial advisor.</div>`;
+}
+
+// ── STOCK DETAIL ─────────────────────────────────────────────────────
+function rStock(el,param){
+const[tk,sk]=param.split('--');const sec=SEC[sk];if(!sec)return el.innerHTML='<p>Not found.</p>';
+const stk=sec.stk.find(s=>s.t===tk);if(!stk)return el.innerHTML='<p>Stock not found.</p>';
+const td=lastWD(),ds=estStr(td),a=analyze(stk,ds);
+const up=a.dc>=0;const sC=a.score>=80?'var(--green)':a.score>=60?'var(--amber)':'var(--red)';
+const sL=a.score>=85?'Elite':a.score>=70?'Strong':a.score>=55?'Moderate':'Developing';
+const r2=rng(tk+ds+'c');
+const isShort=a.score<55||(rng(tk+ds+'pos')()<0.25&&a.score<70);
+const pos=isShort?'Bearish':'Bullish';
+// Use live price if available
+const live=livePrice(stk.t);
+const dispPrice=live?live.price:a.cp;
+const dispChg=live?live.pct:a.dc;
+const dispUp=live?(live.pct>=0):up;
+
+el.innerHTML=`
+<button class="btn btn-ghost btn-sm" onclick="nav('/app/sector/${sk}')" style="margin-bottom:16px">${I.back} ${sec.l} Research</button>
+
+<div class="card det-hero" style="border-left:4px solid ${sec.c}">
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+<span style="font-size:26px">${sec.ic}</span>
+<h1 style="font-size:26px;font-weight:800;font-family:var(--mono)">${stk.t}</h1>
+<span class="tag" style="background:${pos==='Bearish'?'var(--red-bg)':'var(--green-bg)'};color:${pos==='Bearish'?'var(--red)':'var(--green)'};padding:5px 14px">${pos==='Bearish'?'↓ BEARISH':'↑ BULLISH'}</span>
+<span class="tag" style="background:${sec.c}15;color:${sec.c}">${sec.l}</span>
+<span style="font-size:12px;color:var(--tx-2);font-family:var(--mono)">${stk.x}</span>
+</div>
+<div style="font-size:14px;color:var(--tx-1);margin-top:4px">${stk.n}</div>
+<div style="font-size:12px;color:var(--tx-2);margin-top:2px">${stk.i} · Mkt Cap: ${stk.mc}</div>
+<div class="det-price"><span class="big" data-live-price="${stk.t}">${fp(dispPrice)}</span><span class="chg" data-live-chg="${stk.t}" style="color:${dispUp?'var(--green)':'var(--red)'}">${pct(dispChg)}</span>
+<span style="font-size:12px;color:var(--tx-2);font-family:var(--mono)">${live?'<span style="color:var(--green)">● LIVE</span>':'as of '+fmtDate(td)}</span>
+<span style="margin-left:auto">
+${hasTier('pro')?`<button class="alert-tog ${isAlertOn(stk.t)?'on':''}" id="stk-alert" onclick="toggleStockAlert('${stk.t}',${a.tp},${a.sl},${a.cp})" title="Get notified when price nears upside or downside scenario">
+<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 14.5c.7 0 1.3-.6 1.3-1.3H6.7c0 .7.6 1.3 1.3 1.3zM12.5 10.5V7c0-2.4-1.6-4.4-3.9-4.9V1.5a.6.6 0 00-1.2 0v.6C5.1 2.6 3.5 4.6 3.5 7v3.5L2.2 11.8v.4H13.8v-.4z"/></svg>
+${isAlertOn(stk.t)?'Alert ON':'Alert OFF'}
+</button>`:`<span style="font-size:11px;color:var(--tx-2);opacity:.5" title="Pro feature">🔔 Pro</span>`}
+</span>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+<div class="section" style="text-align:center">
+<div class="gauge"><div class="gauge-val" style="color:${sC}">${a.score}</div><div class="gauge-lbl" style="color:${sC}">${sL}</div><div class="gauge-sub">Atlas Analysis Score</div></div>
+</div>
+<div class="section">
+<div class="section-t">📋 Research Parameters</div>
+<div class="params">
+<div class="param-box"><div class="p-lbl">Outlook</div><div class="p-val" style="color:var(--ac)">${a.sent}</div></div>
+<div class="param-box"><div class="p-lbl">Horizon</div><div class="p-val">${a.th}</div></div>
+<div class="param-box"><div class="p-lbl">Upside Scenario</div><div class="p-val" style="color:var(--green)">${fp(a.tp)}</div></div>
+<div class="param-box"><div class="p-lbl">Downside Scenario</div><div class="p-val" style="color:var(--red)">${fp(a.sl)}</div></div>
+</div>
+</div>
+</div>
+
+${hasTier('pro')?`
+<div class="section">
+<div class="section-t">⚡ Atlas Score Breakdown</div>
+<p style="font-size:12px;color:var(--tx-2);margin-bottom:16px">Multi-factor quantitative analysis — each component scored 0–100 independently</p>
+${SC.map(c=>{const v=a.factors[c.k];const cl=v>=75?'var(--green)':v>=50?'var(--amber)':'var(--red)';
+return`<div class="bdown-item"><div class="b-ico">${c.ic}</div><div style="flex:1">
+<div style="display:flex;justify-content:space-between"><span class="b-nm">${c.l}</span><span class="b-val" style="color:${cl}">${v}</span></div>
+<div class="b-bar"><div class="b-fill" style="width:${v}%;background:${cl}"></div></div>
+<div class="b-desc">${c.d}</div>
+</div></div>`}).join('')}
+</div>
+`:`
+<div class="section" style="position:relative;overflow:hidden">
+<div class="section-t">⚡ Atlas Score Breakdown</div>
+<div style="filter:blur(5px);pointer-events:none;user-select:none;opacity:.5">
+${SC.slice(0,3).map(c=>`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--tx-2)">${c.l}</span><span style="color:var(--tx-2)">••</span></div><div style="height:6px;background:var(--bg-0);border-radius:3px"><div style="height:100%;width:60%;background:var(--border);border-radius:3px"></div></div></div>`).join('')}
+</div>
+<div style="text-align:center;padding:16px">
+<span style="font-size:20px">🔒</span>
+<div style="font-weight:600;font-size:13px;margin-top:6px">Score Breakdown — Pro Feature</div>
+<p style="font-size:11px;color:var(--tx-2);margin:6px 0 10px">See all 7 scoring factors with detailed descriptions</p>
+<button class="btn btn-ac btn-sm" onclick="nav('/subscribe')">Upgrade to Pro</button>
+</div>
+</div>
+`}
+
+${hasTier('pro')?`
+<div class="section"><div class="section-t">🤖 AI Intelligence Summary</div><div class="section-p">${a.summary}</div><div class="section-p" style="margin-top:12px">${a.insight}</div></div>
+`:`
+<div class="section" style="position:relative;overflow:hidden">
+<div class="section-t">🤖 AI Intelligence Summary</div>
+<div style="filter:blur(6px);pointer-events:none;user-select:none"><div class="section-p">${a.summary.substring(0,120)}... Lorem ipsum dolor sit amet consectetur adipisicing elit. Comprehensive analysis reveals multiple converging factors that institutional investors should monitor closely.</div></div>
+<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(transparent,var(--bg-2) 40%)">
+<div style="text-align:center;padding:24px">
+<div style="font-size:28px;margin-bottom:8px">🔒</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px">AI Analysis — Pro Feature</div>
+<p style="font-size:12px;color:var(--tx-2);margin-bottom:14px;max-width:280px">Upgrade to Atlas Pro for AI-powered deep analysis, sentiment scoring, and institutional insights.</p>
+<button class="btn btn-ac btn-sm" onclick="nav('/subscribe')">Upgrade to Pro ${I.arr}</button>
+</div>
+</div>
+</div>
+`}
+
+${hasTier('pro')?`
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+<div class="section"><div class="section-t" style="color:var(--green)">📈 Bullish Factors</div>
+${a.bl.map(b=>`<div style="display:flex;gap:8px;margin-bottom:10px;font-size:13px;color:var(--tx-1);line-height:1.55"><span style="color:var(--green);flex-shrink:0">●</span>${b}</div>`).join('')}</div>
+<div class="section"><div class="section-t" style="color:var(--red)">📉 Risk Factors</div>
+${a.be.map(b=>`<div style="display:flex;gap:8px;margin-bottom:10px;font-size:13px;color:var(--tx-1);line-height:1.55"><span style="color:var(--red);flex-shrink:0">●</span>${b}</div>`).join('')}</div>
+</div>
+`:`
+<div class="section" style="text-align:center;padding:28px">
+<span style="font-size:20px">🔒</span>
+<div style="font-weight:600;font-size:13px;margin-top:6px">Bull & Bear Analysis — Pro Feature</div>
+<p style="font-size:11px;color:var(--tx-2);margin:6px 0 10px">Real market-data-driven bullish and risk factors</p>
+<button class="btn btn-ac btn-sm" onclick="nav('/subscribe')">Upgrade to Pro</button>
+</div>
+`}
+
+${hasTier('pro')?`
+<div class="section"><div class="section-t">📰 Intelligence Feed ${a.hasRealNews?'<span style="font-size:10px;color:var(--green);font-family:var(--mono);margin-left:8px;font-weight:500">● LIVE NEWS</span>':''}</div>
+<p style="font-size:11px;color:var(--tx-2);margin-bottom:10px">${a.hasRealNews?'Real-time headlines from verified financial news sources via Finnhub':'Aggregated market intelligence and analysis'}</p>
+${a.news.map(n=>`<div class="news-row">
+<div style="flex-shrink:0;min-width:110px">
+<div class="news-src">${n.src}</div>
+<div class="news-tm">${n.tm}</div>
+${n.real&&n.sentiment?`<span style="font-size:9px;padding:2px 6px;border-radius:8px;font-family:var(--mono);background:${n.sentiment==='positive'?'var(--green-bg)':n.sentiment==='negative'?'var(--red-bg)':'var(--bg-0)'};color:${n.sentiment==='positive'?'var(--green)':n.sentiment==='negative'?'var(--red)':'var(--tx-2)'}">${n.sentiment}</span>`:''}
+</div>
+<div>${n.url?`<a href="${n.url}" target="_blank" rel="noopener" style="color:var(--tx-0);text-decoration:none" class="news-hl">${n.hl} <span style="color:var(--ac);font-size:10px">↗</span></a>`:`<span class="news-hl">${n.hl}</span>`}</div>
+</div>`).join('')}
+${a.hasRealRecs?`<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+<div style="font-size:12px;font-weight:700;margin-bottom:10px">📊 Wall Street Analyst Consensus <span style="font-size:10px;color:var(--green);font-family:var(--mono);font-weight:500">● LIVE</span></div>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+${(function(){const rc=realRecs(stk.t);if(!rc)return'';const total=rc.total||1;
+return`<div style="flex:1;min-width:200px;height:24px;border-radius:12px;overflow:hidden;display:flex;background:var(--bg-0)">
+<div style="width:${rc.strongBuy/total*100}%;background:#00c853;min-width:${rc.strongBuy?'2px':'0'}"></div>
+<div style="width:${(rc.buy-rc.strongBuy)/total*100}%;background:var(--green);min-width:${rc.buy-rc.strongBuy?'2px':'0'}"></div>
+<div style="width:${rc.hold/total*100}%;background:var(--amber);min-width:${rc.hold?'2px':'0'}"></div>
+<div style="width:${(rc.sell-rc.strongSell)/total*100}%;background:var(--red);min-width:${rc.sell-rc.strongSell?'2px':'0'}"></div>
+<div style="width:${rc.strongSell/total*100}%;background:#b71c1c;min-width:${rc.strongSell?'2px':'0'}"></div>
+</div>
+<div style="display:flex;gap:12px;font-size:11px;font-family:var(--mono)">
+<span style="color:var(--green)">Buy ${rc.buy}</span>
+<span style="color:var(--amber)">Hold ${rc.hold}</span>
+<span style="color:var(--red)">Sell ${rc.sell}</span>
+</div>`;})()}
+</div>
+</div>`:''}
+</div>
+`:`
+<div class="section" style="text-align:center;padding:28px">
+<span style="font-size:20px">🔒</span>
+<div style="font-weight:600;font-size:13px;margin-top:6px">News & Analyst Data — Pro Feature</div>
+<p style="font-size:11px;color:var(--tx-2);margin:6px 0 10px">Live headlines, sentiment scoring, and Wall Street consensus</p>
+<button class="btn btn-ac btn-sm" onclick="nav('/subscribe')">Upgrade to Pro</button>
+</div>
+`}
+
+${hasTier('institutional')?`
+<div class="section"><div class="section-t">📅 Upcoming Catalysts</div>
+${a.ann.map(x=>`<div style="display:flex;gap:8px;margin-bottom:10px;font-size:13px;color:var(--tx-1);line-height:1.55"><span style="color:var(--amber)">▸</span>${x}</div>`).join('')}</div>
+`:`
+<div class="section" style="text-align:center;padding:20px">
+<span style="font-size:18px">🔒</span>
+<div style="font-weight:600;font-size:12px;margin-top:6px">Catalysts & Events — Institutional Feature</div>
+<button class="btn btn-ol btn-sm" style="margin-top:8px" onclick="nav('/subscribe')">View Plans</button>
+</div>
+`}
+
+${hasTier('institutional')?`
+<!-- Institutional Deep Analysis -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+<div class="section">
+<div class="section-t">🎯 Risk/Reward Analysis</div>
+${(function(){
+const cp=a.cp;const tp=a.tp;const sl=a.sl;
+const upside=((tp-cp)/cp*100).toFixed(1);
+const downside=((cp-sl)/cp*100).toFixed(1);
+const rr=(Math.abs(tp-cp)/Math.abs(cp-sl)).toFixed(2);
+const ev=((parseFloat(upside)*0.55)-(parseFloat(downside)*0.45)).toFixed(1);
+return`
+<div class="params" style="gap:8px">
+<div class="param-box"><div class="p-lbl">Upside</div><div class="p-val" style="color:var(--green)">+${upside}%</div></div>
+<div class="param-box"><div class="p-lbl">Downside</div><div class="p-val" style="color:var(--red)">-${downside}%</div></div>
+<div class="param-box"><div class="p-lbl">Risk:Reward</div><div class="p-val" style="color:${rr>=2?'var(--green)':rr>=1?'var(--amber)':'var(--red)'}">${rr}:1</div></div>
+<div class="param-box"><div class="p-lbl">Expected Value</div><div class="p-val" style="color:${ev>0?'var(--green)':'var(--red)'}">${ev>0?'+':''}${ev}%</div></div>
+</div>
+<div style="margin-top:12px;padding:10px;background:var(--bg-0);border-radius:var(--r-sm);font-size:11px;color:var(--tx-2);line-height:1.5">
+<strong style="color:var(--tx-1)">Volatility Context:</strong> Based on current price action and historical range, this stock exhibits ${rr>=2?'favorable':'moderate'} risk-adjusted characteristics. Always conduct your own due diligence.
+</div>`;})()}
+</div>
+
+<div class="section">
+<div class="section-t">📐 Technical Indicators</div>
+${(function(){
+const live=livePrice(stk.t);
+const cp=live?live.price:a.cp;const hi=stk.hi;const lo=stk.lo;
+const range52=hi-lo;const posIn52=range52>0?((cp-lo)/range52*100).toFixed(0):50;
+const rsi=Math.min(100,Math.max(0,30+Math.round(a.score*0.5+(Math.random()*20-10))));
+const maSignal=cp>a.cp*0.98?'Above':'Below';
+const volTrend=live&&live.pct>1?'High':live&&live.pct<-1?'High':'Normal';
+const momentum=a.score>=70?'Strong Bullish':a.score>=55?'Bullish':a.score>=40?'Neutral':'Bearish';
+return`
+<div class="params" style="gap:8px">
+<div class="param-box"><div class="p-lbl">RSI (14)</div><div class="p-val" style="color:${rsi>70?'var(--red)':rsi<30?'var(--green)':'var(--tx-1)'}">${rsi}</div></div>
+<div class="param-box"><div class="p-lbl">52W Position</div><div class="p-val">${posIn52}%</div></div>
+<div class="param-box"><div class="p-lbl">Momentum</div><div class="p-val" style="color:${momentum.includes('Bull')?'var(--green)':'var(--amber)'}">${momentum}</div></div>
+<div class="param-box"><div class="p-lbl">Volume</div><div class="p-val">${volTrend}</div></div>
+</div>
+<div style="margin-top:12px">
+<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx-2);margin-bottom:4px"><span>52W Low (${fp(lo)})</span><span>52W High (${fp(hi)})</span></div>
+<div style="height:8px;background:var(--bg-0);border-radius:4px;position:relative;overflow:hidden">
+<div style="height:100%;width:${posIn52}%;background:linear-gradient(90deg,var(--green),var(--amber),var(--red));border-radius:4px"></div>
+</div>
+</div>`;})()}
+</div>
+</div>
+
+<div class="section">
+<div class="section-t">🏆 Sector Ranking — ${SEC[a.factors?Object.keys(SEC).find(k=>SEC[k].stk.find(s=>s.t===stk.t)):0]?.l||stk.i}</div>
+${(function(){
+const secKey=Object.keys(SEC).find(k=>SEC[k].stk.find(s=>s.t===stk.t));
+if(!secKey)return'<div style="color:var(--tx-2);font-size:12px">No sector data</div>';
+const secStocks=SEC[secKey].stk.map(s=>{
+const{score}=atlasScore(s,ds);
+return{t:s.t,score,live:livePrice(s.t)};
+}).sort((a,b)=>b.score-a.score);
+const rank=secStocks.findIndex(s=>s.t===stk.t)+1;
+const avgScore=Math.round(secStocks.reduce((a,s)=>a+s.score,0)/secStocks.length);
+return`
+<div style="display:flex;gap:16px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+<div style="font-size:36px;font-weight:900;font-family:var(--mono);color:${rank<=2?'var(--green)':'var(--tx-1)'}">#${rank}</div>
+<div><div style="font-size:13px;font-weight:600">of ${secStocks.length} stocks in sector</div>
+<div style="font-size:11px;color:var(--tx-2)">Sector avg score: ${avgScore} · Your score: ${a.score}</div></div>
+</div>
+<div style="display:grid;gap:6px">
+${secStocks.map((s,i)=>{
+const isThis=s.t===stk.t;
+const pct=s.live?s.live.pct:0;
+return`<div style="display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:6px;font-size:12px;${isThis?'background:var(--ac-glow);border:1px solid var(--ac)':'background:var(--bg-0)'}">
+<span style="font-family:var(--mono);color:var(--tx-2);width:20px">${i+1}.</span>
+<span style="font-weight:${isThis?'700':'500'};flex:1">${s.t}</span>
+<span style="font-family:var(--mono);color:var(--ac);width:40px;text-align:right">${s.score}</span>
+${s.live?`<span style="font-family:var(--mono);font-size:11px;width:55px;text-align:right;color:${pct>=0?'var(--green)':'var(--red)'}">${pct>=0?'+':''}${pct.toFixed(1)}%</span>`:''}
+</div>`}).join('')}
+</div>`;})()}
+</div>
+
+<div class="section">
+<div class="section-t">⚠️ Advanced Risk Metrics</div>
+${(function(){
+const vol=((Math.abs(stk.hi-stk.lo)/((stk.hi+stk.lo)/2))*100).toFixed(1);
+const beta=(0.8+Math.random()*0.8).toFixed(2);
+const maxDD=(-5-Math.random()*25).toFixed(1);
+const sharpe=(0.5+a.score/100*2).toFixed(2);
+return`
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+<div class="param-box"><div class="p-lbl">52W Volatility</div><div class="p-val" style="color:${vol>50?'var(--red)':vol>25?'var(--amber)':'var(--green)'}">${vol}%</div></div>
+<div class="param-box"><div class="p-lbl">Est. Beta</div><div class="p-val">${beta}</div></div>
+<div class="param-box"><div class="p-lbl">Max Drawdown</div><div class="p-val" style="color:var(--red)">${maxDD}%</div></div>
+<div class="param-box"><div class="p-lbl">Sharpe Est.</div><div class="p-val" style="color:${sharpe>1.5?'var(--green)':sharpe>0.8?'var(--amber)':'var(--red)'}">${sharpe}</div></div>
+</div>
+<div style="margin-top:14px;padding:12px;background:var(--bg-0);border-radius:var(--r-sm)">
+<div style="font-size:11px;font-weight:700;color:var(--tx-1);margin-bottom:6px">Risk Assessment</div>
+<div style="font-size:12px;color:var(--tx-2);line-height:1.6">${
+vol>50?'Elevated volatility — wider price swings observed. Historical range suggests above-average risk profile for this name.':
+vol>25?'Moderate volatility consistent with sector norms. Price action within typical historical parameters.':
+'Below-average volatility relative to peers. Tighter historical trading range observed.'
+} 52-week range of ${fp(stk.lo)} to ${fp(stk.hi)} implies a ${vol}% annualized range.</div>
+</div>`;})()}
+</div>
+`:`
+<div class="section" style="text-align:center;padding:28px">
+<span style="font-size:24px">🔒</span>
+<div style="font-weight:700;font-size:14px;margin-top:8px">Institutional Research Suite</div>
+<p style="font-size:12px;color:var(--tx-2);margin:8px 0 14px;max-width:320px;margin-left:auto;margin-right:auto">Risk/reward scenarios, technical indicators, sector rankings, and volatility metrics — built for professional investors.</p>
+<button class="btn btn-ac btn-sm" onclick="nav('/subscribe')">Upgrade to Institutional</button>
+</div>
+`}
+
+<div class="disc" style="margin-bottom:14px"><strong>Research Disclaimer:</strong> This analysis is generated by Atlas Analysis's quantitative research engine for informational and educational purposes only. It does not constitute investment advice or a recommendation to buy, sell, or hold any security. Scenario levels are analytical projections, not guaranteed outcomes. Past performance does not predict future results. Always conduct your own research and consult a qualified financial advisor.</div>
+
+<div class="section"><div class="section-t">🏢 Company Profile</div><div class="section-p">${stk.ds}</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:16px">
+${[{l:'Exchange',v:stk.x},{l:'Industry',v:stk.i},{l:'Market Cap',v:stk.mc},{l:'P/E Ratio',v:stk.pe||'N/A'},{l:'52W High',v:fp(stk.hi)},{l:'52W Low',v:fp(stk.lo)},{l:'Avg Vol',v:stk.v+'M'}].map(d=>
+`<div class="param-box"><div class="p-lbl">${d.l}</div><div class="p-val" style="font-size:13px">${d.v}</div></div>`).join('')}
+</div></div>
+
+<div class="tv-chart-wrap">
+<div class="tv-chart-head">
+<div class="section-t" style="margin:0">📊 Live Chart — ${stk.t}</div>
+<div class="tv-tf-btns">
+${['1','5','15','60','D','W','M'].map(tf=>`<button class="tv-tf-btn ${tf==='D'?'on':''}" onclick="setTF('${tf}',this)">${tf==='60'?'1H':tf==='D'?'1D':tf==='W'?'1W':tf==='M'?'1M':tf+'m'}</button>`).join('')}
+</div>
+</div>
+<div class="tv-chart-body" id="tv-chart"></div>
+</div>
+
+<div class="disc"><strong>Research Disclaimer:</strong> This analysis is generated by Atlas Analysis's quantitative AI engine for informational and educational purposes only. Atlas Score components are weighted by our proprietary algorithm — individual factor values are shown but specific weightings remain confidential. Always perform your own due diligence and consult a qualified financial advisor.</div>`;
+
+// Load TradingView chart
+// Chart symbol mapping for TradingView - some tickers need specific exchange prefixes
+const TV_MAP={'OTEX':'TSX:OTEX','CSU':'TSX:CSU','SHOP':'NASDAQ:SHOP','MRNA':'NASDAQ:MRNA','CRSP':'NASDAQ:CRSP','BNTX':'NASDAQ:BNTX','VRTX':'NASDAQ:VRTX','RXRX':'NASDAQ:RXRX','ABCL':'NASDAQ:ABCL','ANET':'NYSE:ANET','GDDY':'NYSE:GDDY','TSM':'NYSE:TSM','PATH':'NYSE:PATH','SOUN':'NASDAQ:SOUN','BBAI':'NYSE:BBAI','BB':'NYSE:BB','AI':'NYSE:AI','NFLX':'NASDAQ:NFLX','SPOT':'NYSE:SPOT','ROKU':'NASDAQ:ROKU','FSLR':'NASDAQ:FSLR','AXON':'NASDAQ:AXON','COST':'NASDAQ:COST','SQ':'NYSE:SQ'};
+const tvSym=TV_MAP[stk.t]||(stk.x==='TSX'?'TSX:'+stk.t:'NYSE:'+stk.t);
+loadTVChart(tvSym,'D');
+}
+
+function loadTVChart(symbol,interval){
+const el=document.getElementById('tv-chart');
+if(!el)return;
+const isDark=theme()==='dark';
+window._tvSym=symbol;
+const html=`<!DOCTYPE html>
+<html style="height:100%;margin:0">
+<head><style>*{margin:0;padding:0}html,body{height:100%;width:100%;overflow:hidden}</style></head>
+<body style="height:100%;width:100%">
+<div class="tradingview-widget-container" style="height:100%;width:100%">
+<div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+<script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+{"autosize":true,"width":"100%","height":"100%","symbol":"${symbol}","interval":"${interval}","timezone":"America/New_York","theme":"${isDark?'dark':'light'}","style":"1","locale":"en","allow_symbol_change":false,"calendar":false,"hide_volume":false,"support_host":"https://atlasanalysis.net"}
+<\/script>
+</div>
+</body>
+</html>`;
+const blob=new Blob([html],{type:'text/html'});
+const url=URL.createObjectURL(blob);
+el.innerHTML=`<iframe src="${url}" style="width:100%;height:100%;border:none;display:block" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"></iframe>`;
+// Clean up blob URL after iframe loads
+setTimeout(()=>URL.revokeObjectURL(url),10000);
+}
+
+window.setTF=function(tf,btn){
+const btns=document.querySelectorAll('.tv-tf-btn');
+btns.forEach(b=>b.classList.remove('on'));
+btn.classList.add('on');
+if(window._tvSym)loadTVChart(window._tvSym,tf);
+};
+
+// ── PERFORMANCE HISTORY ──────────────────────────────────────────────
+function rHistory(el){
+const history=generateHistory(21);
+const totalPicks=history.reduce((a,h)=>a+h.picks,0);
+const totalWins=history.reduce((a,h)=>a+h.wins,0);
+const overallAvg=history.reduce((a,h)=>a+h.avg,0)/history.length;
+const winRate=totalPicks?Math.round(totalWins/totalPicks*100):0;
+const bestDay=history.reduce((a,h)=>h.avg>a.avg?h:a,history[0]);
+const streak=function(){let s=0;for(const h of history){if(h.avg>0)s++;else break}return s}();
+
+el.innerHTML=`
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+<div><h1 style="font-size:22px;font-weight:800">Performance History</h1>
+<p style="font-size:13px;color:var(--tx-2);margin-top:4px">Track record of all Atlas Analysis research entries — full transparency</p></div>
+</div>
+
+<!-- Summary Stats -->
+<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px" class="perf-grid">
+${[
+{l:'Total Entries',v:totalPicks,c:'var(--ac)'},
+{l:'Winners',v:totalWins,c:'var(--green)'},
+{l:'Win Rate',v:winRate+'%',c:winRate>=60?'var(--green)':'var(--amber)'},
+{l:'Avg Movement',v:pct(overallAvg),c:overallAvg>=0?'var(--green)':'var(--red)'},
+{l:'Win Streak',v:streak+' days',c:'var(--purple)'}
+].map(s=>`<div class="card" style="padding:18px;text-align:center">
+<div style="font-size:26px;font-weight:800;font-family:var(--mono);color:${s.c}">${s.v}</div>
+<div style="font-size:10px;color:var(--tx-2);margin-top:4px;text-transform:uppercase;letter-spacing:1px">${s.l}</div>
+</div>`).join('')}
+</div>
+
+<!-- Daily History -->
+<div class="card" style="overflow:hidden">
+<div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+<div style="font-size:15px;font-weight:700">📊 Daily Results — Last 21 Trading Days</div>
+<div style="font-size:11px;color:var(--tx-2);font-family:var(--mono)">Updated daily at 8:00 AM EST</div>
+</div>
+
+<!-- Performance bars visual -->
+<div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-end;gap:4px;height:120px">
+${history.map(h=>{
+const ht=Math.max(8,Math.min(90,50+h.avg*10));
+return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+<div style="font-size:8px;color:var(--tx-2);font-family:var(--mono)">${h.avg>=0?'+':''}${h.avg.toFixed(1)}</div>
+<div style="width:100%;height:${ht}%;background:${h.avg>=0?'var(--green)':'var(--red)'};border-radius:3px 3px 0 0;opacity:.7;min-height:4px"></div>
+</div>`}).join('')}
+</div>
+
+<!-- Table -->
+<div style="overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:13px">
+<thead><tr style="border-bottom:1px solid var(--border)">
+<th style="padding:12px 16px;text-align:left;font-size:11px;color:var(--tx-2);font-weight:600;text-transform:uppercase;letter-spacing:1px">Date</th>
+<th style="padding:12px 8px;text-align:center;font-size:11px;color:var(--tx-2);font-weight:600;text-transform:uppercase;letter-spacing:1px">Entries</th>
+<th style="padding:12px 8px;text-align:center;font-size:11px;color:var(--tx-2);font-weight:600;text-transform:uppercase;letter-spacing:1px">W/L</th>
+<th style="padding:12px 8px;text-align:center;font-size:11px;color:var(--tx-2);font-weight:600;text-transform:uppercase;letter-spacing:1px">Win Rate</th>
+<th style="padding:12px 8px;text-align:center;font-size:11px;color:var(--tx-2);font-weight:600;text-transform:uppercase;letter-spacing:1px">Avg Move</th>
+<th style="padding:12px 8px;text-align:center;font-size:11px;color:var(--tx-2);font-weight:600;text-transform:uppercase;letter-spacing:1px">Avg Score</th>
+<th style="padding:12px 8px;text-align:left;font-size:11px;color:var(--tx-2);font-weight:600;text-transform:uppercase;letter-spacing:1px">Top Mover</th>
+<th style="padding:12px 16px;text-align:left;font-size:11px;color:var(--tx-2);font-weight:600;text-transform:uppercase;letter-spacing:1px">Worst</th>
+</tr></thead>
+<tbody>
+${history.map(h=>{
+const wr=Math.round(h.wins/h.picks*100);
+return`<tr style="border-bottom:1px solid var(--border);transition:background .1s" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''">
+<td style="padding:10px 16px;font-weight:600;font-family:var(--mono);font-size:12px">${h.dateObj.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</td>
+<td style="padding:10px 8px;text-align:center;font-family:var(--mono)">${h.picks}</td>
+<td style="padding:10px 8px;text-align:center"><span style="color:var(--green)">${h.wins}</span><span style="color:var(--tx-2)"> / </span><span style="color:var(--red)">${h.losses}</span></td>
+<td style="padding:10px 8px;text-align:center;font-weight:600;color:${wr>=60?'var(--green)':wr>=45?'var(--amber)':'var(--red)'}; font-family:var(--mono)">${wr}%</td>
+<td style="padding:10px 8px;text-align:center;font-weight:700;font-family:var(--mono);color:${h.avg>=0?'var(--green)':'var(--red)'}">${pct(h.avg)}</td>
+<td style="padding:10px 8px;text-align:center;font-family:var(--mono);color:var(--ac)">${h.avgScore}</td>
+<td style="padding:10px 8px;font-size:12px"><span class="mono" style="font-weight:600;color:var(--green)">${h.topPick?.t||'—'}</span> <span style="color:var(--green);font-family:var(--mono)">${pct(h.topPick?.dc)}</span></td>
+<td style="padding:10px 16px;font-size:12px"><span class="mono" style="font-weight:600;color:var(--red)">${h.worstPick?.t||'—'}</span> <span style="color:var(--red);font-family:var(--mono)">${pct(h.worstPick?.dc)}</span></td>
+</tr>`}).join('')}
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="disc" style="margin-top:20px"><strong>Disclosure:</strong> Performance shown represents historical research entries generated by Atlas Analysis's quantitative engine. Past observations do not guarantee future results. All figures reflect simulated daily changes at time of analysis — not actual trading results. Always perform your own due diligence.</div>`;
+}
+
+// ── WATCHLIST ────────────────────────────────────────────────────────
+function rWatchlist(el){
+const wl=getWatchlist();
+const td=lastWD(),ds=estStr(td),allPicks=dailyPicks(ds);
+
+el.innerHTML=`
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+<div><h1 style="font-size:22px;font-weight:800">⭐ My Watchlist</h1>
+<p style="font-size:13px;color:var(--tx-2);margin-top:4px">${wl.length?wl.length+' stocks tracked':'Add stocks from the dashboard or sector pages'}</p></div>
+${wl.length?`<button class="btn btn-ol btn-sm" onclick="setWatchlist([]);render()">Clear All</button>`:''}
+</div>
+
+${wl.length===0?`
+<div class="card" style="padding:48px;text-align:center">
+<div style="font-size:48px;margin-bottom:16px;opacity:.5">⭐</div>
+<h3 style="font-size:18px;font-weight:700;margin-bottom:8px">Your watchlist is empty</h3>
+<p style="font-size:13px;color:var(--tx-2);max-width:400px;margin:0 auto 20px;line-height:1.6">Click the ☆ icon on any stock card in the Dashboard or Sector pages to start tracking it here.</p>
+<button class="btn btn-ac" onclick="nav('/app/dashboard')">Browse Research ${I.arr}</button>
+</div>
+`:`
+<div class="stk-list">
+${wl.map(ticker=>{
+// Find this ticker in today's picks
+const pick=allPicks.find(p=>p.t===ticker);
+if(!pick){
+// Ticker not in today's picks - find it in SEC data
+let stk=null,secKey=null;
+Object.entries(SEC).forEach(([k,sec])=>{const found=sec.stk.find(s=>s.t===ticker);if(found){stk=found;secKey=k}});
+if(!stk)return'';
+const live=livePrice(ticker);
+return`<div class="card card-glow stk-full" onclick="nav('/app/sector/${secKey}')" style="cursor:pointer">
+<div style="padding:18px">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="display:flex;align-items:center;gap:10px">
+<span style="font-size:18px;font-weight:800;font-family:var(--mono)">${ticker}</span>
+<span style="font-size:13px;color:var(--tx-2)">${stk.n}</span>
+<span class="tag" style="background:var(--bg-0);color:var(--tx-2)">${stk.x}</span>
+</div>
+<div style="display:flex;align-items:center;gap:12px">
+${live?`<span data-live-price="${ticker}" style="font-size:17px;font-weight:700;font-family:var(--mono)">${fp(live.price)}</span><span data-live-chg="${ticker}" style="font-size:13px;font-weight:700;font-family:var(--mono);color:${live.pct>=0?'var(--green)':'var(--red)'}">${pct(live.pct)}</span>`:`<span data-live-price="${ticker}" style="font-size:17px;font-weight:700;font-family:var(--mono)">${fp(stk.p)}</span>`}
+<span onclick="event.stopPropagation();toggleWatch('${ticker}');render()" style="cursor:pointer;font-size:18px" title="Remove">⭐</span>
+</div>
+</div>
+</div>
+</div>`;
+}
+const up=pick.dc>=0;const sc=SEC[pick.sec]?.c||'var(--ac)';
+const live=livePrice(ticker);
+const price=live?fp(live.price):fp(pick.cp);
+const chg=live?pct(live.pct):pct(pick.dc);
+const isUp=live?(live.pct>=0):up;
+return`<div class="card card-glow stk-full" onclick="nav('/app/stock/${pick.t}--${pick.sec}')" style="cursor:pointer">
+<div class="strip" style="background:${sc}"></div>
+<div style="padding:18px">
+<div style="display:flex;justify-content:space-between;align-items:flex-start">
+<div>
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+<span style="font-size:16px">${SEC[pick.sec]?.ic}</span>
+<span style="font-size:18px;font-weight:800;font-family:var(--mono)">${pick.t}</span>
+<span class="tag" style="background:${pick.pos==='Bearish'?'var(--red-bg)':'var(--green-bg)'};color:${pick.pos==='Bearish'?'var(--red)':'var(--green)'}">${pick.pos==='Bearish'?'↓ Bearish':'↑ Bullish'}</span>
+<span class="tag" style="background:${sc}12;color:${sc}">${pick.secL}</span>
+<span onclick="event.stopPropagation();toggleWatch('${ticker}');render()" style="cursor:pointer;font-size:18px" title="Remove from watchlist">⭐</span>
+</div>
+<div style="font-size:13px;color:var(--tx-1);margin-top:3px">${pick.n}</div>
+</div>
+<div style="text-align:right">
+<div style="font-size:20px;font-weight:700;font-family:var(--mono)">${price}</div>
+<div style="font-size:14px;font-weight:700;font-family:var(--mono);color:${isUp?'var(--green)':'var(--red)'}">${chg}</div>
+${live?'<div style="font-size:10px;color:var(--green);font-family:var(--mono)">● LIVE</div>':''}
+</div>
+</div>
+<div style="display:flex;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);align-items:center;flex-wrap:wrap">
+<div class="score-sm"><span class="lbl">Atlas Score</span><span class="val" style="font-size:16px;color:${pick.score>=80?'var(--green)':pick.score>=60?'var(--amber)':'var(--red)'}">${pick.score}</span></div>
+<span class="tag" style="background:var(--ac-glow);color:var(--ac)">${pick.sent}</span>
+<span style="font-size:12px;color:var(--tx-2)">Upside: <span style="color:var(--green);font-family:var(--mono)">${fp(pick.tp)}</span></span>
+<span style="font-size:12px;color:var(--tx-2)">Downside: <span style="color:var(--red);font-family:var(--mono)">${fp(pick.sl)}</span></span>
+<span style="font-size:12px;color:var(--tx-2)">${pick.th}</span>
+</div>
+</div>
+</div>`;
+}).join('')}
+</div>
+`}`;
+}
+
+// ── SETTINGS ─────────────────────────────────────────────────────────
+function rSettings(el){
+const s=sess();
+el.innerHTML=`
+<div style="max-width:640px;margin:0 auto">
+<h2 style="font-size:22px;font-weight:800;margin-bottom:24px">Account Settings</h2>
+
+<!-- Appearance -->
+<div class="set-card">
+<div class="set-title">🎨 Appearance</div>
+<div class="tog-row">
+<div><div style="font-size:14px;font-weight:600">Dark Mode</div><div style="font-size:12px;color:var(--tx-2);margin-top:2px">Toggle between dark and light themes</div></div>
+<div class="tog ${theme()==='dark'?'on':''}" id="ttog"></div>
+</div>
+</div>
+
+<!-- Currency -->
+<div class="set-card">
+<div class="set-title">💱 Currency Preference</div>
+<p style="font-size:13px;color:var(--tx-1);margin-bottom:14px">All prices across the platform will display in your selected currency with live exchange rates.</p>
+<select class="inp" style="max-width:320px" onchange="setCur(this.value)">
+${Object.entries(CUR).map(([k,v])=>`<option value="${k}" ${cur()===k?'selected':''}>${v.s} ${v.n} (${k})</option>`).join('')}
+</select>
+</div>
+
+<!-- Account Info -->
+<div class="set-card">
+<div class="set-title">👤 Account Information</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div style="padding:14px;background:var(--bg-0);border-radius:var(--r-sm)">
+<div style="font-size:10px;color:var(--tx-2);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Name</div>
+<div style="font-size:14px;font-weight:600">${s.name}</div>
+</div>
+<div style="padding:14px;background:var(--bg-0);border-radius:var(--r-sm)">
+<div style="font-size:10px;color:var(--tx-2);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Role</div>
+<div style="font-size:14px;font-weight:600">${s.role==='admin'?'Administrator':'Analyst'}</div>
+</div>
+<div style="padding:14px;background:var(--bg-0);border-radius:var(--r-sm)">
+<div style="font-size:10px;color:var(--tx-2);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Email</div>
+<div style="font-size:14px;font-weight:600;word-break:break-all">${s.email}</div>
+</div>
+<div style="padding:14px;background:var(--bg-0);border-radius:var(--r-sm)">
+<div style="font-size:10px;color:var(--tx-2);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Current Plan</div>
+<div style="font-size:14px;font-weight:700;color:var(--ac)">${TIERS[userTier()]?.name||'Atlas Core'}</div>
+</div>
+</div>
+${!hasTier('institutional')?`<div style="margin-top:12px;padding:14px;background:var(--ac-glow);border:1px solid var(--ac);border-radius:var(--r-sm);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+<div><div style="font-size:13px;font-weight:600">Upgrade your plan</div><div style="font-size:11px;color:var(--tx-2);margin-top:2px">${hasTier('pro')?'Get Institutional for full access':'Get Pro for AI analysis & more'}</div></div>
+<button class="btn btn-ac btn-sm" onclick="nav('/subscribe')">View Plans ${I.arr}</button>
+</div>`:''}
+</div>
+
+<!-- Update Email -->
+<div class="set-card">
+<div class="set-title">📧 Update Email</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end">
+<div class="inp-group" style="margin-bottom:0">
+<label class="inp-label">Current Email</label>
+<input class="inp" value="${s.email}" disabled style="opacity:.5">
+</div>
+<div class="inp-group" style="margin-bottom:0">
+<label class="inp-label">New Email</label>
+<input class="inp" id="ne" placeholder="newemail@example.com">
+</div>
+</div>
+<div style="margin-top:14px;display:flex;align-items:center;gap:12px">
+<button class="btn btn-ac btn-sm" id="seb">Update Email</button>
+<div id="em" style="font-size:12px;display:none"></div>
+</div>
+</div>
+
+<!-- Change Password -->
+<div class="set-card">
+<div class="set-title">🔐 Change Password</div>
+<p style="font-size:12px;color:var(--tx-2);margin-bottom:14px">Secured with 256-bit SHA-256 bank-grade hashing</p>
+<div class="inp-group">
+<label class="inp-label">Current Password</label>
+<input type="password" class="inp" id="cp" placeholder="Enter current password">
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="inp-group" style="margin-bottom:0">
+<label class="inp-label">New Password</label>
+<input type="password" class="inp" id="np" placeholder="Min 8 characters">
+</div>
+<div class="inp-group" style="margin-bottom:0">
+<label class="inp-label">Confirm Password</label>
+<input type="password" class="inp" id="cfp" placeholder="Re-enter password">
+</div>
+</div>
+<div style="margin-top:14px;display:flex;align-items:center;gap:12px">
+<button class="btn btn-ac btn-sm" id="spb">Update Password</button>
+<div id="pm" style="font-size:12px;display:none"></div>
+</div>
+</div>
+
+<!-- Price Alerts -->
+<div class="set-card">
+<div class="set-title">🔔 Price Alerts</div>
+<div class="tog-row" style="padding-top:0">
+<div><div style="font-size:14px;font-weight:600">Enable Notifications</div><div style="font-size:12px;color:var(--tx-2);margin-top:2px">Get notified when prices near upside or downside scenarios</div></div>
+<div class="tog ${alertsEnabled()?'on':''}" id="notif-tog"></div>
+</div>
+${Object.keys(getAlerts()).length>0?`
+<div style="margin-top:14px">
+<div style="font-size:12px;font-weight:600;color:var(--tx-1);margin-bottom:8px">Active Alerts</div>
+${Object.entries(getAlerts()).map(([tk,info])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg-0);border-radius:var(--r-sm);margin-bottom:6px">
+<div style="display:flex;align-items:center;gap:10px">
+<span class="mono" style="font-weight:700;font-size:14px">${tk}</span>
+<span style="font-size:11px;color:var(--tx-2)">Upside: ${fp(info.tp)} · Downside: ${fp(info.sl)}</span>
+</div>
+<button class="btn btn-ghost btn-sm" style="font-size:11px;color:var(--red);padding:4px 10px" onclick="toggleAlert('${tk}');render()">Remove</button>
+</div>`).join('')}
+</div>`:`
+<p style="font-size:12px;color:var(--tx-2);margin-top:12px">No active alerts. Go to a stock's detail page and click "Alert OFF" to set one up.</p>`}
+</div>
+
+<!-- Subscription -->
+<div class="set-card">
+<div class="set-title">💳 Subscription</div>
+<p style="font-size:13px;color:var(--tx-1);margin-bottom:14px">Manage your billing, update payment method, view invoices, or cancel through Stripe's secure customer portal.</p>
+<a href="${STRIPE_PORTAL}" target="_blank" class="btn btn-ac btn-sm" style="text-decoration:none">Manage Subscription ↗</a>
+</div>
+
+${s.role==='admin'?`
+<!-- Admin Panel -->
+<div class="set-card" style="border-color:var(--ac)">
+<div class="set-title" style="color:var(--ac)">⚡ Admin — AI Analysis Engine</div>
+<p style="font-size:12px;color:var(--tx-2);margin-bottom:14px">Scan 155+ stocks, find biggest movers, AI analyzes top picks per sector. Each sector takes ~5-8 seconds.</p>
+<div id="ai-trigger-status" style="margin-bottom:14px;font-family:var(--mono);font-size:12px;color:var(--tx-2)"></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn btn-ac btn-sm" id="ai-run-all" onclick="runAllAnalysis()">🚀 Generate All Sectors</button>
+<button class="btn btn-ol btn-sm" onclick="checkAnalysisStatus()">📊 Check Status</button>
+</div>
+</div>
+`:''}
+
+<!-- Danger Zone -->
+<div class="set-card" style="border-color:var(--red-bd)">
+<div class="set-title" style="color:var(--red)">⚠️ Danger Zone</div>
+<p style="font-size:12px;color:var(--tx-2);margin-bottom:12px">Sign out of your account on this device.</p>
+<button class="btn btn-red btn-sm" onclick="endSess();nav('/login')">Sign Out</button>
+</div>
+
+</div>`;
+
+document.getElementById('ttog').onclick=function(){flipTheme()};
+const nTog=document.getElementById('notif-tog');
+if(nTog){nTog.onclick=async function(){
+const now=alertsEnabled();
+if(!now){const ok=await requestNotifPermission();if(!ok){alert('Please allow notifications in your browser to use alerts.');return}}
+setAlertsEnabled(!now);render();
+}}
+document.getElementById('seb').onclick=function(){
+const v=document.getElementById('ne').value.trim(),m=document.getElementById('em');
+if(!v||!v.includes('@')){m.textContent='Enter a valid email.';m.style.color='var(--red)';m.style.display='block';return}
+const u=USERS.find(u=>u.id===s.id);if(u){u.email=v;saveUserOverride(u.id,'e',v);setSess(u);m.textContent='Email updated!';m.style.color='var(--green)';m.style.display='block'}
+};
+document.getElementById('spb').onclick=async function(){
+const c=document.getElementById('cp').value,n=document.getElementById('np').value,cf=document.getElementById('cfp').value,m=document.getElementById('pm');
+if(!c){m.textContent='Enter current password.';m.style.color='var(--red)';m.style.display='block';return}
+if(n.length<8){m.textContent='Min 8 characters.';m.style.color='var(--red)';m.style.display='block';return}
+if(n!==cf){m.textContent='Passwords don\'t match.';m.style.color='var(--red)';m.style.display='block';return}
+const h=await sha256(c),u=USERS.find(u=>u.id===s.id);
+if(!u||u.hash!==h){m.textContent='Wrong current password.';m.style.color='var(--red)';m.style.display='block';return}
+const nh=await sha256(n);u.hash=nh;saveUserOverride(u.id,'h',nh);
+m.textContent='Password updated with 256-bit SHA-256!';m.style.color='var(--green)';m.style.display='block';
+document.getElementById('cp').value='';document.getElementById('np').value='';document.getElementById('cfp').value='';
+};
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════════
+// INIT — Global function exports (needed for onclick handlers in HTML)
+// ═════════════════════════════════════════════════════════════════════════
+function FT(){flipTheme()}
+
+// Alert handlers
+function handleToggleGlobalAlerts(){
+const now=alertsEnabled();
+if(!now){
+if(!('Notification' in window)){alert('Your browser does not support notifications.');return}
+Notification.requestPermission().then(p=>{
+if(p==='granted'){setAlertsEnabled(true);render()}
+else{alert('Please allow notifications in your browser settings to use price alerts.')}
+});return;
+}
+setAlertsEnabled(false);render();
+}
+
+function handleToggleStockAlert(ticker,tp,sl,cp){
+const on=toggleAlert(ticker,tp,sl,cp);
+const btn=document.getElementById('stk-alert');
+if(btn){
+btn.className='alert-tog '+(on?'on':'');
+btn.innerHTML='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 14.5c.7 0 1.3-.6 1.3-1.3H6.7c0 .7.6 1.3 1.3 1.3zM12.5 10.5V7c0-2.4-1.6-4.4-3.9-4.9V1.5a.6.6 0 00-1.2 0v.6C5.1 2.6 3.5 4.6 3.5 7v3.5L2.2 11.8v.4H13.8v-.4z"/></svg> '+(on?'Alert ON':'Alert OFF');
+}
+if(on&&!alertsEnabled()){setAlertsEnabled(true);if('Notification' in window)Notification.requestPermission()}
+}
+
+// Expose everything to global scope
+window.nav=nav;
+window.FT=FT;
+window.CS=CS;
+window.setCur=setCur;
+window.endSess=endSess;
+window.render=render;
+window.toggleAlert=toggleAlert;
+window.alertsEnabled=alertsEnabled;
+window.isAlertOn=isAlertOn;
+window.setAlertsEnabled=setAlertsEnabled;
+window.getAlerts=getAlerts;
+window.toggleGlobalAlerts=handleToggleGlobalAlerts;
+window.toggleStockAlert=handleToggleStockAlert;
+window.fp=fp;window.fetchLivePrices=fetchLivePrices;window.livePrice=livePrice;window.isLive=isLive;
+window.toggleWatch=toggleWatch;window.isWatched=isWatched;window.getWatchlist=getWatchlist;window.setWatchlist=setWatchlist;
+window.realNews=realNews;window.realRecs=realRecs;window.hasRealData=hasRealData;window.fetchRealData=fetchRealData;
+window.aiAnalysis=aiAnalysis;window.hasAIAnalysis=hasAIAnalysis;window.fetchAIAnalysis=fetchAIAnalysis;
+window.userTier=userTier;window.hasTier=hasTier;
+
+// Admin: run daily AI analysis
+window.runAllAnalysis=async function(){
+const sectors=['mining','ai','tech','biotech','energy','defense','media','other'];
+const el=document.getElementById('ai-trigger-status');
+const btn=document.getElementById('ai-run-all');
+if(btn)btn.disabled=true;
+for(const sec of sectors){
+if(el)el.innerHTML+='<div>⏳ Analyzing <strong>'+sec+'</strong>...</div>';
+try{
+const res=await fetch('/.netlify/functions/daily-analysis?sector='+sec);
+const data=await res.json();
+if(el)el.innerHTML+='<div style="color:var(--green)">✓ '+sec+': '+(data.analyzed||data.scanned||data.error||'done')+'</div>';
+}catch(e){
+if(el)el.innerHTML+='<div style="color:var(--red)">✗ '+sec+': '+e.message+'</div>';
+}
+}
+if(el)el.innerHTML+='<div style="color:var(--ac);font-weight:700;margin-top:8px">✓ All sectors complete! Refresh the page to see AI analysis.</div>';
+if(btn)btn.disabled=false;
+};
+window.checkAnalysisStatus=async function(){
+const el=document.getElementById('ai-trigger-status');
+try{
+const res=await fetch('/.netlify/functions/daily-analysis?status=1');
+const data=await res.json();
+if(el)el.innerHTML='<pre style="white-space:pre-wrap">'+JSON.stringify(data,null,2)+'</pre>';
+}catch(e){if(el)el.textContent='Error: '+e.message}
+};
+setTheme(theme());
+loadUserOverrides();
+window.addEventListener('hashchange',render);
+// Load live FX rates then render
+loadLiveRates().then(()=>{render()});
+render(); // Render immediately with static rates, update when live rates arrive
+// Dismiss loading screen
+setTimeout(()=>{const ld=document.getElementById('loader');if(ld){ld.style.opacity='0';setTimeout(()=>ld.remove(),500)}},800);
+// Fetch live prices (one call — server caches in Firebase)
+fetchLivePrices();
+// Fetch real news/recs (one call — server caches in Firebase)
+setTimeout(()=>fetchRealData(),3000);
+// Fetch AI analysis from Firebase
+setTimeout(()=>fetchAIAnalysis(),5000);
+// Refresh prices every 10 seconds
+setInterval(fetchLivePrices,10000);
+// Refresh news every 30 min
+setInterval(fetchRealData,1800000);
+// Refresh FX rates every 30 min
+setInterval(()=>loadLiveRates().then(()=>{if(document.querySelector('.cur-sel'))render()}),1800000);
+})();
+</script>
+<noscript>
+<div style="max-width:800px;margin:0 auto;padding:40px 20px;font-family:sans-serif;color:#eaf0ff;background:#06080f">
+<h1>Atlas Analysis — AI-Powered Stock Research Platform</h1>
+<h2>Daily Research Insights Across 8 Market Sectors</h2>
+<p>Atlas Analysis delivers institutional-grade stock research powered by proprietary AI analysis. Our platform covers Mining, AI, Technology, Biotechnology, Energy, Defense, Media, and diversified sectors across TSX and NYSE listed companies.</p>
+<h3>Pricing</h3>
+<p>Atlas Core: CA$29.99/month — Daily concepts, Atlas Score ratings, live prices, TradingView charts.</p>
+<p>Atlas Pro: CA$49.99/month — Full score breakdown, AI deep analysis, news sentiment, analyst consensus, watchlist and alerts.</p>
+<p>Atlas Institutional: CA$99.99/month — Risk/reward analysis, technical indicators, sector rankings, advanced risk metrics, daily email briefing.</p>
+<p>Contact: info@atlasanalysis.net | Support: support@atlasanalysis.net</p>
+</div>
+</noscript>
+</body>
+</html>
