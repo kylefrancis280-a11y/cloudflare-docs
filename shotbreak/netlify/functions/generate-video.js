@@ -155,7 +155,12 @@ function respond(statusCode, body) {
   return { statusCode, headers: CORS, body: JSON.stringify(body) };
 }
 
-const { verifyToken, getOrCreateUser, setCredits } = require('./lib/auth');
+const { verifyToken, getOrCreateUser, setCredits, getSystemToken } = require('./lib/auth');
+
+// FIRESTORE_BASE is module-local in lib/auth.js (not exported). Define it
+// here too so the provision/add_credits actions can write to /users/<uid>.
+const FIRESTORE_BASE = () =>
+  `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
 // ── WaveSpeedAI API helpers ─────────────────────────────────────────────
 const WS_BASE        = "https://api.wavespeed.ai/api/v3";
