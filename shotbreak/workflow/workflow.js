@@ -2092,7 +2092,7 @@ function renderCharRow(name, c){
         <button class="bible-remove" data-action="remove-char" data-char="${esc(name)}" title="Remove this character" aria-label="Remove ${esc(name)}">×</button>
       </div>
       <textarea class="bible-desc" data-char-desc="${esc(name)}" placeholder="32-year-old lanky detective, black hair, perpetual trench coat, smokes constantly...">${esc(c.canonical_description || '')}</textarea>
-      ${renderCharacterLockedFields(c)}
+      <div data-char-locked="${esc(name)}">${renderCharacterLockedFields(c)}</div>
       ${refStrip}
       <div class="btn-row" style="margin-top:10px">
         <button class="btn btn-ghost btn-sm" data-action="polish-char" data-char="${esc(name)}">✨ Polish description</button>
@@ -2513,7 +2513,11 @@ function wireCastStep(p){
         p.character_bible[name].signature_props = props;
         p.character_bible[name].props = props;  // legacy field kept for compat
         if (periodNotes) p.character_bible[name].period_notes = periodNotes;
-        saveProject(p); toast('Saved to ' + name, 'ok'); sugEl.innerHTML = '';
+        saveProject(p);
+        const lockedEl = document.querySelector(`[data-char-locked="${CSS.escape(name)}"]`);
+        if (lockedEl) lockedEl.innerHTML = renderCharacterLockedFields(p.character_bible[name]);
+        toast('Saved to ' + name, 'ok');
+        sugEl.innerHTML = '';
       });
       sugEl.querySelector('[data-dismiss-wd]').addEventListener('click', () => { sugEl.innerHTML = ''; });
     });
