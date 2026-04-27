@@ -1997,6 +1997,7 @@ Sometimes the right note is "no edit needed." A weak Editor proposes busywork. A
 
 INPUT: timeline object with ordered clips, durations, shot metadata.
 OUTPUT (JSON): {"edits":[{"clip_id":"<>","change":"trim_start|trim_end|reorder|remove|split","value":"<specific — seconds, frames, position>","reason":"<craft-principled why>"}]}`),
+  { maxTokens: 1500 }),
 
   specialist('transition-designer', 'Transition Designer', 'editors', 'timeline-editor', CREDITS.SMALL,
     'Transitions between every clip pair.',
