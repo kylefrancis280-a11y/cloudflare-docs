@@ -2550,8 +2550,12 @@ function wireCastStep(p){
         statusEl.innerHTML = `<span style="color:${color};font-size:11px">${esc(msg)}</span>`;
       };
 
-      // Confirm cost up-front (Flux Dev = 15 credits per gen for non-owners)
-      const isOwner = !!window.SB_OWNER_TOKEN;
+      // Confirm cost up-front (Flux Dev = 15 credits per gen for non-owners).
+      // Owner detection: check Firebase auth email against the owner list
+      // (SB_OWNER_TOKEN is the legacy HMAC path, now removed).
+      const _ownerEmails = new Set(['kyle@shotbreak.io','scott@shotbreak.io','steve@shotbreak.io']);
+      const _fbUser = typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser;
+      const isOwner = !!window.SB_OWNER_TOKEN || (_fbUser && _ownerEmails.has((_fbUser.email||'').toLowerCase()));
       const confirmMsg = isOwner
         ? `Generate reference image for ${name} via Flux Dev? (owner — no charge)`
         : `Generate reference image for ${name} via Flux Dev? Costs 15 credits. Without a reference, every shot featuring ${name} will use a different face.`;
@@ -2566,7 +2570,10 @@ function wireCastStep(p){
         // Build the same kind of "reference sheet" prompt Character Studio uses —
         // multi-angle, neutral background, photorealistic. This format gives
         // Seedance/Veo the strongest face anchor when used as i2v seed.
-        const prompt = `Full body character reference sheet. ${name}: ${description}. Neutral studio lighting, white seamless background, multiple angles showing front, side, and 3/4 view. Highly detailed, photorealistic.`;
+        // "off-white" avoids Flux conflating background color with race descriptors
+        // (e.g. a character described as "white male" + "white background" confuses
+        // the model into treating "white" as a background property, not a race).
+        const prompt = `Full body character reference sheet. ${name}: ${description}. Neutral studio lighting, off-white seamless background, multiple angles showing front, side, and 3/4 view. Highly detailed, photorealistic.`;
         const r = await fetch('/.netlify/functions/generate-character', {
           method: 'POST',
           headers,
@@ -3400,17 +3407,22 @@ function wireGenerateStep(p){
       p,
       (out) => {
         const warnings = out.warnings || [];
-        if (!warnings.length) return;
         const host = document.querySelector('.main-body-inner');
         if (!host) return;
         const el = document.createElement('div');
         el.className = 'suggest';
-        el.style.borderColor = 'var(--amber-border)';
-        el.style.background = 'var(--amber-bg)';
-        el.innerHTML = `
-          <div class="suggest-head" style="color:var(--amber)">Continuity warnings · ${warnings.length}</div>
-          <div class="suggest-diff">${esc(warnings.map(w => `[${w.severity}] ${w.issue} (${(w.shot_ids || []).join(', ')})`).join('\n'))}</div>
-        `;
+        if (!warnings.length) {
+          el.style.borderColor = 'var(--green-border,#4a7c59)';
+          el.style.background = 'var(--green-bg,rgba(74,124,89,0.1))';
+          el.innerHTML = `<div class="suggest-head" style="color:var(--green,#6abe7f)">✓ Continuity check passed — no issues found</div>`;
+        } else {
+          el.style.borderColor = 'var(--amber-border)';
+          el.style.background = 'var(--amber-bg)';
+          el.innerHTML = `
+            <div class="suggest-head" style="color:var(--amber)">Continuity warnings · ${warnings.length}</div>
+            <div class="suggest-diff">${esc(warnings.map(w => `[${w.severity}] ${w.issue} (${(w.shot_ids || []).join(', ')})`).join('\n'))}</div>
+          `;
+        }
         // Insert above the "Open Media Hub" card
         const firstCard = host.querySelector('.card');
         if (firstCard) host.insertBefore(el, firstCard);

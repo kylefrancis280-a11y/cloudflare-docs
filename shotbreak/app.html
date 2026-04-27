@@ -4203,10 +4203,10 @@ function mhSynthesizeCharDescription(name,proj,breakdownDesc){
   // Assemble final prompt.
   if(!parts.length){
     // Nothing at all — give them an editable starter.
-    return'Character reference sheet for '+name+'. [The script didn\'t include explicit physical details — edit this with: age, build, hair, wardrobe, notable features.] Full body, neutral studio lighting, white seamless background, multiple angles (front, side, 3/4 view). Photorealistic.';
+    return'Character reference sheet for '+name+'. [The script didn\'t include explicit physical details — edit this with: age, build, hair, wardrobe, notable features.] Full body, neutral studio lighting, off-white seamless background, multiple angles (front, side, 3/4 view). Photorealistic.';
   }
   const body=parts.filter(Boolean).join('. ').replace(/\s+/g,' ').replace(/\.\s*\./g,'.').trim();
-  return'Character reference sheet for '+name+': '+body+'. Full body, neutral studio lighting, white seamless background, multiple angles (front, side, 3/4 view). Photorealistic.';
+  return'Character reference sheet for '+name+': '+body+'. Full body, neutral studio lighting, off-white seamless background, multiple angles (front, side, 3/4 view). Photorealistic.';
 }
 
 // User-facing "re-extract from script" button for when they want to rebuild the bible
@@ -4280,8 +4280,24 @@ async function mhCharGenerate(idx){
   btn.disabled=true;btn.textContent='Generating...';status.textContent='submitting...';
   try{
     const h=await window.hdrs();
-    // Build rich prompt: full body reference sheet with multi-angle framing
-    const prompt='Full body character reference sheet. '+c.name+': '+c.description+'. Neutral studio lighting, white seamless background, multiple angles showing front, side, and 3/4 view. Highly detailed, photorealistic.';
+    // Build Flux prompt. Strip any "Character reference sheet for X:" framing and
+    // trailing "Full body,..." tail from c.description — mhSynthesizeCharDescription
+    // embeds them, producing doubled framing if we don't strip first.
+    let _desc=c.description.trim()
+      .replace(/^Character reference sheet for [^:.]+[:.]\s*/i,'')
+      .replace(/\.\s*Full body,[^.]*\.[^.]*(\.[^.]*)?$/i,'')
+      .replace(/\[[^\]]*\]/g,'')
+      .trim();
+    // Inject structured ethnicity/skin from attributes when set — these survive
+    // even when descCustom:true hides them from the auto-composed description.
+    const _a=c.attributes||{};
+    const _race=[];
+    if(_a.ethnicity&&_a.ethnicity!=='—')_race.push(_a.ethnicity);
+    if(_a.skin&&_a.skin!=='—')_race.push(_a.skin.toLowerCase()+' skin');
+    if(_race.length&&!_desc.toLowerCase().includes(_race[0].toLowerCase()))_desc=_race.join(', ')+'. '+_desc;
+    // Use "off-white seamless background" to avoid "white" conflicting with race
+    // descriptors when Flux parses the prompt (e.g. "white male" vs "white background").
+    const prompt='Full body character reference sheet. '+c.name+': '+_desc+'. Neutral studio lighting, off-white seamless background, multiple angles showing front, side, and 3/4 view. Highly detailed, photorealistic.';
     const r=await fetch('/.netlify/functions/generate-character',{method:'POST',headers:h,body:JSON.stringify({action:'generate',model,prompt,aspect_ratio:'1:1'})});
     const d=await r.json();
     if(!r.ok){
