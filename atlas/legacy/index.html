@@ -222,6 +222,7 @@ background-size:64px 64px;pointer-events:none}
 .top-r{display:flex;align-items:center;gap:10px}
 .ham{display:none;background:none;border:none;color:var(--tx-0);cursor:pointer;padding:2px}
 .page{padding:24px;max-width:1400px}
+#pg{transition:opacity .15s ease}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:35;backdrop-filter:blur(2px)}
 .overlay.on{display:block}
 
@@ -617,7 +618,7 @@ LIVE[tk]={price:p.price,prev:p.prev,change:p.change||0,pct:p.pct||0,hi:p.hi,lo:p
 });
 liveTS=Date.now();liveCount=Object.keys(LIVE).length;
 console.log('✓ Live prices:',liveCount,'tickers'+(data.cached?' (cached)':' (fresh)'));
-render();
+patchPrices();
 }
 }catch(e){
 console.warn('Price fetch error:',e.message,'— using cached data if available');
@@ -627,7 +628,7 @@ const cached=JSON.parse(LS.get('atlas_prices')||'null');
 if(cached&&cached.data){
 Object.assign(LIVE,cached.data);
 liveTS=cached.ts||Date.now();liveCount=Object.keys(LIVE).length;
-if(liveCount>0){console.log('✓ Cached prices:',liveCount,'tickers');render()}
+if(liveCount>0){console.log('✓ Cached prices:',liveCount,'tickers');patchPrices()}
 }
 }catch(e2){}
 }
@@ -637,6 +638,30 @@ if(liveCount>0)try{LS.set('atlas_prices',JSON.stringify({ts:liveTS,data:LIVE}))}
 
 function livePrice(ticker){return LIVE[ticker]||null}
 function isLive(){return liveCount>0&&(Date.now()-liveTS<600000)}
+
+function patchPrices(){
+document.querySelectorAll('[data-live-price]').forEach(el=>{const lv=LIVE[el.dataset.livePrice];if(lv)el.textContent=fp(lv.price);});
+document.querySelectorAll('[data-live-pct]').forEach(el=>{const lv=LIVE[el.dataset.livePct];if(lv){el.textContent=pct(lv.pct);el.style.color=lv.pct>=0?'var(--green)':'var(--red)';}});
+document.querySelectorAll('[data-live-dot]').forEach(el=>{if(LIVE[el.dataset.liveDot])el.textContent='● LIVE';});
+}
+
+function refreshPage(){
+const pgEl=document.getElementById('pg');
+if(!pgEl)return;
+const rt=location.hash.slice(1)||'/';
+const path=rt.replace('/app/','');
+const pg=path.split('/')[0]||'dashboard';
+pgEl.style.opacity='0';
+setTimeout(()=>{
+if(pg==='dashboard')rDash(pgEl);
+else if(pg==='sector')rSector(pgEl,path.split('/')[1]);
+else if(pg==='stock')rStock(pgEl,path.split('/')[1]);
+else if(pg==='watchlist')rWatchlist(pgEl);
+else if(pg==='history')rHistory(pgEl);
+else rDash(pgEl);
+pgEl.style.opacity='1';
+},120);
+}
 
 /* ── Real Market Data — Server Cached (Finnhub → Firebase) ─────────── */
 const REAL_NEWS={};
@@ -657,7 +682,7 @@ if(data.recs){
 Object.entries(data.recs).forEach(([tk,rec])=>{REAL_RECS[tk]=rec});
 }
 realDataTS=Date.now();
-if(realDataCount>0){console.log('✓ Real news:',realDataCount,'tickers'+(data.cached?' (cached)':' (fresh)'));render()}
+if(realDataCount>0){console.log('✓ Real news:',realDataCount,'tickers'+(data.cached?' (cached)':' (fresh)'));refreshPage();}
 }catch(e){console.warn('News fetch error:',e.message)}
 }
 
@@ -689,7 +714,7 @@ if(data.rankings){
 AI_RANKINGS=data.rankings;
 console.log('✓ AI rankings loaded:',Object.keys(AI_RANKINGS).length,'sectors ranked');
 }
-render();
+refreshPage();
 }catch(e){console.warn('AI analysis fetch:',e.message)}
 }
 
@@ -1672,8 +1697,8 @@ return`<div class="card card-glow stk-full anim-fade d${(i%6)+1}" onclick="nav('
 <div style="font-size:11px;color:var(--tx-2);margin-top:2px">${p.x} · ${p.i}</div>
 </div>
 <div style="text-align:right">
-<div style="font-size:19px;font-weight:700;font-family:var(--mono)">${fp(p.cp)}</div>
-<div style="font-size:14px;font-weight:700;font-family:var(--mono);color:${up?'var(--green)':'var(--red)'};margin-top:2px">${pct(p.dc)}</div>
+<div style="font-size:19px;font-weight:700;font-family:var(--mono)" data-live-price="${p.t}">${fp(p.cp)}</div>
+<div style="font-size:14px;font-weight:700;font-family:var(--mono);color:${up?'var(--green)':'var(--red)'};margin-top:2px" data-live-pct="${p.t}">${pct(p.dc)}</div>
 </div>
 </div>
 </div>
@@ -1752,9 +1777,9 @@ return`<div class="card anim-fade d${i+1}" style="display:flex;flex-direction:co
 </div>
 </div>
 <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px">
-<span style="font-size:24px;font-weight:800;font-family:var(--mono)">${price}</span>
-<span style="font-size:14px;font-weight:700;font-family:var(--mono);color:${isUp?'var(--green)':'var(--red)'}">${chg}</span>
-${live?'<span style="font-size:10px;color:var(--green);font-family:var(--mono)">● LIVE</span>':''}
+<span style="font-size:24px;font-weight:800;font-family:var(--mono)" data-live-price="${p.t}">${price}</span>
+<span style="font-size:14px;font-weight:700;font-family:var(--mono);color:${isUp?'var(--green)':'var(--red)'}" data-live-pct="${p.t}">${chg}</span>
+<span style="font-size:10px;color:var(--green);font-family:var(--mono)" data-live-dot="${p.t}">${live?'● LIVE':''}</span>
 </div>
 </div>
 
@@ -1841,7 +1866,7 @@ el.innerHTML=`
 </div>
 <div style="font-size:14px;color:var(--tx-1);margin-top:4px">${stk.n}</div>
 <div style="font-size:12px;color:var(--tx-2);margin-top:2px">${stk.i} · Mkt Cap: ${stk.mc}</div>
-<div class="det-price"><span class="big">${fp(dispPrice)}</span><span class="chg" style="color:${dispUp?'var(--green)':'var(--red)'}">${pct(dispChg)}</span>
+<div class="det-price"><span class="big" data-live-price="${stk.t}">${fp(dispPrice)}</span><span class="chg" style="color:${dispUp?'var(--green)':'var(--red)'}" data-live-pct="${stk.t}">${pct(dispChg)}</span>
 <span style="font-size:12px;color:var(--tx-2);font-family:var(--mono)">${live?'<span style="color:var(--green)">● LIVE</span>':'as of '+fmtDate(td)}</span>
 <span style="margin-left:auto">
 ${hasTier('pro')?`<button class="alert-tog ${isAlertOn(stk.t)?'on':''}" id="stk-alert" onclick="toggleStockAlert('${stk.t}',${a.tp},${a.sl},${a.cp})" title="Get notified when price nears upside or downside scenario">
