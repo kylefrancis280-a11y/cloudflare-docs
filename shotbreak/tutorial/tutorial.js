@@ -108,18 +108,19 @@
       if (s.target) {
         const el = typeof s.target === 'string' ? document.querySelector(s.target) : s.target;
         if (el) {
-          // Ensure target is on-screen BEFORE measuring, then measure fresh
-          el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-          setTimeout(() => {
-            const r = el.getBoundingClientRect();
-            const pad = 8;
-            spot.style.display = 'block';
-            spot.style.top    = (r.top - pad) + 'px';
-            spot.style.left   = (r.left - pad) + 'px';
-            spot.style.width  = (r.width + pad * 2) + 'px';
-            spot.style.height = (r.height + pad * 2) + 'px';
-            positionCardNear(card, r, s.placement || 'auto');
-          }, 260);
+          // Scroll INSTANTLY so getBoundingClientRect() reads the final position
+          // (smooth-scroll measurements race the scroll and land the spotlight
+          // far from the target). The spotlight has its own CSS transition on
+          // top/left so visual movement still feels smooth.
+          el.scrollIntoView({ block: 'center', inline: 'center' });
+          const r = el.getBoundingClientRect();
+          const pad = 8;
+          spot.style.display = 'block';
+          spot.style.top    = (r.top - pad) + 'px';
+          spot.style.left   = (r.left - pad) + 'px';
+          spot.style.width  = (r.width + pad * 2) + 'px';
+          spot.style.height = (r.height + pad * 2) + 'px';
+          positionCardNear(card, r, s.placement || 'auto');
         } else {
           // Target missing — no spotlight, center the card and keep going
           console.warn('[tutorial] step ' + (i + 1) + ' target not found:', s.target);

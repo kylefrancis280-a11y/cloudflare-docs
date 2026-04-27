@@ -1876,9 +1876,18 @@ function renderScenesList(p){
 }
 
 function renderSceneBodyDisplay(scene){
+  // Render from scene.raw — it's the source of truth and stays accurate
+  // after tighten/apply patches the scene in-place (parsed fields like
+  // scene.action / scene.dialogue are stale until a full re-normalize).
+  const raw = scene.raw || '';
+  if (raw) {
+    const preview = raw.length > 800 ? raw.slice(0, 800) + '…' : raw;
+    return '<div style="white-space:pre-wrap;font-family:inherit;font-size:13px">' + esc(preview) + '</div>';
+  }
+  // Fallback for legacy saves that never stored raw.
   let html = '';
   if (scene.action) html += '<b>' + esc(scene.action.slice(0, 500)) + (scene.action.length > 500 ? '...' : '') + '</b>\n\n';
-  scene.dialogue.forEach(d => {
+  (scene.dialogue || []).forEach(d => {
     html += esc(d.character) + (d.parenthetical ? ' <i>(' + esc(d.parenthetical) + ')</i>' : '') + '\n' + esc(d.line) + '\n\n';
   });
   return html;
@@ -2083,7 +2092,7 @@ function renderCharRow(name, c){
         <button class="bible-remove" data-action="remove-char" data-char="${esc(name)}" title="Remove this character" aria-label="Remove ${esc(name)}">×</button>
       </div>
       <textarea class="bible-desc" data-char-desc="${esc(name)}" placeholder="32-year-old lanky detective, black hair, perpetual trench coat, smokes constantly...">${esc(c.canonical_description || '')}</textarea>
-      ${renderCharacterLockedFields(c)}
+      <div data-char-locked="${esc(name)}">${renderCharacterLockedFields(c)}</div>
       ${refStrip}
       <div class="btn-row" style="margin-top:10px">
         <button class="btn btn-ghost btn-sm" data-action="polish-char" data-char="${esc(name)}">✨ Polish description</button>
@@ -2504,7 +2513,11 @@ function wireCastStep(p){
         p.character_bible[name].signature_props = props;
         p.character_bible[name].props = props;  // legacy field kept for compat
         if (periodNotes) p.character_bible[name].period_notes = periodNotes;
-        saveProject(p); toast('Saved to ' + name, 'ok'); sugEl.innerHTML = '';
+        saveProject(p);
+        const lockedEl = document.querySelector(`[data-char-locked="${CSS.escape(name)}"]`);
+        if (lockedEl) lockedEl.innerHTML = renderCharacterLockedFields(p.character_bible[name]);
+        toast('Saved to ' + name, 'ok');
+        sugEl.innerHTML = '';
       });
       sugEl.querySelector('[data-dismiss-wd]').addEventListener('click', () => { sugEl.innerHTML = ''; });
     });
@@ -2857,7 +2870,7 @@ function renderCoverageScene(scene, p, healthLevel){
         <span style="margin-left:auto">${badge}</span>
       </div>
       <div class="scene-body" style="max-height:140px">
-        ${esc(truncate(scene.action || '', 300))}
+        ${esc(truncate(scene.raw || scene.action || '', 300))}
       </div>
       ${errBanner}
       <div class="scene-actions">
@@ -3707,6 +3720,7 @@ function renderDeliverStep(p){
             <button class="btn btn-ghost" id="btn-music">✨ Score direction (5 credits)</button>
           </div>
           <div id="sound-out"></div>
+          <div id="music-out"></div>
         </div>
 
         <div class="card">
@@ -3788,7 +3802,7 @@ function wireDeliverStep(p){
   agentCall('btn-music', 'music-supervisor',
     { vision: p.vision, shot_list: p.shot_list },
     'Score direction — genre, tempo, cue points. Return {overall_direction, genre, bpm_range, cue_points: [{seconds, intent}]}.',
-    'Score direction', 'sound-out');
+    'Score direction', 'music-out');
 
   agentCall('btn-colorist', 'colorist',
     { vision: p.vision, shot_list: p.shot_list, timeline: p.timeline },

@@ -110,7 +110,7 @@ async function getOrCreateUser(uid, opts = {}) {
   const seedCredits = isOwner ? 999999   : 0;
 
   const token = await getSystemToken();
-  await fetch(
+  const r = await fetch(
     `${FIRESTORE_BASE()}/users?documentId=${uid}`,
     {
       method: 'POST',
@@ -124,6 +124,10 @@ async function getOrCreateUser(uid, opts = {}) {
       }),
     }
   );
+  if (!r.ok) {
+    const txt = await r.text().catch(() => '');
+    throw new Error('USER_CREATE_FAIL_' + r.status + ': ' + txt);
+  }
   return { tier: seedTier, credits: seedCredits };
 }
 

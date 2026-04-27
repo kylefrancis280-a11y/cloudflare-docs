@@ -1,6 +1,6 @@
 [build]
-  base    = "atlas/legacy"
-  publish = "atlas/legacy"
+  base      = "atlas/legacy"
+  publish   = "atlas/legacy"
   functions = "atlas/legacy/netlify/functions"
 
 [functions]
