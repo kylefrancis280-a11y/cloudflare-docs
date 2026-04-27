@@ -340,11 +340,15 @@
     const tonalLine = pa.tonal_anchors || '';
 
     // 4. Action / dialogue / heading
-    const action = shot.shot_brief?.shot || shot.shot_brief?.action ||
-                   shot.description || shot.action ||
+    // Narrative action (what's scripted) MUST lead — it's the primary
+    // constraint that stops the model from inventing things not in the script.
+    // Shot type (ECU, wide, etc.) follows as a modifier.
+    const actionDesc = shot.shot_brief?.action || shot.description || shot.action || '';
+    const shotType   = shot.shot_brief?.shot   || '';
+    const action = actionDesc || shotType ||
                    (shot.prompt && !inFrame.length ? shot.prompt : '') || '';
     const mood = shot.shot_brief?.mood || '';
-    const actionLine = [action, mood].filter(isNonEmpty).join(' — ');
+    const actionLine = [actionDesc || action, shotType, mood].filter(isNonEmpty).join(', ');
     const dialogueLine = shot.dialogue ? `Dialogue: "${shot.dialogue}"` : '';
     const headingLine = heading ? heading + '.' : '';
 
@@ -375,7 +379,7 @@
 
     // 6. Negative prompt (project-level, model-agnostic)
     const negative_prompt = pa.global_negative_prompt ||
-      'no text overlays, no watermarks, no captions, no logo, no extra limbs, no deformed hands, no continuity breaks';
+      'no text overlays, no watermarks, no captions, no logo, no extra limbs, no deformed hands, no continuity breaks, no unscripted characters, no invented props or objects, no environmental embellishments not described in the scene';
 
     // 7. Diagnostics (for debugging when shots still look off)
     const diagnostics = {
