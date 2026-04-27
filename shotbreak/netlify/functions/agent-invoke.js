@@ -23,7 +23,7 @@ const { verifyToken, getOrCreateUser, setCredits }    = require('./lib/auth');
 const ANTHROPIC_URL     = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
 
-const VALID_DEDUCTIONS = new Set([5, 15, 20, 50, 75, 150, 250]);
+const VALID_DEDUCTIONS = new Set([5, 15, 20, 50, 250]);
 
 const CORS = {
   'Access-Control-Allow-Origin':  'https://shotbreak.io',
