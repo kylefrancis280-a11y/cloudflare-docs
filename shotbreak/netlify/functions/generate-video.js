@@ -181,11 +181,12 @@ function ws(path, init = {}) {
 }
 
 // Map WaveSpeedAI status strings to fal-style statuses the frontend expects.
+// Covers all known WaveSpeed v3 status strings plus common provider variants.
 function mapStatus(s) {
   const v = String(s || "").toLowerCase();
-  if (v === "completed" || v === "succeeded" || v === "success") return "COMPLETED";
-  if (v === "failed"    || v === "error"     || v === "canceled") return "FAILED";
-  if (v === "processing"|| v === "running"   || v === "in_progress") return "IN_PROGRESS";
+  if (v === "completed" || v === "succeeded" || v === "success" || v === "done") return "COMPLETED";
+  if (v === "failed"    || v === "error"     || v === "canceled" || v === "cancelled") return "FAILED";
+  if (v === "processing"|| v === "running"   || v === "in_progress" || v === "generating") return "IN_PROGRESS";
   // created / queued / pending / unknown → IN_QUEUE
   return "IN_QUEUE";
 }
@@ -197,19 +198,27 @@ function extractRequestId(d) {
 }
 
 // Result endpoint returns an object whose video URL might be at any of
-// these spots depending on the model. Normalize to a single string.
+// these spots depending on the model/version. WaveSpeed v3 uses outputs[],
+// but some endpoints use download_url or video_url directly.
 function extractVideoUrl(d) {
   const cand =
     d?.data?.outputs?.[0] ||
     d?.outputs?.[0] ||
     d?.data?.output ||
     d?.output ||
+    d?.data?.download_url ||
+    d?.data?.video_url ||
+    d?.data?.url ||
     d?.data?.video?.url ||
     d?.video?.url ||
+    d?.download_url ||
+    d?.video_url ||
     null;
   if (!cand) return null;
   if (typeof cand === "string") return cand;
-  if (cand && typeof cand === "object" && cand.url) return cand.url;
+  if (typeof cand === "object") {
+    return cand.url || cand.video_url || cand.download_url || null;
+  }
   return null;
 }
 
@@ -471,18 +480,27 @@ exports.handler = async (event) => {
     if (!request_id) return respond(400, { error: "request_id required" });
     try {
       const r = await ws(`/predictions/${request_id}/result`);
-      const d = await r.json();
+      const raw = await r.text();
+      let d;
+      try { d = JSON.parse(raw); } catch { d = {}; }
       if (!r.ok) {
-        // Don't crash the poll — return safe IN_QUEUE
+        // Don't crash the poll — return safe IN_QUEUE with debug info
         return respond(200, {
           status: "IN_QUEUE", request_id,
-          warning: d?.message || "status fetch failed",
+          warning: d?.message || ("HTTP " + r.status),
+          _debug: raw.slice(0, 300),
         });
       }
+      const mappedStatus = mapStatus(extractStatus(d));
+      // If already completed, also surface the video URL so the client can
+      // skip the separate result fetch (one less round-trip).
+      const earlyUrl = mappedStatus === "COMPLETED" ? extractVideoUrl(d) : null;
       return respond(200, {
-        status:     mapStatus(extractStatus(d)),
+        status:    mappedStatus,
         request_id,
-        progress:   extractStatus(d),
+        progress:  extractStatus(d),
+        video_url: earlyUrl || undefined,
+        _raw_status: extractStatus(d),
       });
     } catch (e) {
       return respond(200, { status: "IN_QUEUE", request_id, warning: e.message });
@@ -495,12 +513,15 @@ exports.handler = async (event) => {
     if (!request_id) return respond(400, { error: "request_id required" });
     try {
       const r = await ws(`/predictions/${request_id}/result`);
-      const d = await r.json();
+      const raw = await r.text();
+      let d;
+      try { d = JSON.parse(raw); } catch { d = {}; }
       if (!r.ok) {
         return respond(502, {
-          error:   "WaveSpeedAI result fetch failed",
-          detail:  d?.message || d,
+          error:     "WaveSpeedAI result fetch failed",
+          detail:    d?.message || ("HTTP " + r.status),
           video_url: null,
+          _debug:    raw.slice(0, 300),
         });
       }
       const videoUrl = extractVideoUrl(d);
@@ -510,7 +531,13 @@ exports.handler = async (event) => {
         // Frontend compatibility: also expose under common alt keys
         video:     videoUrl ? { url: videoUrl } : null,
         videos:    videoUrl ? [{ url: videoUrl }] : [],
-        raw:       { id: request_id, status: extractStatus(d), error: d?.error || d?.data?.error || null },
+        raw:       {
+          id: request_id,
+          status: extractStatus(d),
+          error: d?.error || d?.data?.error || null,
+          // Include raw outputs so client can inspect if URL extraction fails
+          outputs: d?.data?.outputs || d?.outputs || null,
+        },
       });
     } catch (e) {
       return respond(502, { error: e.message, video_url: null });
