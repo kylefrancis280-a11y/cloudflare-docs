@@ -102,15 +102,26 @@ async function readUser(uid) {
 // Pass { isOwner: true } to seed an owner record so the UI shows the right
 // tier badge — credit math is still skipped at runtime via auth.isOwner.
 async function getOrCreateUser(uid, opts = {}) {
+  const isOwner = !!opts.isOwner;
+
+  // Owners don't need a Firestore doc — auth.isOwner is recomputed from the
+  // JWT email on every request, and credit math is skipped at runtime. So we
+  // skip Firestore entirely for owners. This keeps the app usable when the
+  // Firestore database is down or not yet provisioned.
+  if (isOwner) {
+    const existing = await readUser(uid).catch(() => null);
+    if (existing) return existing;
+    return { tier: 'owner', credits: 999999 };
+  }
+
   const existing = await readUser(uid);
   if (existing) return existing;
 
-  const isOwner     = !!opts.isOwner;
-  const seedTier    = isOwner ? 'owner'  : 'free';
-  const seedCredits = isOwner ? 999999   : 0;
+  const seedTier    = 'free';
+  const seedCredits = 0;
 
   const token = await getSystemToken();
-  const r = await fetch(
+  await fetch(
     `${FIRESTORE_BASE()}/users?documentId=${uid}`,
     {
       method: 'POST',
@@ -124,10 +135,6 @@ async function getOrCreateUser(uid, opts = {}) {
       }),
     }
   );
-  if (!r.ok) {
-    const txt = await r.text().catch(() => '');
-    throw new Error('USER_CREATE_FAIL_' + r.status + ': ' + txt);
-  }
   return { tier: seedTier, credits: seedCredits };
 }
 
