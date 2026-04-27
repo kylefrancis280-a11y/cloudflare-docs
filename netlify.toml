@@ -1,2 +1,7 @@
 [build]
-  base = "shotbreak"
+  base      = "atlas/legacy"
+  publish   = "atlas/legacy"
+  functions = "atlas/legacy/netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
