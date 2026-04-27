@@ -358,6 +358,10 @@ function isTransientAgentError(e) {
   const msg = String(e.message || '').toLowerCase();
   const detail = String(e.detail?.detail || '').toLowerCase();
   const combined = msg + ' ' + detail;
+  // Never retry permanent errors — API key bad, model unavailable, auth fail.
+  if (/invalid.*api.*key|authentication.*fail|x-api-key|401/i.test(combined)) return false;
+  if (/model.*not.*found|unknown.*model/i.test(combined)) return false;
+  if (/403|forbidden/i.test(combined)) return false;
   if (/timeout|timed out|took too long|abort/i.test(combined)) return true;
   if (/529|overloaded|503|unavailable|rate.*limit|429/i.test(combined)) return true;
   if (e.status === 502 || e.status === 503 || e.status === 504 || e.status === 529) return true;
@@ -378,7 +382,7 @@ async function invokeAgent(agentId, input, opts){
         lastErr = err;
         if (i === MAX_RETRIES) break;
         if (!isTransientAgentError(err)) break;
-        console.warn(`[invokeAgent] transient error on ${agentId} (attempt ${i+1}/${MAX_RETRIES+1}), retrying:`, err.message);
+        console.warn(`[invokeAgent] transient error on ${agentId} (attempt ${i+1}/${MAX_RETRIES+1}), retrying:`, err.message, err.detail?.detail || '');
         CrewFeed.log(agentId, 'working');
         await new Promise(res => setTimeout(res, BACKOFFS_MS[i]));
       }
@@ -447,7 +451,7 @@ async function runPassive(agentId, input, p, onOk){
         lastErr = err;
         if (i === MAX_RETRIES) break;
         if (!isTransientAgentError(err)) break;  // permanent error — stop
-        console.warn(`[runPassive] transient error on ${agentId} (attempt ${i+1}/${MAX_RETRIES+1}), retrying:`, err.message);
+        console.warn(`[runPassive] transient error on ${agentId} (attempt ${i+1}/${MAX_RETRIES+1}), retrying:`, err.message, err.detail?.detail || '');
         CrewFeed.log(agentId, 'working');
         await new Promise(res => setTimeout(res, BACKOFFS_MS[i]));
       }
@@ -464,7 +468,7 @@ async function runPassive(agentId, input, p, onOk){
     return { ok: true, output: out };
   } catch (e) {
     CrewFeed.log(agentId, 'err', humanizeError(e));
-    console.warn('passive ' + agentId + ' failed (after retries):', e.message);
+    console.warn('passive ' + agentId + ' failed (after retries):', e.message, e.detail?.detail || '');
     return { ok: false, reason: e.code || 'error', error: e.message };
   }
 }
