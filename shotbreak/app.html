@@ -538,6 +538,62 @@ header{padding:14px 0;border-bottom:1px solid var(--border);position:sticky;top:
 .qst-d{background:rgba(34,197,94,0.1);color:var(--green)}
 .qst-f{background:rgba(239,68,68,0.1);color:var(--red)}
 .stitch-bar{background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:10px;padding:16px;margin-top:16px}
+/* ═══ DAVINCI-STYLE EDITOR ═══════════════════════════════════════════════ */
+#drEditor{display:flex;flex-direction:column;background:#1a1a1a;border-radius:8px;overflow:hidden;color:#ccc;min-height:600px;margin:-8px}
+#drTopRow{display:flex;height:290px;border-bottom:2px solid #111;flex-shrink:0}
+#drPool{width:22%;min-width:150px;background:#202020;border-right:1px solid #2a2a2a;display:flex;flex-direction:column;overflow:hidden}
+#drPoolGrid{flex:1;overflow-y:auto;padding:5px;display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:4px;align-content:start}
+.dr-pc{background:#2a2a2a;border:1px solid #363636;border-radius:4px;overflow:hidden;cursor:pointer;transition:border-color .12s}
+.dr-pc:hover{border-color:#d4a017}.dr-pc.in-tl{opacity:.45}
+.dr-pc video{width:100%;height:46px;object-fit:cover;display:block;pointer-events:none}
+.dr-pc-lbl{font-size:9px;color:#aaa;padding:2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#drViewerPanel{flex:1;background:#0e0e0e;display:flex;flex-direction:column;overflow:hidden}
+#drViewerBody{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+#drPreviewVideo{max-width:100%;max-height:100%;display:none}
+#drViewerEmpty{color:#444;font-size:12px;text-align:center;pointer-events:none}
+#drTransport{height:38px;background:#171717;border-top:1px solid #2a2a2a;display:flex;align-items:center;justify-content:center;gap:2px;flex-shrink:0}
+#drInspPanel{width:22%;min-width:155px;background:#202020;border-left:1px solid #2a2a2a;display:flex;flex-direction:column;overflow:hidden}
+#drInspBody{flex:1;overflow-y:auto;padding:10px}
+.dr-ph{height:26px;background:#222;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;padding:0 10px;font-size:9px;font-weight:700;letter-spacing:.1em;color:#666;text-transform:uppercase;flex-shrink:0}
+.dr-ig{margin-bottom:12px}
+.dr-il{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#555;margin-bottom:3px}
+.dr-ii{width:100%;background:#141414;border:1px solid #333;color:#ddd;border-radius:3px;padding:4px 7px;font-size:11px;font-family:inherit;box-sizing:border-box}
+.dr-ii:focus{outline:none;border-color:#d4a017}
+.dr-irow{display:flex;gap:4px;margin-top:8px}
+#drTimelineRow{flex:1;display:flex;flex-direction:column;min-height:150px;overflow:hidden}
+#drTbar{height:32px;background:#222;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:4px;padding:0 8px;flex-shrink:0}
+#drTLContainer{flex:1;display:flex;overflow:hidden}
+#drTrackHdrs{width:38px;flex-shrink:0;background:#222;border-right:1px solid #2a2a2a}
+.dr-tlbl{height:54px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#555;border-bottom:1px solid #242424}
+#drTLScroll{flex:1;overflow-x:auto;overflow-y:hidden;position:relative}
+#drTLInner{position:relative;min-width:100%}
+#drRuler{height:20px;background:#1e1e1e;border-bottom:1px solid #2a2a2a;position:relative;cursor:pointer;user-select:none;flex-shrink:0}
+.dr-rtick{position:absolute;bottom:0;width:1px;background:#333}
+.dr-rlbl{position:absolute;bottom:2px;font-size:8px;color:#555;font-family:monospace;transform:translateX(-50%);pointer-events:none}
+.dr-track{height:54px;position:relative;background:#1a1a1a;border-bottom:1px solid #222}
+.dr-track-a{background:#181a18;opacity:.75}
+.dr-clip{position:absolute;top:3px;height:48px;border-radius:3px;overflow:hidden;cursor:pointer;border:1px solid rgba(0,0,0,.5);box-sizing:border-box;user-select:none;min-width:16px}
+.dr-clip.sel{border:2px solid #d4a017 !important;box-shadow:inset 0 0 0 1px rgba(212,160,23,.25)}
+.dr-clip-in{height:100%;padding:4px 10px 4px 10px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;pointer-events:none}
+.dr-clip-n{font-size:9px;font-weight:700;color:rgba(255,255,255,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dr-clip-d{font-size:8px;color:rgba(255,255,255,.4);font-family:monospace;margin-top:1px}
+.dr-ch{position:absolute;top:0;width:7px;height:100%;cursor:ew-resize;z-index:4;display:flex;align-items:center;justify-content:center}
+.dr-ch::after{content:'';width:2px;height:55%;background:rgba(255,255,255,.3);border-radius:1px}
+.dr-ch.l{left:0}.dr-ch.r{right:0}
+#drPH{position:absolute;top:0;height:100%;pointer-events:none;z-index:20;left:0}
+#drPHhead{width:10px;height:10px;background:#e84040;clip-path:polygon(0 0,100% 0,50% 100%);margin-left:-5px}
+#drPHline{width:1px;height:100%;background:#e84040;margin-left:-1px}
+.dr-btn{background:#2a2a2a;border:1px solid #383838;color:#bbb;border-radius:3px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.dr-btn:hover{background:#363636;color:#fff}
+.dr-btn-gld{background:rgba(212,160,23,.12);border-color:rgba(212,160,23,.35);color:#d4a017}
+.dr-btn-gld:hover{background:rgba(212,160,23,.22)}
+.dr-tbtn{background:none;border:none;color:#888;cursor:pointer;font-size:12px;padding:2px 6px;border-radius:3px;font-family:inherit}
+.dr-tbtn:hover{background:#333;color:#fff}
+.dr-pbtn{font-size:15px;color:#ccc}
+.dr-tool{background:#252525;border:1px solid #333;color:#777;cursor:pointer;padding:2px 7px;border-radius:3px;font-size:11px;font-family:inherit}
+.dr-tool:hover,.dr-tool.act{background:#363636;color:#fff;border-color:#555}
+.dr-sel{background:#141414;border:1px solid #333;color:#bbb;border-radius:3px;padding:3px 6px;font-size:10px;font-family:inherit}
+#drExpBar{padding:5px 8px;background:#1a1a1a;border-top:1px solid #262626;display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex-shrink:0}
 </style>
 <div id="mediaView" style="display:none">
   <div class="ws">
@@ -685,102 +741,118 @@ header{padding:14px 0;border-bottom:1px solid var(--border);position:sticky;top:
       </div>
     </div>
 
-    <!-- STEP 5: Editor -->
+    <!-- STEP 5: DaVinci-style Editor -->
     <div id="mhStep5" style="display:none">
-      <div class="mh-panel">
-        <h3>Step 5 — Editor</h3>
-        <div class="sub">Arrange your generated clips on the timeline. Drag to reorder, trim start/end, add crossfades, then export a single MP4.</div>
+      <div id="drEditor">
 
-        <div id="mhEditorGate" style="display:none;padding:20px;background:var(--surface2);border-radius:8px;text-align:center;color:var(--dim)">
-          Generate some clips in Step 4 first. They'll appear here for editing.
-        </div>
+        <!-- TOP ROW: Media Pool | Viewer | Inspector -->
+        <div id="drTopRow">
 
-        <div id="mhEditorUI" style="display:none">
-          <!-- Clip library -->
-          <div style="margin-bottom:16px">
-            <div style="font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">📚 Clip Library</div>
-            <div id="mhEditLib" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px"></div>
-            <div style="font-size:11px;color:var(--muted);margin-top:6px">Click a clip to add it to the timeline →</div>
+          <!-- Media Pool -->
+          <div id="drPool">
+            <div class="dr-ph">Media Pool</div>
+            <div id="drPoolGrid"></div>
+            <div style="padding:6px 6px;border-top:1px solid #2a2a2a;display:flex;gap:4px;flex-wrap:wrap">
+              <button class="dr-btn" onclick="document.getElementById('mhEditUploadInput').click()">📁 Upload</button>
+              <input type="file" id="mhEditUploadInput" accept="video/mp4,video/*" multiple style="display:none" onchange="mhEditUploadFiles(this.files)"/>
+              <button class="dr-btn" onclick="drAddAll()">+ Add All</button>
+              <button class="dr-btn" onclick="mhEditImportFromJSON()" title="Import from JSON">📥</button>
+            </div>
+          </div>
+
+          <!-- Viewer -->
+          <div id="drViewerPanel">
+            <div class="dr-ph" style="justify-content:space-between">
+              <span style="color:#555">Source</span>
+              <span id="drTimecode" style="font-family:monospace;color:#e05050;font-size:11px;letter-spacing:.04em">00:00:00:00</span>
+              <span style="color:#555">Preview</span>
+            </div>
+            <div id="drViewerBody">
+              <video id="drPreviewVideo" preload="metadata"
+                onloadedmetadata="drOnMeta(this)"
+                ontimeupdate="drOnTimeUpdate(this)"
+                onended="drOnEnded()"
+                onplay="drOnPlay()" onpause="drOnPause()"></video>
+              <div id="drViewerEmpty">Select a clip to preview</div>
+            </div>
+            <div id="drTransport">
+              <button class="dr-tbtn" onclick="drGoto('start')" title="To start (Home)">⏮</button>
+              <button class="dr-tbtn" onclick="drStep(-1)" title="Step back">⏪</button>
+              <button class="dr-tbtn dr-pbtn" id="drPlayBtn" onclick="drTogglePlay()" title="Play / Pause (Space)">▶</button>
+              <button class="dr-tbtn" onclick="drStep(1)" title="Step forward">⏩</button>
+              <button class="dr-tbtn" onclick="drGoto('end')" title="To end (End)">⏭</button>
+            </div>
+          </div>
+
+          <!-- Inspector -->
+          <div id="drInspPanel">
+            <div class="dr-ph">Inspector</div>
+            <div id="drInspBody"><div style="color:#444;font-size:11px;text-align:center;padding:16px">No clip selected</div></div>
+          </div>
+
+        </div><!-- /drTopRow -->
+
+        <!-- TIMELINE ROW -->
+        <div id="drTimelineRow">
+
+          <!-- Toolbar -->
+          <div id="drTbar">
+            <button class="dr-tool act" id="drToolSel" onclick="drSetTool('select')" title="Selection (S)">▲ Select</button>
+            <button class="dr-tool" id="drToolRaz" onclick="drSetTool('razor')" title="Blade (B)">✂ Blade</button>
+            <div style="width:1px;background:#383838;margin:0 5px;height:18px"></div>
+            <button class="dr-tbtn" onclick="drZoom(-1)" title="Zoom out">−</button>
+            <span id="drZoomLbl" style="font-size:9px;color:#666;min-width:36px;text-align:center;font-family:monospace">60px/s</span>
+            <button class="dr-tbtn" onclick="drZoom(1)" title="Zoom in">+</button>
+            <div style="flex:1"></div>
+            <span id="drTotalDur" style="font-size:9px;color:#555;font-family:monospace;margin-right:6px"></span>
+            <button class="dr-btn" onclick="mhEditClear()" title="Clear timeline">⌫ Clear</button>
+            <div style="width:1px;background:#383838;margin:0 5px;height:18px"></div>
+            <button class="dr-btn" onclick="mhGoto(4)">← Back</button>
+            <button class="dr-btn dr-btn-gld" onclick="mhEditExport()">🎬 Export MP4</button>
           </div>
 
           <!-- Timeline -->
-          <div style="margin-bottom:16px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <div style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;font-weight:700">🎞 Timeline</div>
-              <div style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="mhEditTimelineMeta">0 clips · 0s</div>
+          <div id="drTLContainer">
+            <div id="drTrackHdrs">
+              <div style="height:20px;background:#1e1e1e;border-bottom:1px solid #242424"></div>
+              <div class="dr-tlbl">V1</div>
+              <div class="dr-tlbl">A1</div>
             </div>
-            <div id="mhEditTimeline" style="min-height:100px;background:var(--surface2);border:1px dashed var(--border);border-radius:8px;padding:10px;display:flex;gap:6px;overflow-x:auto;align-items:center"></div>
-          </div>
-
-          <!-- Clip properties (selected) -->
-          <div id="mhEditProps" style="display:none;padding:14px;background:var(--surface2);border:1px solid var(--gold-border);border-radius:8px;margin-bottom:16px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-              <div style="font-weight:700;color:var(--gold);font-size:13px" id="mhEditPropTitle">Clip</div>
-              <button class="b b-g b-xs" onclick="mhEditDeselect()">✕ Close</button>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;align-items:end">
-              <div>
-                <label class="form-label">Trim Start (s)</label>
-                <input type="number" id="mhEditTrimIn" step="0.1" min="0" value="0" style="width:100%;background:var(--bg);color:#fff;border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-family:inherit"/>
-              </div>
-              <div>
-                <label class="form-label">Trim End (s from end)</label>
-                <input type="number" id="mhEditTrimOut" step="0.1" min="0" value="0" style="width:100%;background:var(--bg);color:#fff;border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-family:inherit"/>
-              </div>
-              <div>
-                <label class="form-label">Crossfade into Next (s)</label>
-                <input type="number" id="mhEditFade" step="0.1" min="0" max="3" value="0" style="width:100%;background:var(--bg);color:#fff;border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-family:inherit"/>
-              </div>
-              <div style="display:flex;gap:6px">
-                <button class="b b-g b-s" onclick="mhEditMoveSelected(-1)">← Move</button>
-                <button class="b b-g b-s" onclick="mhEditMoveSelected(1)">Move →</button>
-                <button class="b b-r b-s" onclick="mhEditRemoveSelected()">✕ Remove</button>
+            <div id="drTLScroll">
+              <div id="drTLInner">
+                <div id="drRuler" onmousedown="drRulerDown(event)"></div>
+                <div id="drTrackV" class="dr-track"></div>
+                <div id="drTrackA" class="dr-track dr-track-a"></div>
+                <div id="drPH"><div id="drPHhead"></div><div id="drPHline"></div></div>
               </div>
             </div>
           </div>
 
-          <!-- Export controls -->
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px">
-            <div>
-              <label class="form-label">Export Quality</label>
-              <select id="mhEditQuality" style="width:100%;background:var(--bg);color:#fff;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:inherit">
-                <option value="fast" selected>Fast (copy codec)</option>
-                <option value="hq">High Quality (re-encode)</option>
-              </select>
-            </div>
-            <div>
-              <label class="form-label">Transitions</label>
-              <select id="mhEditTransitions" style="width:100%;background:var(--bg);color:#fff;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:inherit">
-                <option value="hard" selected>Hard cuts (no transitions)</option>
-                <option value="fade">Use per-clip crossfades</option>
-              </select>
-            </div>
-            <div>
-              <label class="form-label">Audio</label>
-              <select id="mhEditAudio" style="width:100%;background:var(--bg);color:#fff;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:inherit">
-                <option value="keep" selected>Keep clip audio</option>
-                <option value="mute">Mute everything</option>
-              </select>
-            </div>
-          </div>
+        </div><!-- /drTimelineRow -->
 
-          <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">
-            <button class="b b-g b-s" onclick="mhGoto(4)">← Back</button>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="b b-gold b-s" onclick="document.getElementById('mhEditUploadInput').click()" title="Upload MP4 video files from your computer">📁 Upload MP4s</button>
-              <input type="file" id="mhEditUploadInput" accept="video/mp4,video/*" multiple style="display:none" onchange="mhEditUploadFiles(this.files)"/>
-              <button class="b b-g b-s" onclick="mhEditImportFromJSON()" title="Paste JSON list of clips to restore a previous session">📥 Import URLs</button>
-              <button class="b b-g b-s" onclick="mhEditAddAll()">+ Add All Clips</button>
-              <button class="b b-g b-s" onclick="mhEditClear()">⌫ Clear Timeline</button>
-              <button class="b b-gold b-big" onclick="mhEditExport()">🎬 Export MP4</button>
-            </div>
-          </div>
-
-          <div id="mhEditExportStatus" style="display:none;margin-top:14px;padding:12px;background:var(--surface2);border-radius:8px">
-            <div style="font-size:12px;color:var(--muted);font-family:var(--mono)" id="mhEditExportLog">Preparing...</div>
-            <div id="mhEditExportResult" style="margin-top:10px"></div>
-          </div>
+        <!-- Export settings bar -->
+        <div id="drExpBar">
+          <span style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.08em">Export:</span>
+          <select id="mhEditQuality" class="dr-sel">
+            <option value="fast" selected>Fast (copy codec)</option>
+            <option value="hq">HQ (re-encode)</option>
+          </select>
+          <select id="mhEditTransitions" class="dr-sel">
+            <option value="hard" selected>Hard cuts</option>
+            <option value="fade">Crossfades</option>
+          </select>
+          <select id="mhEditAudio" class="dr-sel">
+            <option value="keep" selected>Keep audio</option>
+            <option value="mute">Mute</option>
+          </select>
         </div>
+
+        <!-- Export status -->
+        <div id="mhEditExportStatus" style="display:none;padding:10px 12px;background:#141414;border-top:1px solid #252525">
+          <div style="font-size:11px;color:#888;font-family:monospace" id="mhEditExportLog">Preparing...</div>
+          <div id="mhEditExportResult" style="margin-top:8px"></div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -4715,318 +4787,546 @@ function mhRenderClipsGrid(){
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STEP 5: EDITOR — Browser-based timeline editor using FFmpeg.wasm
-// Timeline state lives in _mhEditState (per-session, not persisted — clips
-// come from _mhGenState.jobs which is the latest generation run).
+// STEP 5 — DAVINCI RESOLVE-STYLE EDITOR
 // ═══════════════════════════════════════════════════════════════════════════
+
+// Clip colors (one per scene index, cycling)
+const DR_COLORS=['#1a5878','#1a6e38','#6e1a1a','#6a501a','#421a7a','#1a6a6a','#7a1a56','#3a6218'];
+
 let _mhEditState={
-  clips:[],  // [{id, label, videoUrl, trimIn, trimOut, fadeToNext}]
+  clips:[],  // [{id,label,videoUrl,trimIn,trimOut,fadeToNext,duration,sceneIdx}]
   selected:null
 };
 
-function mhRenderEditor(){
-  const gate=document.getElementById('mhEditorGate');
-  const ui=document.getElementById('mhEditorUI');
-  // Always show the UI — the Upload MP4s button needs to be reachable even
-  // when there are no generated clips yet. The library will show a hint if empty.
-  if(gate)gate.style.display='none';
-  if(ui)ui.style.display='block';
-  mhEditRenderLibrary();
-  mhEditRenderTimeline();
+const _dr={
+  zoom:60,       // px per second
+  playhead:0,    // seconds
+  tool:'select', // 'select'|'razor'
+  playing:false,
+};
+
+// ── Clip math ────────────────────────────────────────────────────────────────
+function drEffDur(c){return Math.max(0.3,(c.duration||5)-(c.trimIn||0)-(c.trimOut||0))}
+function drStartTime(idx){
+  let t=0;
+  for(let i=0;i<idx;i++)t+=drEffDur(_mhEditState.clips[i]);
+  return t;
+}
+function drTotalDuration(){return _mhEditState.clips.reduce((s,c)=>s+drEffDur(c),0)}
+function drFmtTC(s){
+  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=Math.floor(s%60),f=Math.floor((s%1)*24);
+  return [h,m,sec,f].map(v=>String(v).padStart(2,'0')).join(':');
+}
+function drFmtDur(s){
+  const m=Math.floor(s/60),sec=s.toFixed(1);
+  return m>0?m+'m '+(s%60).toFixed(1)+'s':sec+'s';
+}
+function drColorFor(c){return DR_COLORS[(c.sceneIdx||0)%DR_COLORS.length]}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function mhRenderEditor(){drRender()}
+function mhEditRenderTimeline(){drRenderTimeline();drRenderRuler()}
+
+function drRender(){
+  drRenderPool();
+  drRenderTimeline();
+  drRenderRuler();
+  drRenderInspector();
+  drUpdateTimecode(_dr.playhead);
 }
 
-function mhEditRenderLibrary(){
-  const lib=document.getElementById('mhEditLib');
+function drRenderPool(){
+  const grid=document.getElementById('drPoolGrid');
+  if(!grid)return;
   const jobs=(_mhGenState&&_mhGenState.jobs||[]).filter(j=>j.videoUrl);
+  const uploaded=_mhEditState.clips.filter(c=>c._local);
+  const inTL=new Set(_mhEditState.clips.map(c=>c.videoUrl));
   let h='';
-  for(const j of jobs){
-    const label=j._localFile?('UP'+(j.shotIdx+1)):('S'+(j.sceneIdx+1)+'.'+(j.shotIdx+1));
-    h+='<div style="flex-shrink:0;width:180px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer" onclick="mhEditAddClip(\''+label+'\',\''+j.videoUrl+'\')" title="Click to add to timeline">';
-    h+='<video src="'+j.videoUrl+'" muted preload="metadata" style="width:100%;display:block;background:#000;aspect-ratio:16/9;object-fit:cover"></video>';
-    h+='<div style="padding:6px 8px"><div style="color:var(--gold);font-size:11px;font-weight:700">'+label+'</div><div style="color:var(--dim);font-size:10px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap">'+esc((j.prompt||'').substring(0,40))+'</div></div>';
-    h+='</div>';
+  if(!jobs.length&&!uploaded.length){
+    h='<div style="grid-column:1/-1;color:#444;font-size:10px;text-align:center;padding:16px">Generate clips in Step 4 first</div>';
   }
-  lib.innerHTML=h||'<div style="color:var(--muted);font-size:12px;padding:14px;text-align:center;width:100%">No clips yet — click <b>📁 Upload MP4s</b> below to load local files, or generate some on Step 4.</div>';
+  for(const j of jobs){
+    const lbl=j._localFile?('UP'+(j.shotIdx+1)):('S'+(j.sceneIdx+1)+'.'+(j.shotIdx+1));
+    const cls=inTL.has(j.videoUrl)?'dr-pc in-tl':'dr-pc';
+    h+='<div class="'+cls+'" onclick="drPoolAdd(\''+lbl+'\',\''+j.videoUrl+'\','+(j.sceneIdx||0)+')" title="Click to add to timeline">'
+      +'<video src="'+j.videoUrl+'" muted preload="metadata"></video>'
+      +'<div class="dr-pc-lbl">'+lbl+'</div></div>';
+  }
+  grid.innerHTML=h;
 }
 
-function mhEditRenderTimeline(){
-  const tl=document.getElementById('mhEditTimeline');
-  const meta=document.getElementById('mhEditTimelineMeta');
-  if(!_mhEditState.clips.length){
-    tl.innerHTML='<div style="color:var(--muted);font-size:12px;padding:20px;text-align:center;width:100%">Click clips above to add them here, or use "+ Add All Clips" below.</div>';
-    meta.textContent='0 clips · 0s';
-    document.getElementById('mhEditProps').style.display='none';
+function drRenderTimeline(){
+  const trackV=document.getElementById('drTrackV');
+  const trackA=document.getElementById('drTrackA');
+  const inner=document.getElementById('drTLInner');
+  if(!trackV)return;
+  const clips=_mhEditState.clips;
+  const totalW=Math.max(drTotalDuration()*_dr.zoom+200, 600);
+  if(inner)inner.style.width=totalW+'px';
+  let hV='',hA='';
+  let t=0;
+  for(let i=0;i<clips.length;i++){
+    const c=clips[i];
+    const dur=drEffDur(c);
+    const w=Math.max(dur*_dr.zoom,16);
+    const left=t*_dr.zoom;
+    const color=drColorFor(c);
+    const sel=(_mhEditState.selected===i)?'dr-clip sel':'dr-clip';
+    const durLbl=drFmtDur(dur);
+    // Video track clip
+    hV+='<div class="'+sel+'" style="left:'+left+'px;width:'+w+'px;background:'+color+';border-color:'+color+'"'
+      +' onmousedown="drClipDown(event,'+i+')">'
+      +'<div class="dr-ch l" onmousedown="drTrimDown(event,'+i+',\'l\')"></div>'
+      +'<div class="dr-clip-in"><div class="dr-clip-n">'+c.label+'</div><div class="dr-clip-d">'+durLbl+'</div></div>'
+      +'<div class="dr-ch r" onmousedown="drTrimDown(event,'+i+',\'r\')"></div>'
+      +'</div>';
+    // Audio track (same clip, dimmer)
+    hA+='<div class="dr-clip" style="left:'+left+'px;width:'+w+'px;background:'+color+';opacity:0.45;border-color:'+color+'">'
+      +'<div class="dr-clip-in" style="pointer-events:none"><div class="dr-clip-n" style="font-size:8px;opacity:.7">'+c.label+'</div></div>'
+      +'</div>';
+    t+=dur;
+  }
+  trackV.innerHTML=hV;
+  trackA.innerHTML=hA;
+  trackV.style.width=totalW+'px';
+  trackA.style.width=totalW+'px';
+  // Update duration display
+  const durEl=document.getElementById('drTotalDur');
+  if(durEl)durEl.textContent=clips.length+' clips · '+drFmtDur(drTotalDuration());
+  // Re-position playhead
+  drSetPlayhead(_dr.playhead);
+}
+
+function drRenderRuler(){
+  const ruler=document.getElementById('drRuler');
+  if(!ruler)return;
+  const total=Math.max(drTotalDuration()+5,10);
+  ruler.style.width=Math.max(total*_dr.zoom+200,600)+'px';
+  const step=_dr.zoom<30?5:_dr.zoom<80?2:1;
+  let h='';
+  for(let s=0;s<=Math.ceil(total)+5;s+=step){
+    const x=s*_dr.zoom;
+    const major=s%5===0;
+    h+='<div class="dr-rtick" style="left:'+x+'px;height:'+(major?'12':'6')+'px;background:'+(major?'#444':'#2e2e2e')+'"></div>';
+    if(major)h+='<div class="dr-rlbl" style="left:'+x+'px">'+drFmtDur(s)+'</div>';
+  }
+  ruler.innerHTML=h;
+}
+
+function drRenderInspector(){
+  const body=document.getElementById('drInspBody');
+  if(!body)return;
+  const i=_mhEditState.selected;
+  if(i==null||!_mhEditState.clips[i]){
+    body.innerHTML='<div style="color:#444;font-size:11px;text-align:center;padding:16px">No clip selected</div>';
     return;
   }
-  let h='';
-  let totalDur=0;
-  _mhEditState.clips.forEach((c,i)=>{
-    const sel=_mhEditState.selected===i;
-    // Approximate duration (we don't preload; use 6s default for rough math)
-    const approxDur=Math.max(0,6-(c.trimIn||0)-(c.trimOut||0));
-    totalDur+=approxDur;
-    h+='<div style="flex-shrink:0;width:140px;background:'+(sel?'var(--gold-bg)':'var(--surface)')+';border:2px solid '+(sel?'var(--gold)':'var(--border)')+';border-radius:6px;cursor:pointer;overflow:hidden;position:relative" onclick="mhEditSelect('+i+')">';
-    h+='<video src="'+c.videoUrl+'" muted preload="metadata" style="width:100%;display:block;background:#000;aspect-ratio:16/9;object-fit:cover;pointer-events:none"></video>';
-    h+='<div style="padding:4px 6px"><div style="color:'+(sel?'var(--gold)':'#fff')+';font-size:10px;font-weight:700">'+esc(c.label)+'</div>';
-    h+='<div style="color:var(--dim);font-size:9px;font-family:var(--mono)">'+approxDur.toFixed(1)+'s</div></div>';
-    if(c.fadeToNext>0&&i<_mhEditState.clips.length-1)h+='<div style="position:absolute;right:-10px;top:50%;transform:translateY(-50%);background:var(--gold);color:#000;border-radius:50%;width:20px;height:20px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:2">~</div>';
-    h+='</div>';
-    if(i<_mhEditState.clips.length-1){
-      h+='<div style="flex-shrink:0;color:var(--dim);font-size:10px">—</div>';
-    }
-  });
-  tl.innerHTML=h;
-  meta.textContent=_mhEditState.clips.length+' clips · ~'+totalDur.toFixed(1)+'s';
-  // Show props if selected
-  if(_mhEditState.selected!=null&&_mhEditState.clips[_mhEditState.selected]){
-    const c=_mhEditState.clips[_mhEditState.selected];
-    document.getElementById('mhEditProps').style.display='block';
-    document.getElementById('mhEditPropTitle').textContent='Clip '+esc(c.label);
-    document.getElementById('mhEditTrimIn').value=c.trimIn||0;
-    document.getElementById('mhEditTrimOut').value=c.trimOut||0;
-    document.getElementById('mhEditFade').value=c.fadeToNext||0;
-  }else{
-    document.getElementById('mhEditProps').style.display='none';
+  const c=_mhEditState.clips[i];
+  const dur=(c.duration||5).toFixed(1);
+  const eff=drEffDur(c).toFixed(2);
+  body.innerHTML=`
+    <div class="dr-ig">
+      <div class="dr-il">Clip</div>
+      <div style="font-size:12px;font-weight:700;color:#d4a017;word-break:break-all">${c.label}</div>
+    </div>
+    <div class="dr-ig">
+      <div class="dr-il">Source Duration</div>
+      <div style="font-size:11px;font-family:monospace;color:#888">${dur}s</div>
+    </div>
+    <div class="dr-ig">
+      <div class="dr-il">Effective Duration</div>
+      <div style="font-size:11px;font-family:monospace;color:#aaa">${eff}s</div>
+    </div>
+    <div class="dr-ig">
+      <div class="dr-il">Trim Start (s)</div>
+      <input class="dr-ii" type="number" step="0.1" min="0" value="${(c.trimIn||0).toFixed(1)}"
+        oninput="_mhEditState.clips[${i}].trimIn=Math.max(0,parseFloat(this.value)||0);drRender();mhPersistClips()"/>
+    </div>
+    <div class="dr-ig">
+      <div class="dr-il">Trim End (s from end)</div>
+      <input class="dr-ii" type="number" step="0.1" min="0" value="${(c.trimOut||0).toFixed(1)}"
+        oninput="_mhEditState.clips[${i}].trimOut=Math.max(0,parseFloat(this.value)||0);drRender();mhPersistClips()"/>
+    </div>
+    <div class="dr-ig">
+      <div class="dr-il">Crossfade to Next (s)</div>
+      <input class="dr-ii" type="number" step="0.1" min="0" max="3" value="${(c.fadeToNext||0).toFixed(1)}"
+        oninput="_mhEditState.clips[${i}].fadeToNext=Math.max(0,Math.min(3,parseFloat(this.value)||0));mhPersistClips()"/>
+    </div>
+    <div class="dr-irow">
+      <button class="dr-btn" onclick="drMoveClip(${i},-1)">← Move</button>
+      <button class="dr-btn" onclick="drMoveClip(${i},1)">Move →</button>
+      <button class="dr-btn" style="color:#e05050;border-color:#6a2020" onclick="drRemoveClip(${i})">✕</button>
+    </div>`;
+}
+
+// ── Playhead ──────────────────────────────────────────────────────────────────
+function drSetPlayhead(t){
+  _dr.playhead=Math.max(0,t);
+  const ph=document.getElementById('drPH');
+  if(ph)ph.style.left=(_dr.playhead*_dr.zoom)+'px';
+  drUpdateTimecode(_dr.playhead);
+}
+
+function drUpdateTimecode(t){
+  const el=document.getElementById('drTimecode');
+  if(el)el.textContent=drFmtTC(t);
+}
+
+function drRulerDown(e){
+  e.preventDefault();
+  const ruler=document.getElementById('drRuler');
+  const scroll=document.getElementById('drTLScroll');
+  function seek(e){
+    const rect=ruler.getBoundingClientRect();
+    const x=e.clientX-rect.left+scroll.scrollLeft;
+    const t=Math.max(0,x/_dr.zoom);
+    drSetPlayhead(t);
+    drSeekToPlayhead();
+  }
+  seek(e);
+  const up=()=>{document.removeEventListener('mousemove',seek);document.removeEventListener('mouseup',up)};
+  document.addEventListener('mousemove',seek);
+  document.addEventListener('mouseup',up);
+}
+
+function drSeekToPlayhead(){
+  const vid=document.getElementById('drPreviewVideo');
+  if(!vid||!vid.src)return;
+  const i=_mhEditState.selected;
+  if(i==null)return;
+  const clipStart=drStartTime(i);
+  const c=_mhEditState.clips[i];
+  const localT=_dr.playhead-clipStart+(c.trimIn||0);
+  if(localT>=0&&localT<=(c.duration||5)){
+    vid.currentTime=localT;
   }
 }
 
-function mhEditAddClip(label,videoUrl){
+// ── Clip interactions ─────────────────────────────────────────────────────────
+function drClipDown(e,idx){
+  if(_dr.tool==='razor'){drRazorCut(e,idx);return}
+  e.preventDefault();
+  e.stopPropagation();
+  // If just a click (no drag), select and preview
+  const startX=e.clientX;
+  let dragging=false;
+  const clips=_mhEditState.clips;
+
+  const onMove=(e)=>{
+    if(Math.abs(e.clientX-startX)>6)dragging=true;
+    if(!dragging)return;
+    // Compute drop position
+    const trackEl=document.getElementById('drTrackV');
+    const scrollEl=document.getElementById('drTLScroll');
+    const rect=trackEl.getBoundingClientRect();
+    const x=e.clientX-rect.left+scrollEl.scrollLeft;
+    const targetT=Math.max(0,x/_dr.zoom);
+    let cumT=0,insertAt=clips.length;
+    for(let j=0;j<clips.length;j++){
+      if(j===idx)continue;
+      const half=drEffDur(clips[j])/2;
+      if(targetT<cumT+half){insertAt=j;break}
+      cumT+=drEffDur(clips[j]);
+    }
+    // Animate — just re-render with a ghost (simplified: show selection)
+    _mhEditState.selected=idx;
+    drRenderTimeline();
+  };
+
+  const onUp=(e)=>{
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onUp);
+    if(dragging){
+      // Execute reorder
+      const trackEl=document.getElementById('drTrackV');
+      const scrollEl=document.getElementById('drTLScroll');
+      const rect=trackEl.getBoundingClientRect();
+      const x=e.clientX-rect.left+scrollEl.scrollLeft;
+      const targetT=Math.max(0,x/_dr.zoom);
+      let cumT=0,insertAt=clips.length;
+      for(let j=0;j<clips.length;j++){
+        if(j===idx)continue;
+        if(targetT<cumT+drEffDur(clips[j])/2){insertAt=j;break}
+        cumT+=drEffDur(clips[j]);
+      }
+      const clip=clips.splice(idx,1)[0];
+      const newIdx=insertAt>idx?insertAt-1:insertAt;
+      clips.splice(newIdx,0,clip);
+      _mhEditState.selected=newIdx;
+      mhPersistClips();
+    } else {
+      drSelectClip(idx);
+    }
+    drRender();
+  };
+
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',onUp);
+}
+
+function drTrimDown(e,idx,side){
+  e.preventDefault();e.stopPropagation();
+  const c=_mhEditState.clips[idx];
+  const origIn=c.trimIn||0,origOut=c.trimOut||0;
+  const startX=e.clientX;
+  const dur=c.duration||5;
+
+  const onMove=(e)=>{
+    const dx=(e.clientX-startX)/_dr.zoom;
+    if(side==='l'){
+      c.trimIn=Math.max(0,Math.min(origIn+dx,dur-origOut-0.3));
+    } else {
+      c.trimOut=Math.max(0,Math.min(origOut-dx,dur-origIn-0.3));
+    }
+    drRenderTimeline();drRenderInspector();mhPersistClips();
+  };
+  const onUp=()=>{document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp)};
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',onUp);
+}
+
+function drRazorCut(e,idx){
+  const trackEl=document.getElementById('drTrackV');
+  const scrollEl=document.getElementById('drTLScroll');
+  const rect=trackEl.getBoundingClientRect();
+  const x=e.clientX-rect.left+scrollEl.scrollLeft;
+  const cutT=x/_dr.zoom;
+  const clipStart=drStartTime(idx);
+  const cutLocal=cutT-clipStart;
+  const c=_mhEditState.clips[idx];
+  const dur=c.duration||5;
+  if(cutLocal<0.3||cutLocal>dur-0.3)return;
+  // Split into two clips
+  const a={...c,duration:cutLocal+(c.trimIn||0),trimOut:0};
+  const b={...c,trimIn:(c.trimIn||0)+cutLocal,duration:dur,trimOut:c.trimOut||0,id:c.id+'_b'};
+  _mhEditState.clips.splice(idx,1,a,b);
+  drRender();mhPersistClips();
+}
+
+// ── Clip CRUD ─────────────────────────────────────────────────────────────────
+function drSelectClip(idx){
+  _mhEditState.selected=idx;
+  const c=_mhEditState.clips[idx];
+  const vid=document.getElementById('drPreviewVideo');
+  const empty=document.getElementById('drViewerEmpty');
+  if(vid&&c&&c.videoUrl){
+    if(vid.src!==c.videoUrl){vid.src=c.videoUrl;vid.load()}
+    vid.style.display='block';
+    if(empty)empty.style.display='none';
+  }
+  drRenderTimeline();drRenderInspector();
+  // Seek playhead to start of this clip
+  drSetPlayhead(drStartTime(idx));
+}
+
+function drPoolAdd(label,videoUrl,sceneIdx){
   _mhEditState.clips.push({
-    id:'clip_'+Date.now()+'_'+Math.random().toString(36).substring(2,7),
-    label,videoUrl,trimIn:0,trimOut:0,fadeToNext:0
+    id:Date.now()+'_'+Math.random().toString(36).slice(2),
+    label,videoUrl,sceneIdx:sceneIdx||0,
+    trimIn:0,trimOut:0,fadeToNext:0,duration:5
   });
-  mhEditRenderTimeline();
-}
-function mhEditAddClipByLabel(label){
-  // Helper called from the Step 4 clip grid
-  const j=(_mhGenState.jobs||[]).find(j=>j.videoUrl&&('S'+(j.sceneIdx+1)+'.'+(j.shotIdx+1))===label);
-  if(!j)return;
-  mhEditAddClip(label,j.videoUrl);
-  mhGoto(5);
-}
-function mhEditAddAll(){
-  const jobs=(_mhGenState&&_mhGenState.jobs||[]).filter(j=>j.videoUrl);
-  jobs.forEach(j=>{
-    const label='S'+(j.sceneIdx+1)+'.'+(j.shotIdx+1);
-    if(!_mhEditState.clips.some(c=>c.label===label)){
-      _mhEditState.clips.push({id:'clip_'+j.sceneIdx+'_'+j.shotIdx,label,videoUrl:j.videoUrl,trimIn:0,trimOut:0,fadeToNext:0});
-    }
-  });
-  mhEditRenderTimeline();
-}
-function mhEditClear(){
-  if(!_mhEditState.clips.length)return;
-  if(!confirm('Clear the timeline? Your clips are still safe in the library.'))return;
-  _mhEditState.clips=[];_mhEditState.selected=null;
-  mhEditRenderTimeline();
-}
-
-// Import clips from a JSON paste. Accepts either:
-//   [{label:"S1.1", url:"https://..."}, ...]   — from the clipboard-dump snippet
-//   [{sceneIdx:0, shotIdx:0, videoUrl:"..."}, ...]  — raw job shape
-// Merges into _mhGenState.jobs so they show up in the clip library.
-function mhEditImportFromJSON(){
-  const raw=prompt('Paste JSON list of clips (from the backup snippet):');
-  if(!raw||!raw.trim())return;
-  let parsed;
-  try{parsed=JSON.parse(raw.trim())}
-  catch(e){alert('Invalid JSON: '+e.message);return}
-  if(!Array.isArray(parsed)){alert('Expected an array of clips');return}
-  if(!_mhGenState.jobs)_mhGenState.jobs=[];
-  let added=0;
-  for(const item of parsed){
-    if(!item||typeof item!=='object')continue;
-    const url=item.url||item.videoUrl;
-    if(!url)continue;
-    // Parse label "S1.5" into sceneIdx=0, shotIdx=4, or use raw indices
-    let si=item.sceneIdx, shi=item.shotIdx;
-    if(typeof si!=='number'||typeof shi!=='number'){
-      const m=(item.label||'').match(/^S(\d+)\.(\d+)$/);
-      if(m){si=parseInt(m[1])-1; shi=parseInt(m[2])-1}
-      else continue; // no way to identify — skip
-    }
-    // Skip if already present with a URL
-    const existing=_mhGenState.jobs.find(j=>j.sceneIdx===si&&j.shotIdx===shi);
-    if(existing&&existing.videoUrl===url)continue;
-    if(existing){existing.videoUrl=url;existing.status='done';existing.error=null}
-    else{
-      _mhGenState.jobs.push({sceneIdx:si,shotIdx:shi,prompt:item.prompt||'(imported)',status:'done',requestId:null,videoUrl:url,error:null});
-    }
-    added++;
-  }
-  // Also persist to localStorage for next time
   mhPersistClips();
-  mhEditRenderLibrary();
-  mhEditRenderTimeline();
-  mhRenderClipsGrid();
-  alert('Imported '+added+' clip(s). They\'re now in the Clip Library above — click to add to the timeline.');
+  drRender();
+  // Probe duration
+  drProbeDuration(_mhEditState.clips.length-1);
 }
 
-// Upload local MP4 files into the editor. Files are held in memory via blob URLs
-// and added to the clip library (NOT persisted — refresh will clear them, since
-// blob URLs die when the page unloads). User can then add to timeline and export.
-function mhEditUploadFiles(fileList){
-  if(!fileList||!fileList.length)return;
-  if(!_mhGenState.jobs)_mhGenState.jobs=[];
-  // Find a safe scene/shot index range for local uploads (use negative scene idx
-  // so they don't collide with generated clips from the script breakdown)
-  const LOCAL_SCENE=-1;
-  let nextShot=0;
-  // Count existing local uploads to pick next shot index
-  const existingLocal=_mhGenState.jobs.filter(j=>j.sceneIdx===LOCAL_SCENE);
-  if(existingLocal.length)nextShot=Math.max(...existingLocal.map(j=>j.shotIdx))+1;
-  let added=0;
-  for(const file of fileList){
-    if(!file.type.startsWith('video/')){console.warn('[upload] skipping non-video:',file.name);continue}
-    const blobUrl=URL.createObjectURL(file);
-    _mhGenState.jobs.push({
-      sceneIdx:LOCAL_SCENE,
-      shotIdx:nextShot++,
-      prompt:file.name,  // use filename as prompt/label
-      status:'done',
-      requestId:null,
-      videoUrl:blobUrl,
-      error:null,
-      _localFile:true
-    });
-    added++;
-  }
-  mhEditRenderLibrary();
-  mhEditRenderTimeline();
-  mhRenderClipsGrid();
-  // Reset the input so selecting the same file twice still fires onchange
-  const input=document.getElementById('mhEditUploadInput');
-  if(input)input.value='';
-  if(added){
-    console.log('[mh] uploaded',added,'local video file(s)');
-  }else{
-    alert('No valid video files were selected. Try again with .mp4 files.');
+function mhEditAddClip(label,videoUrl){drPoolAdd(label,videoUrl,0)}
+
+function drAddAll(){
+  const jobs=(_mhGenState&&_mhGenState.jobs||[]).filter(j=>j.videoUrl);
+  const existing=new Set(_mhEditState.clips.map(c=>c.videoUrl));
+  jobs.forEach(j=>{
+    if(!existing.has(j.videoUrl)){
+      _mhEditState.clips.push({
+        id:Date.now()+'_'+Math.random().toString(36).slice(2),
+        label:j._localFile?('UP'+(j.shotIdx+1)):('S'+(j.sceneIdx+1)+'.'+(j.shotIdx+1)),
+        videoUrl:j.videoUrl,sceneIdx:j.sceneIdx||0,
+        trimIn:0,trimOut:0,fadeToNext:0,duration:5
+      });
+    }
+  });
+  mhPersistClips();
+  drRender();
+  // Probe all durations
+  _mhEditState.clips.forEach((_,i)=>drProbeDuration(i));
+}
+
+function drMoveClip(idx,dir){
+  const clips=_mhEditState.clips;
+  const to=idx+dir;
+  if(to<0||to>=clips.length)return;
+  [clips[idx],clips[to]]=[clips[to],clips[idx]];
+  _mhEditState.selected=to;
+  mhPersistClips();drRender();
+}
+
+function drRemoveClip(idx){
+  _mhEditState.clips.splice(idx,1);
+  _mhEditState.selected=null;
+  mhPersistClips();drRender();
+}
+
+function mhEditRemoveSelected(){if(_mhEditState.selected!=null)drRemoveClip(_mhEditState.selected)}
+function mhEditMoveSelected(dir){if(_mhEditState.selected!=null)drMoveClip(_mhEditState.selected,dir)}
+function mhEditDeselect(){_mhEditState.selected=null;drRenderTimeline();drRenderInspector()}
+
+function drProbeDuration(idx){
+  const c=_mhEditState.clips[idx];
+  if(!c||!c.videoUrl||c._durationProbed)return;
+  c._durationProbed=true;
+  const v=document.createElement('video');
+  v.preload='metadata';
+  v.onloadedmetadata=()=>{
+    if(!isNaN(v.duration)&&v.duration>0){
+      _mhEditState.clips[idx].duration=v.duration;
+      drRenderTimeline();drRenderRuler();
+      if(_mhEditState.selected===idx)drRenderInspector();
+    }
+  };
+  v.src=c.videoUrl;
+}
+
+// ── Zoom ──────────────────────────────────────────────────────────────────────
+function drZoom(dir){
+  const steps=[10,20,30,50,60,80,100,120,160,200];
+  const cur=steps.findIndex(s=>s>=_dr.zoom);
+  const next=Math.max(0,Math.min(steps.length-1,cur+dir));
+  _dr.zoom=steps[next];
+  const lbl=document.getElementById('drZoomLbl');
+  if(lbl)lbl.textContent=_dr.zoom+'px/s';
+  drRenderTimeline();drRenderRuler();drSetPlayhead(_dr.playhead);
+}
+
+// ── Tool ──────────────────────────────────────────────────────────────────────
+function drSetTool(t){
+  _dr.tool=t;
+  document.getElementById('drToolSel').classList.toggle('act',t==='select');
+  document.getElementById('drToolRaz').classList.toggle('act',t==='razor');
+}
+
+// ── Transport ─────────────────────────────────────────────────────────────────
+function drTogglePlay(){
+  const vid=document.getElementById('drPreviewVideo');
+  if(!vid||!vid.src||(!vid.src.startsWith('http')&&!vid.src.startsWith('blob:')))return;
+  if(vid.paused){vid.play()}else{vid.pause()}
+}
+
+function drGoto(pos){
+  const vid=document.getElementById('drPreviewVideo');
+  if(!vid)return;
+  if(pos==='start'){vid.currentTime=0;drSetPlayhead(drStartTime(_mhEditState.selected||0))}
+  else if(pos==='end'){vid.currentTime=vid.duration||0;drSetPlayhead(drStartTime(_mhEditState.selected||0)+(vid.duration||0))}
+}
+
+function drStep(dir){
+  const vid=document.getElementById('drPreviewVideo');
+  if(vid)vid.currentTime=Math.max(0,(vid.currentTime||0)+dir*(1/24));
+}
+
+function drOnPlay(){_dr.playing=true;const b=document.getElementById('drPlayBtn');if(b)b.textContent='⏸'}
+function drOnPause(){_dr.playing=false;const b=document.getElementById('drPlayBtn');if(b)b.textContent='▶'}
+function drOnEnded(){_dr.playing=false;const b=document.getElementById('drPlayBtn');if(b)b.textContent='▶'}
+
+function drOnTimeUpdate(vid){
+  const i=_mhEditState.selected;
+  if(i==null)return;
+  const clipStart=drStartTime(i);
+  const c=_mhEditState.clips[i];
+  const t=clipStart+vid.currentTime-(c.trimIn||0);
+  drSetPlayhead(t);
+}
+
+function drOnMeta(vid){
+  const i=_mhEditState.selected;
+  if(i!=null&&_mhEditState.clips[i]){
+    _mhEditState.clips[i].duration=vid.duration;
+    drRenderTimeline();drRenderRuler();drRenderInspector();
   }
 }
-// Expose on window so inline onchange can find it regardless of scope
-window.mhEditUploadFiles=mhEditUploadFiles;
-// Called after every successful generation so users never lose their work.
+
+// ── Keyboard shortcuts ────────────────────────────────────────────────────────
+document.addEventListener('keydown',(e)=>{
+  if(!document.getElementById('mhStep5')||document.getElementById('mhStep5').style.display==='none')return;
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.code==='Space'){e.preventDefault();drTogglePlay()}
+  if(e.code==='KeyS')drSetTool('select');
+  if(e.code==='KeyB')drSetTool('razor');
+  if(e.code==='Delete'||e.code==='Backspace'){if(_mhEditState.selected!=null){e.preventDefault();drRemoveClip(_mhEditState.selected)}}
+  if(e.code==='ArrowLeft'){drStep(-1)}
+  if(e.code==='ArrowRight'){drStep(1)}
+  if(e.code==='Home')drGoto('start');
+  if(e.code==='End')drGoto('end');
+  if(e.code==='Equal'||e.code==='NumpadAdd')drZoom(1);
+  if(e.code==='Minus'||e.code==='NumpadSubtract')drZoom(-1);
+});
+
+// ── Persist / Load ────────────────────────────────────────────────────────────
 function mhPersistClips(){
-  try{
-    const p=projectLoad();if(!p)return;
-    const key='sb_clips_'+((curUser&&(curUser.uid||curUser.name))||'anon');
-    const clips=(_mhGenState.jobs||[])
-      .filter(j=>j.videoUrl&&!j._localFile) // skip local uploads (blob URLs die on reload)
-      .map(j=>({sceneIdx:j.sceneIdx,shotIdx:j.shotIdx,videoUrl:j.videoUrl,prompt:j.prompt||''}));
-    localStorage.setItem(key,JSON.stringify({projectCreatedAt:p.createdAt,clips,savedAt:Date.now()}));
-  }catch(e){console.warn('[mh] clip persist failed',e)}
+  try{localStorage.setItem('sb_mh_clips',JSON.stringify(_mhEditState.clips))}catch(e){}
 }
 
-// Load persisted clips into _mhGenState.jobs at Step 4/5 entry.
 function mhLoadPersistedClips(){
   try{
-    const p=projectLoad();if(!p)return;
-    const key='sb_clips_'+((curUser&&(curUser.uid||curUser.name))||'anon');
-    const raw=localStorage.getItem(key);
-    if(raw){
-      const data=JSON.parse(raw);
-      // Only restore if the saved clips belong to THIS project
-      if(!(data.projectCreatedAt&&data.projectCreatedAt!==p.createdAt)){
-        if(Array.isArray(data.clips)){
-          if(!_mhGenState.jobs)_mhGenState.jobs=[];
-          for(const c of data.clips){
-            const existing=_mhGenState.jobs.find(j=>j.sceneIdx===c.sceneIdx&&j.shotIdx===c.shotIdx);
-            if(existing){if(!existing.videoUrl){existing.videoUrl=c.videoUrl;existing.status='done';existing.prompt=existing.prompt||c.prompt}}
-            else{_mhGenState.jobs.push({sceneIdx:c.sceneIdx,shotIdx:c.shotIdx,prompt:c.prompt||'(restored)',status:'done',requestId:null,videoUrl:c.videoUrl,error:null})}
-          }
-        }
-      }
+    const raw=localStorage.getItem('sb_mh_clips');
+    if(!raw)return;
+    const clips=JSON.parse(raw);
+    if(Array.isArray(clips)&&clips.length){
+      // Merge: keep persisted clips that have a videoUrl
+      const existing=new Set(_mhEditState.clips.map(c=>c.videoUrl));
+      clips.forEach(c=>{if(c.videoUrl&&!existing.has(c.videoUrl))_mhEditState.clips.push(c)});
     }
-    // v85.1 workflow clip restore: when this session was opened from /workflow/,
-    // also pull any clips already on the workflow project (from a prior
-    // generation session) so the user doesn't see them as "to generate" and
-    // re-burn credits on shots that are already done. The workflow's
-    // proj.clips entries use 1-indexed scene/shot positions matching the
-    // staged scene order.
-    if(p.workflow_project_id){
-      const allRaw=localStorage.getItem('SB_Projects_v1');
-      if(allRaw){
-        const all=JSON.parse(allRaw);
-        const wfProj=all&&all[p.workflow_project_id];
-        const wfClips=wfProj&&wfProj.clips;
-        if(wfClips&&typeof wfClips==='object'){
-          if(!_mhGenState.jobs)_mhGenState.jobs=[];
-          let restored=0;
-          Object.values(wfClips).forEach(c=>{
-            if(!c||!c.url||typeof c.scene!=='number'||typeof c.shot!=='number')return;
-            const sceneIdx=c.scene-1;
-            const shotIdx=c.shot-1;
-            const existing=_mhGenState.jobs.find(j=>j.sceneIdx===sceneIdx&&j.shotIdx===shotIdx);
-            if(existing){
-              if(!existing.videoUrl){existing.videoUrl=c.url;existing.status='done'}
-            } else {
-              _mhGenState.jobs.push({sceneIdx,shotIdx,prompt:'(from workflow)',status:'done',requestId:null,videoUrl:c.url,error:null});
-              restored++;
-            }
-          });
-          if(restored)console.log('[mh] restored',restored,'clip(s) from workflow project',p.workflow_project_id);
-        }
-      }
-    }
-  }catch(e){console.warn('[mh] clip restore failed',e)}
-}
-function mhEditSelect(i){
-  _mhEditState.selected=(_mhEditState.selected===i)?null:i;
-  mhEditRenderTimeline();
-  // Wire up property inputs to update the selected clip
-  const commit=()=>{
-    if(_mhEditState.selected==null)return;
-    const c=_mhEditState.clips[_mhEditState.selected];
-    if(!c)return;
-    c.trimIn=parseFloat(document.getElementById('mhEditTrimIn').value)||0;
-    c.trimOut=parseFloat(document.getElementById('mhEditTrimOut').value)||0;
-    c.fadeToNext=parseFloat(document.getElementById('mhEditFade').value)||0;
-    mhEditRenderTimeline();
-  };
-  ['mhEditTrimIn','mhEditTrimOut','mhEditFade'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.onchange=commit;
-  });
-}
-function mhEditDeselect(){_mhEditState.selected=null;mhEditRenderTimeline()}
-function mhEditMoveSelected(dir){
-  const i=_mhEditState.selected;
-  if(i==null)return;
-  const ni=i+dir;
-  if(ni<0||ni>=_mhEditState.clips.length)return;
-  const[c]=_mhEditState.clips.splice(i,1);
-  _mhEditState.clips.splice(ni,0,c);
-  _mhEditState.selected=ni;
-  mhEditRenderTimeline();
-}
-function mhEditRemoveSelected(){
-  const i=_mhEditState.selected;
-  if(i==null)return;
-  _mhEditState.clips.splice(i,1);
-  _mhEditState.selected=null;
-  mhEditRenderTimeline();
+  }catch(e){}
 }
 
-// ── Export the timeline using FFmpeg.wasm ──
-// ═══════════════════════════════════════════════════════════════════════
-// EXPORT MP4 — iframe-aware entry point.
-//
-// FFmpeg.wasm cannot reliably run inside the workflow's embedded iframe
-// (cross-origin-isolated blob worker → Chromium rejects importScripts /
-// dynamic import of ffmpeg-core in too many subtle ways). The workaround
-// that has actually shipped: when we detect we're in an iframe, hand the
-// timeline off to a fresh top-level tab via localStorage, where ffmpeg
-// runs as it always has on the standalone page. Standalone /app.html
-// users keep the original inline export — no UX change for them.
-// ═══════════════════════════════════════════════════════════════════════
-async function mhEditExport(){
-  if(!_mhEditState.clips.length){alert('Add some clips to the timeline first.');return}
-  let inIframe=false;
-  try{inIframe=(window.self!==window.top)}catch(e){inIframe=true}
-  if(inIframe){
-    // SYNC portion only — popup blocker rejects window.open() after any await.
-    return mhEditExportPopOut();
-  }
-  return mhEditExportInline();
+// ── Upload / Import ───────────────────────────────────────────────────────────
+function mhEditUploadFiles(fileList){
+  if(!fileList)return;
+  Array.from(fileList).forEach((f,i)=>{
+    const url=URL.createObjectURL(f);
+    _mhEditState.clips.push({
+      id:'local_'+Date.now()+'_'+i,
+      label:'UP'+(i+1),videoUrl:url,sceneIdx:0,
+      trimIn:0,trimOut:0,fadeToNext:0,duration:5,_local:true
+    });
+    drProbeDuration(_mhEditState.clips.length-1);
+  });
+  mhPersistClips();drRender();
+}
+
+function mhEditImportFromJSON(){
+  const raw=prompt('Paste clip JSON (array of {label,videoUrl} objects):');
+  if(!raw)return;
+  try{
+    const data=JSON.parse(raw);
+    const arr=Array.isArray(data)?data:(data.clips||[]);
+    arr.forEach((c,i)=>{
+      if(c.videoUrl)_mhEditState.clips.push({
+        id:'import_'+Date.now()+'_'+i,
+        label:c.label||('Clip '+(i+1)),
+        videoUrl:c.videoUrl,sceneIdx:0,
+        trimIn:c.trimIn||0,trimOut:c.trimOut||0,
+        fadeToNext:c.fadeToNext||0,duration:c.duration||5
+      });
+    });
+    mhPersistClips();drRender();
+  }catch(e){alert('Invalid JSON: '+e.message)}
+}
+
+function mhEditAddAll(){drAddAll()}
+
+function mhEditClear(){
+  if(!_mhEditState.clips.length)return;
+  if(!confirm('Clear the timeline?'))return;
+  _mhEditState.clips=[];_mhEditState.selected=null;
+  mhPersistClips();drRender();
+}
+
+// ── Export ────────────────────────────────────────────────────────────────────
+function mhEditExport(){
+  if(!_mhEditState.clips.length){alert('Add clips to the timeline first.');return}
+  const isIframe=()=>{try{return window.self!==window.top}catch(e){return true}};
+  if(isIframe()){mhEditExportPopOut()}else{mhEditExportInline()}
 }
 
 function mhEditExportPopOut(){
@@ -5035,47 +5335,15 @@ function mhEditExportPopOut(){
   const resultEl=document.getElementById('mhEditExportResult');
   if(statusEl)statusEl.style.display='block';
   if(resultEl)resultEl.innerHTML='';
-
-  // Snapshot timeline + export options into a transient localStorage entry.
-  // The new tab reads this on load and triggers the export automatically.
   const key='sb_autoexport_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
-  const payload={
-    clips:_mhEditState.clips,
-    quality:document.getElementById('mhEditQuality')?.value||'fast',
-    transitions:document.getElementById('mhEditTransitions')?.value||'hard',
-    audio:document.getElementById('mhEditAudio')?.value||'keep',
-    created_at:Date.now(),
-  };
-  try{localStorage.setItem(key,JSON.stringify(payload))}
-  catch(e){
-    if(logEl)logEl.textContent='✗ Couldn\'t stash export state: '+e.message;
-    return;
-  }
-
-  // window.open MUST run synchronously inside the click handler — any await
-  // before this and the popup blocker fires.
+  const payload={clips:_mhEditState.clips,quality:document.getElementById('mhEditQuality')?.value||'fast',transitions:document.getElementById('mhEditTransitions')?.value||'hard',audio:document.getElementById('mhEditAudio')?.value||'keep',created_at:Date.now()};
+  try{localStorage.setItem(key,JSON.stringify(payload))}catch(e){if(logEl)logEl.textContent='Could not stash export state: '+e.message;return}
   const url='/app.html?autoexport='+encodeURIComponent(key)+'#media';
   const win=window.open(url,'_blank');
-  if(!win){
-    if(logEl)logEl.textContent='✗ Popup was blocked. Click the link below to open the export tab manually.';
-    if(resultEl){
-      resultEl.innerHTML='<div style="margin-top:8px"><a href="'+url+'" target="_blank" rel="noopener" class="b b-gold b-s">→ Open export tab manually</a></div>'
-        +'<div style="font-size:11px;color:var(--muted);margin-top:8px">Or allow popups for this site in your browser settings, then click Export MP4 again.</div>';
-    }
-    return;
-  }
-
-  if(logEl)logEl.textContent='▸ Export running in new tab — your '+payload.clips.length+' clips were handed off automatically. Don\'t close this tab; the new one will start the export and offer the download.';
-  if(resultEl){
-    resultEl.innerHTML='<div style="margin-top:6px;padding:10px;background:var(--surface);border:1px solid var(--gold-border);border-radius:6px">'
-      +'<div style="font-size:12px;color:var(--gold);font-weight:700;margin-bottom:4px">🪟 Export tab opened</div>'
-      +'<div style="font-size:11px;color:var(--muted);margin-bottom:8px">FFmpeg can\'t run inside this embedded pane — cross-origin-isolated iframe limits in Chromium block the worker. The export runs in a top-level tab where it works reliably.</div>'
-      +'<a href="'+url+'" target="_blank" rel="noopener" class="b b-g b-xs">→ Reopen export tab</a>'
-      +'</div>';
-  }
+  if(!win){if(logEl)logEl.textContent='Popup blocked.';if(resultEl)resultEl.innerHTML='<a href="'+url+'" target="_blank" class="b b-gold b-s">Open export tab manually</a>';return}
+  if(logEl)logEl.textContent='Export running in new tab — '+payload.clips.length+' clips handed off.';
 }
 
-// ── Original inline export (renamed from mhEditExport) ──
 async function mhEditExportInline(){
   if(!_mhEditState.clips.length){alert('Add some clips to the timeline first.');return}
   const quality=document.getElementById('mhEditQuality').value;
@@ -5086,42 +5354,37 @@ async function mhEditExportInline(){
   const resultEl=document.getElementById('mhEditExportResult');
   statusEl.style.display='block';resultEl.innerHTML='';
   const log=(m)=>{logEl.textContent='▸ '+m};
-
   try{
-    log('Loading FFmpeg.wasm (first time takes ~10s)...');
-    const ff=await mhLoadFFmpeg(log);
+    log('Loading FFmpeg.wasm (first time ~10s)...');
+    const ff=await V._loadFFmpeg(log);
     log('FFmpeg ready. Downloading '+_mhEditState.clips.length+' clips...');
-
-    // Download clips to FFmpeg FS
     const inputs=[];
     for(let i=0;i<_mhEditState.clips.length;i++){
       const c=_mhEditState.clips[i];
-      // Proxy through our function to avoid CORS on WaveSpeed CDN URLs.
-      const h=await window.hdrs();
-      const resp=await fetch('/proxy-clip',{method:'POST',headers:h,body:JSON.stringify({url:c.videoUrl})});
+      let resp;
+      if(c.videoUrl&&(c.videoUrl.startsWith('blob:')||c.videoUrl.startsWith('data:'))){
+        resp=await fetch(c.videoUrl);
+      }else{
+        const h=await window.hdrs();
+        resp=await fetch('/proxy-clip',{method:'POST',headers:h,body:JSON.stringify({url:c.videoUrl})});
+      }
       if(!resp.ok)throw new Error('Clip '+(i+1)+' download failed (HTTP '+resp.status+')');
       const buf=new Uint8Array(await resp.arrayBuffer());
       const fn='raw'+i+'.mp4';
       await ff.writeFile(fn,buf);
       log('Downloaded clip '+(i+1)+'/'+_mhEditState.clips.length);
-      // Pre-process: trim if needed
       let processed=fn;
       if(c.trimIn>0||c.trimOut>0){
         processed='proc'+i+'.mp4';
-        // We don't know exact duration — use -ss for start and let concat handle end
         const args=['-i',fn];
         if(c.trimIn>0)args.push('-ss',String(c.trimIn));
-        if(c.trimOut>0){
-          // approximate: assume 6s clip, trim-out seconds from end
-          args.push('-t',String(Math.max(0.5,6-(c.trimIn||0)-c.trimOut)));
-        }
+        if(c.trimOut>0)args.push('-t',String(Math.max(0.5,(c.duration||6)-(c.trimIn||0)-c.trimOut)));
         if(audioMode==='mute')args.push('-an');
         args.push('-c','copy',processed);
         try{await ff.exec(args)}catch{
-          // If copy fails (needs re-encode for trim), fall back to re-encode
           const re=['-i',fn];
           if(c.trimIn>0)re.push('-ss',String(c.trimIn));
-          if(c.trimOut>0)re.push('-t',String(Math.max(0.5,6-(c.trimIn||0)-c.trimOut)));
+          if(c.trimOut>0)re.push('-t',String(Math.max(0.5,(c.duration||6)-(c.trimIn||0)-c.trimOut)));
           if(audioMode==='mute')re.push('-an');
           re.push('-c:v','libx264','-preset','ultrafast','-crf','23',processed);
           await ff.exec(re);
@@ -5132,40 +5395,18 @@ async function mhEditExportInline(){
       }
       inputs.push(processed);
     }
-
-    // Build the concat step.
-    // Simple mode (hard cuts, fast copy): use concat demuxer
-    // Fade mode (crossfades, re-encode required): use xfade filter chain
     if(transitions==='fade'&&_mhEditState.clips.some(c=>c.fadeToNext>0)){
       log('Re-encoding with crossfade transitions...');
-      // xfade requires a filter_complex chain. For N inputs:
-      //   [0:v][1:v]xfade=offset=D0:duration=F0[v01]; [v01][2:v]xfade=offset=D01:duration=F1[v012]; ...
-      // This gets complex fast. For v1, we do pairwise xfade with approx 6s per clip.
-      let filter='';
-      let prev='0:v';
-      let runningOffset=0;
-      for(let i=0;i<inputs.length;i++){
-        if(i===0){runningOffset=6-(_mhEditState.clips[0].fadeToNext||0);continue}
+      let filter='',prev='0:v',offset=drEffDur(_mhEditState.clips[0]);
+      for(let i=1;i<inputs.length;i++){
         const fade=_mhEditState.clips[i-1].fadeToNext||0;
-        if(fade>0){
-          const out=(i===inputs.length-1)?'[vout]':'[v'+i+']';
-          filter+='['+prev+']['+i+':v]xfade=transition=fade:duration='+fade.toFixed(2)+':offset='+runningOffset.toFixed(2)+out+';';
-          prev='v'+i;
-          runningOffset+=6-fade;
-        }else{
-          // no fade: concat by filter still
-          filter+='['+prev+']['+i+':v]concat=n=2:v=1:a=0[v'+i+'];';
-          prev='v'+i;
-          runningOffset+=6;
-        }
+        const out=(i===inputs.length-1)?'[vout]':'[v'+i+']';
+        if(fade>0){filter+='['+prev+']['+i+':v]xfade=transition=fade:duration='+fade.toFixed(2)+':offset='+(offset-fade).toFixed(2)+out+';';prev=out.replace(/[\[\]]/g,'');}
+        else{filter+='['+prev+']['+i+':v]concat=n=2:v=1:a=0'+out+';';prev=out.replace(/[\[\]]/g,'');}
+        offset+=drEffDur(_mhEditState.clips[i]);
       }
-      // Assemble command
-      const args=[];
-      inputs.forEach(f=>{args.push('-i',f)});
-      args.push('-filter_complex',filter.replace(/;$/,''));
-      args.push('-map','[vout]');
-      if(audioMode!=='mute')args.push('-map','0:a?');  // keep first clip's audio as rough placeholder
-      args.push('-c:v','libx264','-preset','ultrafast','-crf','20','output.mp4');
+      const args=[];inputs.forEach(f=>{args.push('-i',f)});
+      args.push('-filter_complex',filter.replace(/;$/,''),'-map','[vout]','-c:v','libx264','-preset','ultrafast','-crf','20','output.mp4');
       await ff.exec(args);
     }else{
       log('Stitching with hard cuts...');
@@ -5174,28 +5415,16 @@ async function mhEditExportInline(){
       if(quality==='hq'){
         await ff.exec(['-f','concat','-safe','0','-i','list.txt','-c:v','libx264','-preset','medium','-crf','20','-c:a','aac','output.mp4']);
       }else{
-        // Fast: try copy first; fallback to re-encode if codecs mismatch
-        try{
-          await ff.exec(['-f','concat','-safe','0','-i','list.txt','-c','copy','output.mp4']);
-        }catch{
-          log('Codec mismatch — re-encoding...');
-          await ff.exec(['-f','concat','-safe','0','-i','list.txt','-c:v','libx264','-preset','ultrafast','-crf','23','-c:a','aac','output.mp4']);
-        }
+        try{await ff.exec(['-f','concat','-safe','0','-i','list.txt','-c','copy','output.mp4'])}
+        catch{log('Codec mismatch — re-encoding...');await ff.exec(['-f','concat','-safe','0','-i','list.txt','-c:v','libx264','-preset','ultrafast','-crf','23','-c:a','aac','output.mp4'])}
       }
     }
-
     log('Reading output...');
     const data=await ff.readFile('output.mp4');
     const blob=new Blob([data.buffer],{type:'video/mp4'});
     const url=URL.createObjectURL(blob);
     log('Export complete — '+(blob.size/1024/1024).toFixed(1)+'MB');
-    resultEl.innerHTML='<div style="margin-top:10px;padding:12px;background:var(--surface);border:1px solid var(--gold-border);border-radius:8px">'
-      +'<div style="font-weight:700;color:var(--gold);margin-bottom:8px">🎬 Export Ready</div>'
-      +'<video src="'+url+'" controls style="width:100%;max-width:720px;border-radius:6px;background:#000"></video>'
-      +'<div style="margin-top:10px"><a href="'+url+'" download="shotbreak_edit_'+Date.now()+'.mp4" class="b b-gold">⬇ Download MP4</a></div>'
-      +'</div>';
-
-    // Clean up ffmpeg FS
+    resultEl.innerHTML='<div style="margin-top:10px;padding:12px;background:var(--surface);border:1px solid var(--gold-border);border-radius:8px"><div style="font-weight:700;color:var(--gold);margin-bottom:8px">🎬 Export Ready</div><video src="'+url+'" controls style="width:100%;max-width:720px;border-radius:6px;background:#000"></video><div style="margin-top:10px"><a href="'+url+'" download="shotbreak_edit_'+Date.now()+'.mp4" class="b b-gold">⬇ Download MP4</a></div></div>';
     for(const f of inputs)await ff.deleteFile(f).catch(()=>{});
     await ff.deleteFile('output.mp4').catch(()=>{});
     await ff.deleteFile('list.txt').catch(()=>{});
@@ -5205,21 +5434,10 @@ async function mhEditExportInline(){
   }
 }
 
-
-// Reuse the existing FFmpeg loader from SBVideo (window.SBVideo._loadFFmpeg)
-// so we don't load two copies from different CDNs and to leverage the
-// battle-tested loading path that already works for the existing stitch tool.
-async function mhLoadFFmpeg(progressCb){
-  if(window.SBVideo&&typeof window.SBVideo._loadFFmpeg==='function'){
-    return await window.SBVideo._loadFFmpeg(progressCb);
-  }
-  // Fallback (should never hit this in production — SBVideo always loads).
-  throw new Error('FFmpeg loader unavailable. Refresh the page and try again.');
-}
-
+// ── Auto-stitch (Step 4) ──────────────────────────────────────────────────────
 async function mhStitchRun(mode){
   const jobs=_mhGenState.jobs.filter(j=>j.videoUrl);
-  if(jobs.length<2){return}  // Nothing to stitch
+  if(jobs.length<2){return}
   const area=document.getElementById('mhStitchArea');
   const statusEl=document.getElementById('mhStitchStatus');
   const resultEl=document.getElementById('mhStitchResult');
@@ -5227,7 +5445,6 @@ async function mhStitchRun(mode){
   area.style.display='block';
   resultEl.innerHTML='';
 
-  // Build stitch groups
   let groups=[];
   if(mode==='all'){groups=[jobs]}
   else if(mode==='scene'){
@@ -5259,19 +5476,18 @@ async function mhStitchRun(mode){
         fileList.push(fn);
         statusEl.textContent='Downloaded '+(i+1)+'/'+g.length+' clips';
       }
-      // concat demuxer list
       const listTxt=fileList.map(f=>"file '"+f+"'").join('\n');
       await ff.writeFile('list.txt',new TextEncoder().encode(listTxt));
-      statusEl.textContent='Stitching '+label+'...';
-      await ff.exec(['-f','concat','-safe','0','-i','list.txt','-c','copy','out.mp4']);
-      const data=await ff.readFile('out.mp4');
-      const blob=new Blob([data.buffer],{type:'video/mp4'});
+      statusEl.textContent='Stitching...';
+      const outFile='out_'+gi+'.mp4';
+      await ff.exec(['-f','concat','-safe','0','-i','list.txt','-c','copy',outFile]);
+      const data=await ff.readFile(outFile);
+      const blob=new Blob([data],{type:'video/mp4'});
       const url=URL.createObjectURL(blob);
       resultEl.innerHTML+='<div style="margin-top:12px;padding:12px;background:var(--surface);border-radius:8px"><div style="font-weight:700;color:var(--gold);margin-bottom:6px">🎬 '+label+' — '+g.length+' clips stitched</div><video src="'+url+'" controls style="width:100%;max-width:720px;border-radius:6px"></video><div style="margin-top:8px"><a href="'+url+'" download="shotbreak_'+label.replace(/\s/g,'_')+'.mp4" class="b b-gold b-s">⬇ Download</a></div></div>';
-      // Clean up ffmpeg FS
       for(const f of fileList)await ff.deleteFile(f).catch(()=>{});
       await ff.deleteFile('list.txt').catch(()=>{});
-      await ff.deleteFile('out.mp4').catch(()=>{});
+      await ff.deleteFile(outFile).catch(()=>{});
     }
     statusEl.textContent='All stitches complete.';
   }catch(e){
