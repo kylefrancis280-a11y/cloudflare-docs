@@ -265,8 +265,9 @@ exports.handler = async (event) => {
     const { url } = body;
     if (!url || typeof url !== "string") return respond(400, { error: "url required" });
 
-    // Only proxy WaveSpeed / known CDN domains — don't be an open proxy.
-    const allowed = /^https:\/\/(cdn\.|media\.|files\.)?wavespeed\.ai\//i;
+    // Only proxy WaveSpeed CDN domains — don't be an open proxy.
+    // Matches wavespeed.ai and any subdomain (output., storage., cdn., etc.)
+    const allowed = /^https:\/\/([a-z0-9][a-z0-9-]*\.)*wavespeed\.ai\//i;
     if (!allowed.test(url)) {
       return respond(403, { error: "URL not from an allowed domain" });
     }

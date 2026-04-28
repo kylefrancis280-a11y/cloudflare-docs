@@ -1713,7 +1713,7 @@ V._closeGallery=function(){const ov=document.getElementById("vg-overlay");if(ov)
 
 V._zipAll=async function(){if(typeof JSZip==="undefined"){alert("JSZip not loaded");return}
 const clips=[...V.jobs.entries()].filter(([,j])=>j.videoUrl).sort((a,b)=>(a[1].scene*100+a[1].shot)-(b[1].scene*100+b[1].shot));if(!clips.length)return;
-const z=new JSZip(),f=z.folder("SHOTBREAK_Clips");const _zh=await window.hdrs();for(const[,j]of clips){try{const _zr=await fetch('/.netlify/functions/generate-video',{method:'POST',headers:_zh,body:JSON.stringify({action:'proxy_clip',url:j.videoUrl})});if(!_zr.ok)continue;const b=await _zr.blob();f.file("SC"+String(j.scene).padStart(2,"0")+"_SH"+String(j.shot).padStart(2,"0")+".mp4",b)}catch(e){}}
+const z=new JSZip(),f=z.folder("SHOTBREAK_Clips");const _zh=await window.hdrs();for(const[,j]of clips){try{const _zr=await fetch('/proxy-clip',{method:'POST',headers:_zh,body:JSON.stringify({url:j.videoUrl})});if(!_zr.ok)continue;const b=await _zr.blob();f.file("SC"+String(j.scene).padStart(2,"0")+"_SH"+String(j.shot).padStart(2,"0")+".mp4",b)}catch(e){}}
 const content=await z.generateAsync({type:"blob"});const a=document.createElement("a");a.href=URL.createObjectURL(content);a.download="SHOTBREAK_Clips.zip";a.click();URL.revokeObjectURL(a.href)};
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -1967,7 +1967,7 @@ V._stitchClips=async function(clipUrls,fade,onProgress){
   if(!clipUrls||!clipUrls.length)throw new Error("No clips to stitch");
   if(clipUrls.length===1){
     onProgress&&onProgress("Single clip — downloading...");
-    const _h=await window.hdrs();const r=await fetch('/.netlify/functions/generate-video',{method:'POST',headers:_h,body:JSON.stringify({action:'proxy_clip',url:clipUrls[0]})});return await r.blob();
+    const _h=await window.hdrs();const r=await fetch('/proxy-clip',{method:'POST',headers:_h,body:JSON.stringify({url:clipUrls[0]})});return await r.blob();
   }
   const ffmpeg=await V._loadFFmpeg(onProgress);
   // Clean any prior session files from FFmpeg FS
@@ -5098,7 +5098,7 @@ async function mhEditExportInline(){
       const c=_mhEditState.clips[i];
       // Proxy through our function to avoid CORS on WaveSpeed CDN URLs.
       const h=await window.hdrs();
-      const resp=await fetch('/.netlify/functions/generate-video',{method:'POST',headers:h,body:JSON.stringify({action:'proxy_clip',url:c.videoUrl})});
+      const resp=await fetch('/proxy-clip',{method:'POST',headers:h,body:JSON.stringify({url:c.videoUrl})});
       if(!resp.ok)throw new Error('Clip '+(i+1)+' download failed (HTTP '+resp.status+')');
       const buf=new Uint8Array(await resp.arrayBuffer());
       const fn='raw'+i+'.mp4';
@@ -5251,7 +5251,7 @@ async function mhStitchRun(mode){
       const fileList=[];
       for(let i=0;i<g.length;i++){
         const _sh=await window.hdrs();
-        const resp=await fetch('/.netlify/functions/generate-video',{method:'POST',headers:_sh,body:JSON.stringify({action:'proxy_clip',url:g[i].videoUrl})});
+        const resp=await fetch('/proxy-clip',{method:'POST',headers:_sh,body:JSON.stringify({url:g[i].videoUrl})});
         if(!resp.ok)throw new Error('Clip download failed (HTTP '+resp.status+')');
         const buf=new Uint8Array(await resp.arrayBuffer());
         const fn='in'+i+'.mp4';
