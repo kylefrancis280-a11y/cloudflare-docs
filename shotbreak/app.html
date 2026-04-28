@@ -5356,7 +5356,7 @@ async function mhEditExportInline(){
   const log=(m)=>{logEl.textContent='▸ '+m};
   try{
     log('Loading FFmpeg.wasm (first time ~10s)...');
-    const ff=await V._loadFFmpeg(log);
+    const ff=await window.SBVideo._loadFFmpeg(log);
     log('FFmpeg ready. Downloading '+_mhEditState.clips.length+' clips...');
     const inputs=[];
     for(let i=0;i<_mhEditState.clips.length;i++){
