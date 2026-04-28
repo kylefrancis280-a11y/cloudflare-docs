@@ -5208,7 +5208,7 @@ function drSetTool(t){
 // ── Transport ─────────────────────────────────────────────────────────────────
 function drTogglePlay(){
   const vid=document.getElementById('drPreviewVideo');
-  if(!vid||!vid.src||!vid.src.startsWith('http'))return;
+  if(!vid||!vid.src||(!vid.src.startsWith('http')&&!vid.src.startsWith('blob:')))return;
   if(vid.paused){vid.play()}else{vid.pause()}
 }
 
@@ -5356,13 +5356,18 @@ async function mhEditExportInline(){
   const log=(m)=>{logEl.textContent='▸ '+m};
   try{
     log('Loading FFmpeg.wasm (first time ~10s)...');
-    const ff=await mhLoadFFmpeg(log);
+    const ff=await V._loadFFmpeg(log);
     log('FFmpeg ready. Downloading '+_mhEditState.clips.length+' clips...');
     const inputs=[];
     for(let i=0;i<_mhEditState.clips.length;i++){
       const c=_mhEditState.clips[i];
-      const h=await window.hdrs();
-      const resp=await fetch('/proxy-clip',{method:'POST',headers:h,body:JSON.stringify({url:c.videoUrl})});
+      let resp;
+      if(c.videoUrl&&(c.videoUrl.startsWith('blob:')||c.videoUrl.startsWith('data:'))){
+        resp=await fetch(c.videoUrl);
+      }else{
+        const h=await window.hdrs();
+        resp=await fetch('/proxy-clip',{method:'POST',headers:h,body:JSON.stringify({url:c.videoUrl})});
+      }
       if(!resp.ok)throw new Error('Clip '+(i+1)+' download failed (HTTP '+resp.status+')');
       const buf=new Uint8Array(await resp.arrayBuffer());
       const fn='raw'+i+'.mp4';
@@ -5396,8 +5401,8 @@ async function mhEditExportInline(){
       for(let i=1;i<inputs.length;i++){
         const fade=_mhEditState.clips[i-1].fadeToNext||0;
         const out=(i===inputs.length-1)?'[vout]':'[v'+i+']';
-        if(fade>0){filter+='['+prev+']['+i+':v]xfade=transition=fade:duration='+fade.toFixed(2)+':offset='+(offset-fade).toFixed(2)+out+';';prev='v'+i;}
-        else{filter+='['+prev+']['+i+':v]concat=n=2:v=1:a=0[v'+i+'];';prev='v'+i;}
+        if(fade>0){filter+='['+prev+']['+i+':v]xfade=transition=fade:duration='+fade.toFixed(2)+':offset='+(offset-fade).toFixed(2)+out+';';prev=out.replace(/[\[\]]/g,'');}
+        else{filter+='['+prev+']['+i+':v]concat=n=2:v=1:a=0'+out+';';prev=out.replace(/[\[\]]/g,'');}
         offset+=drEffDur(_mhEditState.clips[i]);
       }
       const args=[];inputs.forEach(f=>{args.push('-i',f)});
