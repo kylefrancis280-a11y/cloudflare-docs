@@ -253,6 +253,44 @@ exports.handler = async (event) => {
     });
   }
 
+  // ── PROXY_CLIP ──────────────────────────────────────────────────────
+  // Downloads a WaveSpeed CDN video URL server-side and returns it as
+  // binary so the editor can fetch clips without hitting browser CORS.
+  // Auth required to prevent open-proxy abuse.
+  if (action === "proxy_clip") {
+    let auth;
+    try { auth = await verifyToken(event); }
+    catch { return respond(401, { error: "Login required" }); }
+
+    const { url } = body;
+    if (!url || typeof url !== "string") return respond(400, { error: "url required" });
+
+    // Only proxy WaveSpeed / known CDN domains — don't be an open proxy.
+    const allowed = /^https:\/\/(cdn\.|media\.|files\.)?wavespeed\.ai\//i;
+    if (!allowed.test(url)) {
+      return respond(403, { error: "URL not from an allowed domain" });
+    }
+
+    try {
+      const r = await fetch(url);
+      if (!r.ok) return respond(502, { error: "CDN fetch failed: HTTP " + r.status });
+      const buf = await r.arrayBuffer();
+      const ct = r.headers.get("content-type") || "video/mp4";
+      return {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "https://shotbreak.io",
+          "Content-Type": ct,
+          "Cache-Control": "public, max-age=3600",
+        },
+        body: Buffer.from(buf).toString("base64"),
+        isBase64Encoded: true,
+      };
+    } catch (e) {
+      return respond(502, { error: "Proxy fetch failed: " + e.message });
+    }
+  }
+
   // ── UPLOAD_IMAGE (character reference photo) ────────────────────────
   // Accepts a base64 data URL from the browser, uploads it to WaveSpeed's
   // media storage, returns a public URL we can pass into I2V endpoints.
