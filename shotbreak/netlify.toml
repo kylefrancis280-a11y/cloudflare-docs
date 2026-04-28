@@ -6,6 +6,10 @@
   path = "/proxy-clip"
   function = "proxy-clip"
 
+[[edge_functions]]
+  path = "/proxy-clip"
+  function = "proxy-clip"
+
 [functions]
   node_bundler = "esbuild"
   # Bundle the shared lib directory + agent registry with every function so

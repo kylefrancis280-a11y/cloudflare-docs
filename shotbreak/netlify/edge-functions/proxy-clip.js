@@ -1,7 +1,6 @@
 // SHOTBREAK — WaveSpeed clip proxy (Edge Function)
 // Streams CDN videos to the browser — no 6MB cap, no base64 overhead.
 // Handles large clips (100MB+) by piping the upstream body directly.
-// Uses Web Crypto to verify Firebase ID tokens without the Admin SDK.
 
 const CORS = {
   'Access-Control-Allow-Origin': 'https://shotbreak.io',
@@ -16,65 +15,22 @@ function json(status, obj) {
   });
 }
 
-// ── Firebase public-key cache ────────────────────────────────────────────────
-let _keyCache = null;
-let _keyCacheExpiry = 0;
-
-async function getPublicKeys() {
-  if (_keyCache && Date.now() < _keyCacheExpiry) return _keyCache;
+// Verify Firebase ID token via accounts:lookup — same mechanism as all other
+// SHOTBREAK functions (lib/auth.js verifyToken). Simple and battle-tested.
+async function verifyFirebaseToken(token) {
+  const apiKey = Netlify.env.get('FIREBASE_API_KEY');
+  if (!apiKey) throw new Error('FIREBASE_API_KEY not set');
   const r = await fetch(
-    'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com'
+    'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' + apiKey,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken: token }),
+    }
   );
-  const { keys } = await r.json();
-  const cc = r.headers.get('cache-control') || '';
-  const maxAge = parseInt(cc.match(/max-age=(\d+)/)?.[1] || '3600', 10);
-  const map = {};
-  for (const k of keys) {
-    map[k.kid] = await crypto.subtle.importKey(
-      'jwk', k,
-      { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
-      false, ['verify']
-    );
-  }
-  _keyCache = map;
-  _keyCacheExpiry = Date.now() + maxAge * 1000;
-  return map;
-}
-
-function b64url(s) {
-  const padded = s.replace(/-/g, '+').replace(/_/g, '/');
-  const pad = (4 - padded.length % 4) % 4;
-  return atob(padded + '='.repeat(pad));
-}
-
-async function verifyFirebaseJwt(token, projectId) {
-  const parts = token.split('.');
-  if (parts.length !== 3) throw new Error('malformed JWT');
-  let header, payload;
-  try {
-    header  = JSON.parse(b64url(parts[0]));
-    payload = JSON.parse(b64url(parts[1]));
-  } catch { throw new Error('decode error'); }
-
-  const now = Math.floor(Date.now() / 1000);
-  if ((payload.exp || 0) < now) throw new Error('token expired');
-  if (payload.iss !== `https://securetoken.google.com/${projectId}`) throw new Error('wrong issuer');
-  if (payload.aud !== projectId) throw new Error('wrong audience');
-  if (!payload.sub) throw new Error('missing sub');
-
-  const keys = await getPublicKeys();
-  const key = keys[header.kid];
-  if (!key) throw new Error('unknown signing key');
-
-  const sigBytes = Uint8Array.from(b64url(parts[2]), c => c.charCodeAt(0));
-  const ok = await crypto.subtle.verify(
-    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
-    key,
-    sigBytes,
-    new TextEncoder().encode(`${parts[0]}.${parts[1]}`)
-  );
-  if (!ok) throw new Error('invalid signature');
-  return payload;
+  const d = await r.json();
+  if (!r.ok || !d.users?.[0]) throw new Error('invalid token');
+  return d.users[0];
 }
 
 // ── Handler ──────────────────────────────────────────────────────────────────
@@ -86,9 +42,8 @@ export default async function handler(req) {
   const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
   if (!token) return json(401, { error: 'Login required' });
 
-  const projectId = Netlify.env.get('FIREBASE_PROJECT_ID') || 'shotbreak-9f342';
   try {
-    await verifyFirebaseJwt(token, projectId);
+    await verifyFirebaseToken(token);
   } catch {
     return json(401, { error: 'Login required' });
   }
