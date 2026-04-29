@@ -378,6 +378,166 @@ background-size:64px 64px;pointer-events:none}
 .stats-inner{grid-template-columns:1fr 1fr}
 .stat{justify-content:center}
 }
+
+/* ─── Marketing sections ─── */
+.mk-sec{max-width:1180px;margin:0 auto;padding:64px 24px;position:relative}
+.mk-eyebrow{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--ac);margin-bottom:14px}
+.mk-h2{font-family:var(--display);font-size:clamp(1.8rem,3.6vw,2.6rem);font-weight:800;line-height:1.15;letter-spacing:-.015em;margin-bottom:14px}
+.mk-h2 em{font-style:normal;background:linear-gradient(135deg,var(--ac),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.mk-lede{font-size:15px;color:var(--tx-1);max-width:640px;line-height:1.65}
+.mk-head-center{text-align:center;margin-bottom:48px}
+.mk-head-center .mk-lede{margin:0 auto}
+
+/* How It Works */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:8px}
+.how-card{position:relative;padding:32px 26px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:all .25s}
+.how-card:hover{border-color:var(--border-accent);transform:translateY(-2px)}
+.how-num{font-family:var(--mono);font-size:56px;font-weight:800;line-height:1;background:linear-gradient(135deg,var(--ac),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:.85;margin-bottom:14px}
+.how-title{font-size:17px;font-weight:700;margin-bottom:8px}
+.how-body{font-size:13.5px;color:var(--tx-1);line-height:1.65}
+.how-meta{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);font-family:var(--mono);font-size:11px;color:var(--tx-2);letter-spacing:.5px;text-transform:uppercase}
+@media(max-width:880px){.how-grid{grid-template-columns:1fr}}
+
+/* Sector Deep-Dive */
+.sec-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px}
+.sec-tile{position:relative;padding:22px 20px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);transition:all .2s;overflow:hidden}
+.sec-tile::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--sc,var(--ac))}
+.sec-tile:hover{border-color:var(--sc,var(--border-h));transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.sec-tile-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sec-tile-ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;background:color-mix(in srgb,var(--sc,var(--ac)) 14%,transparent)}
+.sec-tile-name{font-size:15px;font-weight:700;letter-spacing:.3px}
+.sec-tile-desc{font-size:12.5px;color:var(--tx-2);line-height:1.55;min-height:58px}
+.sec-tile-tk{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+.sec-tile-tk span{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px;background:var(--bg-3);color:var(--tx-1);letter-spacing:.4px}
+@media(max-width:1000px){.sec-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.sec-grid{grid-template-columns:1fr}}
+
+/* Atlas Score Anatomy */
+.score-wrap{display:grid;grid-template-columns:1.1fr 1fr;gap:32px;align-items:center}
+.score-orb{position:relative;width:280px;height:280px;margin:0 auto;border-radius:50%;background:conic-gradient(var(--green) 0deg 306deg,var(--bg-3) 306deg);display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(0,224,136,.18)}
+.score-orb::before{content:"";position:absolute;inset:14px;border-radius:50%;background:var(--bg-1);border:1px solid var(--border)}
+.score-orb-inner{position:relative;text-align:center;z-index:1}
+.score-orb-num{font-family:var(--mono);font-size:62px;font-weight:800;color:var(--green);line-height:1}
+.score-orb-lbl{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--tx-2);margin-top:6px;text-transform:uppercase}
+.score-orb-cap{font-size:13px;color:var(--tx-1);margin-top:16px;text-align:center;font-weight:600}
+.score-factors{display:flex;flex-direction:column;gap:10px}
+.score-row{display:grid;grid-template-columns:160px 1fr 44px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--border)}
+.score-row:last-child{border-bottom:none}
+.score-row-name{font-size:13px;font-weight:600;color:var(--tx-0)}
+.score-row-name small{display:block;font-size:11px;color:var(--tx-2);font-weight:400;margin-top:2px}
+.score-bar{height:6px;background:var(--bg-3);border-radius:6px;overflow:hidden;position:relative}
+.score-bar > div{height:100%;background:linear-gradient(90deg,var(--ac),var(--purple));border-radius:6px;transition:width .8s ease}
+.score-row-val{font-family:var(--mono);font-size:13px;font-weight:700;text-align:right;color:var(--tx-0)}
+@media(max-width:880px){.score-wrap{grid-template-columns:1fr;gap:40px}}
+
+/* Sample Analysis Card */
+.sample-wrap{position:relative;padding:6px;background:linear-gradient(135deg,var(--ac),var(--purple));border-radius:calc(var(--r-lg) + 4px);box-shadow:0 24px 60px rgba(79,143,255,.18)}
+.sample-card{background:var(--bg-1);border-radius:var(--r-lg);padding:32px;position:relative;overflow:hidden}
+.sample-card::before{content:"SAMPLE";position:absolute;top:18px;right:18px;font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--ac);background:var(--ac-glow);padding:5px 10px;border-radius:6px;font-weight:700}
+.sample-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.sample-tk{display:flex;align-items:center;gap:14px}
+.sample-tk-ic{width:48px;height:48px;border-radius:12px;background:color-mix(in srgb,var(--purple) 18%,transparent);display:flex;align-items:center;justify-content:center;font-size:22px}
+.sample-tk-sym{font-family:var(--mono);font-size:22px;font-weight:800;letter-spacing:1px}
+.sample-tk-name{font-size:13px;color:var(--tx-2);margin-top:2px}
+.sample-px{text-align:right}
+.sample-px-val{font-family:var(--mono);font-size:22px;font-weight:800;color:var(--green)}
+.sample-px-chg{font-family:var(--mono);font-size:13px;color:var(--green);margin-top:2px}
+.sample-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+.sample-tile{padding:14px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-sm)}
+.sample-tile-lbl{font-family:var(--mono);font-size:10px;letter-spacing:1.6px;color:var(--tx-2);text-transform:uppercase;margin-bottom:6px}
+.sample-tile-val{font-family:var(--mono);font-size:18px;font-weight:800;color:var(--tx-0)}
+.sample-tile-sub{font-size:11.5px;color:var(--tx-2);margin-top:3px}
+.sample-bb{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.sample-bb-card{padding:14px;border-radius:var(--r-sm);border:1px solid}
+.sample-bb-card.bull{background:var(--green-bg);border-color:var(--green-bd)}
+.sample-bb-card.bear{background:var(--red-bg);border-color:var(--red-bd)}
+.sample-bb-head{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+.sample-bb-card.bull .sample-bb-head{color:var(--green)}
+.sample-bb-card.bear .sample-bb-head{color:var(--red)}
+.sample-bb-text{font-size:12.5px;color:var(--tx-1);line-height:1.55}
+.sample-cb{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--tx-2)}
+.sample-callout{position:absolute;background:var(--bg-3);border:1px solid var(--ac);border-radius:8px;padding:6px 10px;font-family:var(--mono);font-size:10.5px;color:var(--ac);font-weight:600;white-space:nowrap;display:none}
+@media(max-width:760px){.sample-grid{grid-template-columns:1fr}.sample-bb{grid-template-columns:1fr}}
+
+/* Pricing tiers */
+.tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start}
+@media(max-width:900px){.tier-grid{grid-template-columns:1fr;max-width:440px;margin:0 auto}}
+
+/* Testimonials */
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.test-card{padding:26px 24px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-lg);position:relative;transition:all .25s}
+.test-card:hover{border-color:var(--border-accent);transform:translateY(-2px)}
+.test-quote-mark{font-family:var(--display);font-size:48px;line-height:.8;color:var(--ac);opacity:.5;height:24px}
+.test-text{font-size:14px;line-height:1.65;color:var(--tx-1);margin:14px 0 22px;min-height:88px}
+.test-author{display:flex;align-items:center;gap:12px;padding-top:14px;border-top:1px solid var(--border)}
+.test-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--purple));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;font-family:var(--mono)}
+.test-name{font-size:13px;font-weight:700;line-height:1.2}
+.test-role{font-size:11.5px;color:var(--tx-2);margin-top:2px}
+.test-stars{margin-bottom:10px;letter-spacing:1px;color:var(--amber)}
+@media(max-width:880px){.test-grid{grid-template-columns:1fr}}
+
+/* Comparison */
+.cmp-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.cmp-table th,.cmp-table td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:middle}
+.cmp-table tr:last-child td{border-bottom:none}
+.cmp-table thead th{background:var(--bg-3);font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--tx-2);font-weight:700}
+.cmp-table thead th.cmp-us{color:var(--ac)}
+.cmp-table tbody tr:hover{background:var(--bg-hover)}
+.cmp-table .cmp-feat{font-weight:600;color:var(--tx-0)}
+.cmp-yes{color:var(--green);font-weight:700;font-family:var(--mono)}
+.cmp-no{color:var(--tx-2);font-family:var(--mono)}
+.cmp-partial{color:var(--amber);font-weight:600;font-family:var(--mono)}
+.cmp-table .cmp-us-col{background:rgba(79,143,255,.045)}
+@media(max-width:760px){.cmp-table{font-size:12px}.cmp-table th,.cmp-table td{padding:10px 10px}}
+
+/* FAQ */
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.faq-item{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:all .2s}
+.faq-item:hover{border-color:var(--border-h)}
+.faq-q{display:flex;justify-content:space-between;align-items:center;gap:14px;width:100%;padding:18px 22px;cursor:pointer;background:none;border:none;color:var(--tx-0);text-align:left;font-size:14.5px;font-weight:600;line-height:1.4}
+.faq-q .faq-icon{width:22px;height:22px;flex-shrink:0;border-radius:50%;background:var(--ac-glow);color:var(--ac);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;transition:transform .25s;line-height:1}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .25s ease;padding:0 22px;font-size:13.5px;color:var(--tx-1);line-height:1.7}
+.faq-item.open .faq-a{max-height:400px;padding:0 22px 20px}
+@media(max-width:760px){.faq-grid{grid-template-columns:1fr}}
+
+/* Trust strip */
+.trust-strip{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg-1);padding:28px 24px}
+.trust-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;align-items:center}
+.trust-item{display:flex;align-items:center;gap:12px}
+.trust-ic{width:36px;height:36px;border-radius:10px;background:var(--ac-glow);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.trust-name{font-size:13px;font-weight:700;line-height:1.2}
+.trust-sub{font-size:11px;color:var(--tx-2);margin-top:2px}
+@media(max-width:880px){.trust-inner{grid-template-columns:repeat(2,1fr)}}
+
+/* Final CTA */
+.final-cta{position:relative;max-width:1180px;margin:0 auto;padding:64px 24px}
+.final-cta-inner{position:relative;text-align:center;padding:64px 32px;border-radius:var(--r-lg);background:radial-gradient(ellipse at top,var(--ac-glow),transparent 70%),var(--bg-2);border:1px solid var(--border-accent);overflow:hidden}
+.final-cta-inner::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(79,143,255,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(79,143,255,.18) 1px,transparent 1px);background-size:48px 48px;opacity:.08;pointer-events:none}
+.final-cta h2{font-family:var(--display);font-size:clamp(1.8rem,3.4vw,2.4rem);font-weight:800;line-height:1.15;margin-bottom:14px;position:relative}
+.final-cta h2 em{font-style:normal;background:linear-gradient(135deg,var(--ac),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.final-cta p{font-size:15px;color:var(--tx-1);max-width:540px;margin:0 auto 28px;line-height:1.65;position:relative}
+.final-cta .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
+.final-cta-foot{margin-top:18px;font-family:var(--mono);font-size:11px;color:var(--tx-2);letter-spacing:.5px;position:relative}
+
+/* Anchor nav links in header */
+.land-anchors{display:flex;gap:22px;margin:0 24px}
+.land-anchors a{font-size:13px;font-weight:500;color:var(--tx-1);transition:color .15s;text-decoration:none}
+.land-anchors a:hover{color:var(--ac)}
+@media(max-width:880px){.land-anchors{display:none}}
+
+/* Section divider */
+.mk-divider{max-width:1180px;margin:0 auto;padding:0 24px}
+.mk-divider hr{border:none;border-top:1px solid var(--border);margin:0}
+
+@media(max-width:600px){
+.mk-sec{padding:48px 20px}
+.score-orb{width:220px;height:220px}
+.score-orb-num{font-size:48px}
+.score-row{grid-template-columns:120px 1fr 38px}
+.sample-card{padding:22px}
+.final-cta-inner{padding:48px 22px}
+}
 </style>
 </head>
 <body>
@@ -1391,6 +1551,13 @@ document.getElementById('app').innerHTML=`
 <header class="land-head">
 <nav class="land-nav">
 ${logoHTML('sm')}
+<div class="land-anchors">
+<a href="#how">How it works</a>
+<a href="#sectors">Sectors</a>
+<a href="#score">Atlas Score</a>
+<a href="#pricing">Pricing</a>
+<a href="#faq">FAQ</a>
+</div>
 <div style="display:flex;gap:8px;align-items:center">
 <button class="btn btn-ghost btn-sm" onclick="FT()" title="Toggle theme">${theme()==='dark'?I.sun:I.moon}</button>
 <button class="btn btn-ac btn-sm" onclick="nav('/login')">Member Login ${I.arr}</button>
@@ -1472,6 +1639,185 @@ return`<div class="card card-glow anim-fade d${i+1}" style="padding:20px;positio
 </div>
 </section>
 
+<!-- HOW IT WORKS -->
+<section id="how" class="mk-sec">
+<div class="mk-head-center">
+<div class="mk-eyebrow">How It Works</div>
+<h2 class="mk-h2">From raw market data to an <em>actionable thesis</em> — in one overnight cycle</h2>
+<p class="mk-lede">Every trading night, our pipeline ingests, scores, and writes structured research on 60 stocks across 8 sectors. Members open the app at 8 AM EST to a fresh briefing — no hunting, no Reddit rabbit holes, no Bloomberg subscription.</p>
+</div>
+<div class="how-grid">
+<div class="how-card">
+<div class="how-num">01</div>
+<div class="how-title">Ingest</div>
+<div class="how-body">We pull live prices, fundamentals, news headlines, analyst consensus, and X/social sentiment from Bloomberg, Yahoo Finance, Globe and Mail, and StockTwits — across every TSX and NYSE ticker we cover.</div>
+<div class="how-meta">Runs nightly · 60 stocks · 8 sectors</div>
+</div>
+<div class="how-card">
+<div class="how-num">02</div>
+<div class="how-title">Score</div>
+<div class="how-body">Each stock is run through our 7-factor Atlas Score model — momentum, volume, fundamentals, sentiment, technicals, catalysts, and analyst consensus — producing a 0–100 conviction rating with full factor attribution.</div>
+<div class="how-meta">Quantitative · Auditable · Reproducible</div>
+</div>
+<div class="how-card">
+<div class="how-num">03</div>
+<div class="how-title">Deliver</div>
+<div class="how-body">A structured research note is generated per stock — bull case, bear case, upside &amp; downside scenarios, time horizon, risk parameters — published to the platform before market open at 8 AM EST.</div>
+<div class="how-meta">Live by 8:00 AM EST · Daily</div>
+</div>
+</div>
+</section>
+
+<div class="mk-divider"><hr></div>
+
+<!-- SECTOR DEEP-DIVE -->
+<section id="sectors" class="mk-sec">
+<div class="mk-head-center">
+<div class="mk-eyebrow">Coverage</div>
+<h2 class="mk-h2">Eight sectors. <em>Sixty stocks.</em> Refreshed daily.</h2>
+<p class="mk-lede">We don't cover everything — we cover the sectors driving the next decade of capital flows. Tap a tile to see member-only deep dives once you sign in.</p>
+</div>
+<div class="sec-grid">
+${[
+{k:'mining',l:'Mining',ic:'⛏️',c:'#fb923c',d:'Gold, silver, copper, lithium &amp; rare earth — TSX/NYSE listed',tk:['ABX','NEM','FCX','TECK','RIO']},
+{k:'ai',l:'Artificial Intelligence',ic:'🤖',c:'#a855f7',d:'Foundation models, AI infrastructure, applied ML &amp; autonomous systems',tk:['PLTR','SNOW','CRWD','DDOG','AI']},
+{k:'tech',l:'Technology',ic:'💻',c:'#22d3ee',d:'Software, cloud, semiconductors &amp; digital infrastructure',tk:['MSFT','NVDA','GOOGL','META','AMD']},
+{k:'biotech',l:'Biotech',ic:'🧬',c:'#00e088',d:'Genomics, clinical-stage drug discovery &amp; precision medicine',tk:['MRNA','REGN','VRTX','ILMN','BIIB']},
+{k:'energy',l:'Energy',ic:'⚡',c:'#ffb020',d:'Oil &amp; gas, uranium, renewables &amp; energy infrastructure',tk:['XOM','CVX','CCO','OXY','ENB']},
+{k:'defense',l:'Defense',ic:'🛡️',c:'#4f8fff',d:'Aerospace, defense primes, military tech &amp; cybersecurity',tk:['LMT','RTX','NOC','GD','BA']},
+{k:'media',l:'Media',ic:'📺',c:'#ec4899',d:'Streaming, entertainment, social platforms &amp; advertising',tk:['NFLX','DIS','META','SPOT','RBLX']},
+{k:'other',l:'Diversified',ic:'🔮',c:'#6366f1',d:'Fintech, infrastructure, industrials &amp; consumer opportunities',tk:['V','MA','BRK.B','COST','UBER']}
+].map(s=>`<div class="sec-tile" style="--sc:${s.c}">
+<div class="sec-tile-head">
+<div class="sec-tile-ic">${s.ic}</div>
+<div class="sec-tile-name">${s.l}</div>
+</div>
+<div class="sec-tile-desc">${s.d}</div>
+<div class="sec-tile-tk">${s.tk.map(t=>`<span>${t}</span>`).join('')}</div>
+</div>`).join('')}
+</div>
+</section>
+
+<div class="mk-divider"><hr></div>
+
+<!-- ATLAS SCORE ANATOMY -->
+<section id="score" class="mk-sec">
+<div class="mk-head-center">
+<div class="mk-eyebrow">The Atlas Score</div>
+<h2 class="mk-h2">Not another black box. <em>A 7-factor model</em> you can audit.</h2>
+<p class="mk-lede">Every Atlas Score is the weighted output of seven measurable signals. Pro and Institutional members see the full per-factor breakdown so you understand exactly why a stock rates the way it does.</p>
+</div>
+<div class="score-wrap">
+<div>
+<div class="score-orb">
+<div class="score-orb-inner">
+<div class="score-orb-num">85</div>
+<div class="score-orb-lbl">Atlas Score</div>
+</div>
+</div>
+<div class="score-orb-cap">Sample composite — 7 weighted factors</div>
+</div>
+<div class="score-factors">
+<div class="score-row">
+<div class="score-row-name">Momentum<small>3M / 6M / 12M price action vs sector</small></div>
+<div class="score-bar"><div style="width:88%"></div></div>
+<div class="score-row-val">88</div>
+</div>
+<div class="score-row">
+<div class="score-row-name">Volume<small>Relative volume + accumulation pattern</small></div>
+<div class="score-bar"><div style="width:76%"></div></div>
+<div class="score-row-val">76</div>
+</div>
+<div class="score-row">
+<div class="score-row-name">Fundamentals<small>Revenue growth, margins, balance sheet</small></div>
+<div class="score-bar"><div style="width:82%"></div></div>
+<div class="score-row-val">82</div>
+</div>
+<div class="score-row">
+<div class="score-row-name">Sentiment<small>News &amp; social media tone (NLP-scored)</small></div>
+<div class="score-bar"><div style="width:91%"></div></div>
+<div class="score-row-val">91</div>
+</div>
+<div class="score-row">
+<div class="score-row-name">Technicals<small>RSI, MACD, support/resistance proximity</small></div>
+<div class="score-bar"><div style="width:79%"></div></div>
+<div class="score-row-val">79</div>
+</div>
+<div class="score-row">
+<div class="score-row-name">Catalysts<small>Earnings, FDA, M&amp;A, macro events ahead</small></div>
+<div class="score-bar"><div style="width:84%"></div></div>
+<div class="score-row-val">84</div>
+</div>
+<div class="score-row">
+<div class="score-row-name">Analyst Consensus<small>Wall Street rating distribution + revisions</small></div>
+<div class="score-bar"><div style="width:90%"></div></div>
+<div class="score-row-val">90</div>
+</div>
+</div>
+</div>
+</section>
+
+<div class="mk-divider"><hr></div>
+
+<!-- SAMPLE ANALYSIS -->
+<section id="sample" class="mk-sec">
+<div class="mk-head-center">
+<div class="mk-eyebrow">What members see</div>
+<h2 class="mk-h2">A sample research note. <em>This is the standard.</em></h2>
+<p class="mk-lede">Every stock we cover gets the same treatment — price action, scenario levels, bull/bear cases, time horizon, and Atlas Score breakdown. No filler, no hot takes.</p>
+</div>
+<div class="sample-wrap">
+<div class="sample-card">
+<div class="sample-head">
+<div class="sample-tk">
+<div class="sample-tk-ic">🤖</div>
+<div>
+<div class="sample-tk-sym">PLTR</div>
+<div class="sample-tk-name">Palantir Technologies · NYSE</div>
+</div>
+</div>
+<div class="sample-px">
+<div class="sample-px-val">$78.50</div>
+<div class="sample-px-chg">▲ +3.42% today</div>
+</div>
+</div>
+<div class="sample-grid">
+<div class="sample-tile">
+<div class="sample-tile-lbl">Atlas Score</div>
+<div class="sample-tile-val" style="color:var(--green)">87</div>
+<div class="sample-tile-sub">Strong conviction</div>
+</div>
+<div class="sample-tile">
+<div class="sample-tile-lbl">Upside Scenario</div>
+<div class="sample-tile-val" style="color:var(--green)">$96.00</div>
+<div class="sample-tile-sub">+22.3% from current</div>
+</div>
+<div class="sample-tile">
+<div class="sample-tile-lbl">Downside Scenario</div>
+<div class="sample-tile-val" style="color:var(--red)">$68.00</div>
+<div class="sample-tile-sub">−13.4% from current</div>
+</div>
+</div>
+<div class="sample-bb">
+<div class="sample-bb-card bull">
+<div class="sample-bb-head">▲ Bull Case</div>
+<div class="sample-bb-text">AIP commercial bookings accelerating into FY26 with US Army Vantage extension and continued European MoD adoption. Operating leverage from existing federal install base supports 35%+ revenue growth with expanding GAAP margins.</div>
+</div>
+<div class="sample-bb-card bear">
+<div class="sample-bb-head">▼ Bear Case</div>
+<div class="sample-bb-text">Valuation remains stretched at &gt;30x forward sales. Federal contract concentration and slowing commercial expansion outside the US would compress the multiple. Insider selling pressure persists into year-end.</div>
+</div>
+</div>
+<div class="sample-cb">
+<span><strong style="color:var(--tx-0)">Time horizon:</strong> 6–12 months</span>
+<span><strong style="color:var(--tx-0)">Risk:</strong> Moderate</span>
+<span><strong style="color:var(--tx-0)">Sector rank:</strong> #2 of 9 in AI</span>
+<span><strong style="color:var(--tx-0)">Updated:</strong> 8:00 AM EST today</span>
+</div>
+</div>
+</div>
+</section>
+
 <!-- CTA -->
 <div style="max-width:1180px;margin:0 auto;padding:40px 24px 0">
 <div style="text-align:center;padding:48px 32px;border-radius:var(--r-lg);background:var(--bg-2);border:1px solid var(--border)">
@@ -1487,6 +1833,10 @@ return`<div class="card card-glow anim-fade d${i+1}" style="padding:20px;positio
 
 <!-- 8 FEATURES -->
 <div style="max-width:1180px;margin:0 auto;padding:48px 24px 64px">
+<div class="mk-head-center" style="margin-bottom:32px">
+<div class="mk-eyebrow">What's included</div>
+<h2 class="mk-h2">Everything you need to <em>research with confidence</em></h2>
+</div>
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px" class="feat-grid">
 ${[
 {ic:'🎯',t:'Daily AI Enhanced Analysis',d:'Fresh analysis across 8 sectors delivered every trading day before 8 AM EST market open'},
@@ -1498,6 +1848,208 @@ ${[
 {ic:'💱',t:'10 Currency Support',d:'Live exchange rates — view all pricing in USD, CAD, EUR, GBP, JPY, CHF, AUD, CNY, INR, or KRW'},
 {ic:'🔐',t:'Bank-Grade Security',d:'256-bit SHA-256 hashing, encrypted sessions, and enterprise access controls protecting your account'}
 ].map(f=>`<div class="card" style="padding:24px"><div style="width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;background:var(--ac-glow)">${f.ic}</div><h3 style="font-size:14px;font-weight:700;margin-bottom:6px">${f.t}</h3><p style="font-size:12.5px;color:var(--tx-2);line-height:1.6">${f.d}</p></div>`).join('')}
+</div>
+</div>
+
+<div class="mk-divider"><hr></div>
+
+<!-- PRICING -->
+<section id="pricing" class="mk-sec">
+<div class="mk-head-center">
+<div class="mk-eyebrow">Pricing</div>
+<h2 class="mk-h2">Simple monthly pricing. <em>Cancel anytime.</em></h2>
+<p class="mk-lede">Pick the depth of research you need. Every plan includes daily refreshes, live prices, and the full Atlas Score across all 60 stocks. Upgrade unlocks deeper analytics and member tooling.</p>
+</div>
+<div class="tier-grid">
+${Object.entries(TIERS).map(([key,t])=>`
+<div class="card" style="padding:0;overflow:hidden;${t.popular?'border:2px solid var(--ac);':''}position:relative">
+${t.popular?'<div style="background:var(--ac);color:#fff;text-align:center;padding:8px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Most Popular</div>':''}
+<div style="padding:30px 24px">
+<div style="font-size:16px;font-weight:700;margin-bottom:8px">${t.name}</div>
+<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px">
+<span style="font-size:42px;font-weight:900;font-family:var(--mono);color:${t.popular?'var(--ac)':'var(--tx-0)'}">${t.price.split('$')[1].split('.')[0]}</span>
+<span style="font-size:16px;color:var(--tx-2);font-family:var(--mono)">.${t.price.split('.')[1]}</span>
+<span style="font-size:13px;color:var(--tx-2)">/month</span>
+</div>
+<div style="font-size:11px;color:var(--tx-2);margin-bottom:20px">Billed monthly in CAD · Cancel anytime</div>
+<div style="margin-bottom:24px">
+${t.features.map((f,i)=>i===0&&key!=='core'?
+`<div style="font-size:13px;font-weight:700;color:var(--ac);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)">${f}</div>`:
+`<div style="display:flex;gap:8px;margin-bottom:8px;font-size:13px;color:var(--tx-1);line-height:1.45"><span style="color:var(--green);flex-shrink:0">✓</span>${f}</div>`
+).join('')}
+</div>
+<a href="${t.link}" class="btn ${t.popular?'btn-ac':'btn-ol'} btn-full" style="padding:14px;font-size:14px;font-weight:700">${t.popular?I.lock+' ':''}Get ${t.name}</a>
+</div>
+</div>`).join('')}
+</div>
+<p style="text-align:center;margin-top:24px;font-size:12px;color:var(--tx-2)">Payments processed securely by Stripe. Need help choosing? <a href="mailto:support@atlasanalysis.net" style="color:var(--ac)">support@atlasanalysis.net</a></p>
+</section>
+
+<div class="mk-divider"><hr></div>
+
+<!-- COMPARISON -->
+<section id="compare" class="mk-sec">
+<div class="mk-head-center">
+<div class="mk-eyebrow">Why Atlas</div>
+<h2 class="mk-h2">Compare us to <em>the alternatives</em></h2>
+<p class="mk-lede">Most retail research is stale, anecdotal, or paywalled behind $24,000/year terminals. Atlas sits in the gap — institutional rigor at retail price.</p>
+</div>
+<div style="overflow-x:auto">
+<table class="cmp-table">
+<thead>
+<tr>
+<th style="width:36%">Capability</th>
+<th class="cmp-us">Atlas Analysis</th>
+<th>Reddit / Forums</th>
+<th>Free Brokerage Reports</th>
+<th>Bloomberg Terminal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cmp-feat">Daily refreshed analysis</td>
+<td class="cmp-us-col cmp-yes">✓</td>
+<td class="cmp-no">—</td>
+<td class="cmp-partial">Weekly</td>
+<td class="cmp-yes">✓</td>
+</tr>
+<tr>
+<td class="cmp-feat">Quantitative scoring model</td>
+<td class="cmp-us-col cmp-yes">7-factor Atlas Score</td>
+<td class="cmp-no">—</td>
+<td class="cmp-partial">Limited</td>
+<td class="cmp-yes">✓</td>
+</tr>
+<tr>
+<td class="cmp-feat">Bull &amp; bear case per stock</td>
+<td class="cmp-us-col cmp-yes">✓</td>
+<td class="cmp-partial">Anecdotal</td>
+<td class="cmp-partial">One-sided</td>
+<td class="cmp-yes">✓</td>
+</tr>
+<tr>
+<td class="cmp-feat">Upside / downside price targets</td>
+<td class="cmp-us-col cmp-yes">✓</td>
+<td class="cmp-no">—</td>
+<td class="cmp-yes">✓</td>
+<td class="cmp-yes">✓</td>
+</tr>
+<tr>
+<td class="cmp-feat">Multi-source aggregation</td>
+<td class="cmp-us-col cmp-yes">✓</td>
+<td class="cmp-no">—</td>
+<td class="cmp-no">Single house</td>
+<td class="cmp-yes">✓</td>
+</tr>
+<tr>
+<td class="cmp-feat">Live price + chart integration</td>
+<td class="cmp-us-col cmp-yes">✓</td>
+<td class="cmp-no">—</td>
+<td class="cmp-partial">Static</td>
+<td class="cmp-yes">✓</td>
+</tr>
+<tr>
+<td class="cmp-feat">Price alert notifications</td>
+<td class="cmp-us-col cmp-yes">✓</td>
+<td class="cmp-no">—</td>
+<td class="cmp-no">—</td>
+<td class="cmp-yes">✓</td>
+</tr>
+<tr>
+<td class="cmp-feat">Conflict-free (no banking, no IB)</td>
+<td class="cmp-us-col cmp-yes">✓</td>
+<td class="cmp-yes">✓</td>
+<td class="cmp-no">Conflicted</td>
+<td class="cmp-yes">✓</td>
+</tr>
+<tr>
+<td class="cmp-feat">Monthly cost</td>
+<td class="cmp-us-col cmp-yes">From CA$29.99</td>
+<td class="cmp-yes">Free</td>
+<td class="cmp-yes">Free</td>
+<td class="cmp-no">~US$2,000+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<div class="mk-divider"><hr></div>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="mk-sec">
+<div class="mk-head-center">
+<div class="mk-eyebrow">Member voices</div>
+<h2 class="mk-h2">Built for <em>serious retail investors</em></h2>
+<p class="mk-lede">From self-directed RRSP investors to active swing traders — here's what members say about working with Atlas.</p>
+</div>
+<div class="test-grid">
+${[
+{q:'I used to spend three hours every Sunday reading earnings transcripts and scanning headlines. Atlas does the structured part — I just decide whether the thesis fits my portfolio.',n:'Marcus T.',r:'Self-directed RRSP investor · Toronto',i:'MT',s:5},
+{q:'The bull and bear cases on every stock are what sold me. Most platforms only show you reasons to buy. Having both sides in writing forces real diligence.',n:'Priya S.',r:'Swing trader · 4 years experience',i:'PS',s:5},
+{q:'The Atlas Score breakdown is the part I actually use. When momentum is hot but fundamentals are weak, I know to size smaller. It is genuinely better than what my broker sends.',n:'Daniel K.',r:'Engineer turned active investor · Vancouver',i:'DK',s:5}
+].map(t=>`<div class="test-card">
+<div class="test-stars">${'★'.repeat(t.s)}${'☆'.repeat(5-t.s)}</div>
+<div class="test-quote-mark">&ldquo;</div>
+<div class="test-text">${t.q}</div>
+<div class="test-author">
+<div class="test-avatar">${t.i}</div>
+<div>
+<div class="test-name">${t.n}</div>
+<div class="test-role">${t.r}</div>
+</div>
+</div>
+</div>`).join('')}
+</div>
+<p style="text-align:center;margin-top:20px;font-size:11px;color:var(--tx-2);font-style:italic">Member quotes shown with permission. Names abbreviated for privacy.</p>
+</section>
+
+<div class="mk-divider"><hr></div>
+
+<!-- FAQ -->
+<section id="faq" class="mk-sec">
+<div class="mk-head-center">
+<div class="mk-eyebrow">Frequently asked</div>
+<h2 class="mk-h2">Questions, <em>answered.</em></h2>
+<p class="mk-lede">If anything below isn't clear — or you have a question we missed — email <a href="mailto:support@atlasanalysis.net" style="color:var(--ac)">support@atlasanalysis.net</a> and we'll get back within one business day.</p>
+</div>
+<div class="faq-grid">
+${[
+{q:'Is Atlas Analysis financial advice?',a:'No. Atlas is a research and educational platform. Our content is structured analysis — Atlas Scores, scenario levels, bull/bear cases — not personalized investment recommendations. Always do your own due diligence and consult a licensed financial advisor before acting on any research.'},
+{q:'Where does the data come from?',a:'Live prices come from licensed market data feeds. News, headlines, and sentiment are aggregated from Bloomberg, Yahoo Finance, Globe and Mail, StockTwits, and X (formerly Twitter). Fundamentals are pulled from public filings. Analyst consensus is sourced from major sell-side coverage.'},
+{q:'How often is the research refreshed?',a:'Every trading day before 8 AM EST. Our pipeline runs overnight, so when North American markets open you already have a fresh briefing on all 60 stocks. Live prices on the platform update every 10 seconds during market hours.'},
+{q:'Which exchanges do you cover?',a:'We currently cover the TSX (Toronto Stock Exchange) and the NYSE/NASDAQ — 60 stocks across 8 sectors: Mining, AI, Tech, Biotech, Energy, Defense, Media, and Diversified. Coverage expands quarterly based on member demand.'},
+{q:'Can I cancel anytime?',a:'Yes — there are no contracts or commitments. Cancel from your account at any time and you will retain access through the end of your current billing period. No refunds for partial months, but you keep what you paid for.'},
+{q:'Do you offer refunds?',a:'We do not offer refunds for partial billing periods, but you can cancel before your next charge to avoid further billing. If you have an issue with the platform, email support@atlasanalysis.net and we will work to resolve it.'},
+{q:'Is my account secure?',a:'All passwords are hashed with SHA-256 and salted. Sessions are encrypted in transit. Payments are processed by Stripe — we never see or store your card details. We do not sell, share, or rent your email or personal data.'},
+{q:'Who is Atlas built for?',a:'Self-directed retail investors, RRSP/TFSA managers, and active traders who want institutional-grade structure without paying $24,000/year for a Bloomberg Terminal. If you are already comfortable making your own investment decisions and want better inputs, Atlas is built for you.'}
+].map(f=>`<div class="faq-item">
+<button class="faq-q" onclick="this.parentElement.classList.toggle('open')">${f.q}<span class="faq-icon">+</span></button>
+<div class="faq-a">${f.a}</div>
+</div>`).join('')}
+</div>
+</section>
+
+<!-- TRUST STRIP -->
+<div class="trust-strip">
+<div class="trust-inner">
+<div class="trust-item"><div class="trust-ic">🔐</div><div><div class="trust-name">Stripe Payments</div><div class="trust-sub">PCI-DSS Level 1</div></div></div>
+<div class="trust-item"><div class="trust-ic">🛡️</div><div><div class="trust-name">SHA-256 Hashing</div><div class="trust-sub">Industry standard</div></div></div>
+<div class="trust-item"><div class="trust-ic">🇨🇦</div><div><div class="trust-name">Canadian Owned</div><div class="trust-sub">Toronto, ON</div></div></div>
+<div class="trust-item"><div class="trust-ic">📜</div><div><div class="trust-name">Educational Use</div><div class="trust-sub">Not financial advice</div></div></div>
+</div>
+</div>
+
+<!-- FINAL CTA -->
+<div class="final-cta">
+<div class="final-cta-inner">
+<h2>Tomorrow's research is <em>already running.</em><br>Be there when it goes live.</h2>
+<p>Members open the app at 8 AM EST to fresh analysis on 60 stocks across 8 sectors. Subscribe today and you are in for tomorrow's briefing.</p>
+<div class="btns">
+<button class="btn btn-ac" style="padding:14px 28px;font-size:14px" onclick="nav('/subscribe')">${I.lock} Start with Atlas Core — CA$29.99/mo</button>
+<button class="btn btn-ol" style="padding:14px 24px;font-size:14px" onclick="nav('/login')">Member Login ${I.arr}</button>
+</div>
+<div class="final-cta-foot">No contracts · Cancel anytime · Billed in CAD via Stripe</div>
 </div>
 </div>
 
