@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>AI Still-Image Ad Prompts — Atlas Analysis</title>
+<title>Gemini Image Prompts for Atlas Ads</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
 </a>
 <nav class="media-nav-links">
 <a href="index.html">All docs</a>
-<a href="video-scripts.html">Video scripts →</a>
+<a href="video-scripts.html">Shotbreak scripts →</a>
 </nav>
 <button class="media-print-btn" onclick="window.print()">Print / Save PDF</button>
 </div>
@@ -29,177 +29,159 @@
 
 <main class="page-narrow">
 
-<div class="doc-eyebrow">Creative · 04 of 08</div>
-<h1 class="doc-title">AI Still-Image<br><em>Ad Prompts</em></h1>
-<p class="doc-lede">30+ drop-in prompts for Midjourney v6, DALL-E 3, and Stable Diffusion XL — organized by hook archetype and platform. Each prompt is paired with placement specs, on-image text overlay, and a tested CTA. Skip the prompt-engineering trial-and-error and ship creatives this week.</p>
+<div class="doc-eyebrow">Creative · Gemini Image Prompts</div>
+<h1 class="doc-title">Gemini Image Prompts<br><em>for Atlas ads</em></h1>
+<p class="doc-lede">Drop-in prompts for <strong>Google Gemini</strong> (Imagen 3 / Imagen 4) to generate static ad creative for Atlas Analysis. Each prompt is paired with the format it's for (Meta feed, Reels cover, Stories, Google Display) and the on-image text overlay you'd add after generation.</p>
 <div class="doc-meta">
-<span>Tools: Midjourney · DALL-E 3 · SDXL</span>
-<span>Platforms: Meta · Google Display · LinkedIn</span>
-<span>Aspect ratios: 1:1 · 4:5 · 9:16 · 1.91:1</span>
+<span>Tool: Gemini (gemini.google.com)</span>
+<span>Format: copy → paste → generate</span>
+<span>Aspect ratios noted per prompt</span>
 </div>
 
 <h2 class="sec">How to use this doc</h2>
 <ol>
-<li>Pick a hook archetype that matches your offer angle (six are listed below).</li>
-<li>Copy the base prompt into Midjourney/DALL-E/SDXL.</li>
-<li>Append the placement modifier (square / vertical / banner) — it controls the aspect ratio.</li>
-<li>Generate 4 variations. Pick the strongest. Add the on-image text in Canva/Figma using the suggested overlay (we don't ask the AI to render text — most models still butcher it).</li>
-<li>Pair with the CTA copy and ship.</li>
+<li>Open Gemini at <a href="https://gemini.google.com">gemini.google.com</a>.</li>
+<li>Copy any prompt below into the chat. Hit enter.</li>
+<li>If it generates the wrong aspect ratio, append "Aspect ratio 1:1" / "Aspect ratio 9:16" / "Aspect ratio 1.91:1" depending on placement.</li>
+<li>Generate 4 variations per prompt. Pick the strongest. Add the on-image text overlay listed under each prompt using Canva, Photopea, or Figma.</li>
+<li>Save as PNG/JPG. Upload to Meta Ads Manager / Google Ads.</li>
 </ol>
 
 <div class="callout tip">
-<strong>The ten-creative rule</strong>
-Hormozi: most creatives die. Plan to ship 10 creatives at launch, expect 7 to underperform, scale the 2–3 that work. Don't fall in love with any single image — fall in love with the test.
+<strong>Brand consistency suffix — append to every prompt</strong>
+"Atlas Analysis brand: deep navy and dark blue (#06080f, #0b0e18) backgrounds, electric blue (#4f8fff) and purple (#a855f7) gradient accents, sharp geometric triangle logo, subtle grid mesh texture, financial-platform aesthetic, professional and modern, high-end fintech UI feel."
 </div>
-
-<h2 class="sec">Six hook archetypes for Atlas</h2>
-<table class="tbl">
-<thead><tr><th>#</th><th>Archetype</th><th>When it works</th><th>Headline angle</th></tr></thead>
-<tbody>
-<tr><td>1</td><td><strong>The Pre-market briefing</strong></td><td>Cold — broad finance interest</td><td>"While you sleep, we research 60 stocks."</td></tr>
-<tr><td>2</td><td><strong>The Stop guessing</strong></td><td>Cold — DIY investors</td><td>"Stop guessing. Get structured research."</td></tr>
-<tr><td>3</td><td><strong>The Atlas Score</strong></td><td>Cold — data-driven crowd</td><td>"This stock scored 87. Here's why."</td></tr>
-<tr><td>4</td><td><strong>The Bloomberg comparison</strong></td><td>Cold — premium positioning</td><td>"$24K/yr Bloomberg vs. $30/mo Atlas."</td></tr>
-<tr><td>5</td><td><strong>The Sunday hours</strong></td><td>Retargeting — busy professionals</td><td>"Get back your Sunday afternoons."</td></tr>
-<tr><td>6</td><td><strong>The 7-factor model</strong></td><td>Retargeting — credibility</td><td>"7 factors. One score. No black box."</td></tr>
-</tbody>
-</table>
-
-<h2 class="sec">Brand visual system (use in every prompt)</h2>
-<div class="card">
-<h4>Atlas Brand DNA</h4>
-<p style="font-size:13px;color:var(--tx-1);line-height:1.7">
-<strong>Color palette:</strong> deep navy (#06080f), royal blue (#4f8fff), violet purple (#a855f7), accent green (#00e088), accent red (#ff4466). Dark backgrounds preferred.<br>
-<strong>Mood:</strong> institutional, calm, technical, premium — not "WallStreetBets memes" or "crypto-bro neon".<br>
-<strong>Style nouns:</strong> Bloomberg Terminal, financial cinema (The Big Short), Apple keynote slides, glassmorphism, data visualization, candlestick charts, subtle grid mesh.<br>
-<strong>Avoid:</strong> stock-photo handshakes, suited men pointing at screens, dollar signs, gold bars, lambo imagery, AI-generated faces with weird hands.
-</p>
-</div>
-
-<p class="prompt-label">Reusable style suffix — append to every Midjourney prompt</p>
-<div class="prompt">cinematic finance editorial, deep navy &amp; royal blue palette, subtle violet accents, glassmorphism panels, financial dashboard aesthetic, ultra-detailed, 8k, dramatic rim lighting, depth of field, no text, no logo --ar [RATIO] --style raw --v 6</div>
-
-<h2 class="sec">Prompts by hook archetype</h2>
-
-<h3 class="sub">Hook 01 — The Pre-market briefing</h3>
-
-<p class="prompt-label">Prompt 1.A · Square (1:1) for Meta feed</p>
-<div class="prompt">A solitary cup of coffee on a dark walnut desk before sunrise, steam rising in a thin curl, a glowing tablet beside it displays a financial dashboard with candlestick charts and rising blue line graphs, soft window light from the right, peaceful early-morning atmosphere, cinematic, hyperreal, deep navy and royal blue color palette, violet glow from the tablet, --ar 1:1 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay:</strong> headline "Wake up to research." subhead "60 stocks. 8 sectors. Refreshed every trading day at 8 AM EST." CTA chip "Try Atlas — CA$29.99/mo".</p>
-
-<p class="prompt-label">Prompt 1.B · Vertical (9:16) for Reels / Stories</p>
-<div class="prompt">Aerial top-down shot of a minimalist home-office desk at dawn, single tablet screen showing a financial briefing with stock tickers and Atlas Score widgets, ceramic coffee cup, leather notebook, fountain pen, soft cool window light from above, deep navy desktop surface, royal-blue accent glow from the screen, photorealistic, --ar 9:16 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay:</strong> top text "8:00 AM EST" / center text "Your research is ready." / bottom CTA "Open Atlas →".</p>
-
-<p class="prompt-label">Prompt 1.C · Banner (1.91:1) for Google Display</p>
-<div class="prompt">Wide cinematic shot of a panoramic city skyline at pre-dawn blue hour, Toronto financial district silhouette, soft pink-orange horizon, ultra-modern glass tower in the foreground, slight camera tilt, dramatic atmospheric haze, navy-blue dominant palette, --ar 16:9 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay:</strong> left-aligned headline "The market opens in 90 minutes. Your research is already done." right-side CTA button "Read today's briefing".</p>
-
-<h3 class="sub">Hook 02 — The Stop guessing</h3>
-
-<p class="prompt-label">Prompt 2.A · Square (1:1)</p>
-<div class="prompt">Two side-by-side desk vignettes split exactly down the middle: left side chaotic — open laptop with 12 browser tabs, scattered Reddit and Twitter posts on a phone, crumpled notes, energy-drink cans, harsh blue glow, panicked atmosphere; right side serene — clean dark-mode dashboard on one tablet showing structured stock research with green Atlas Score, single coffee cup, organized, soft warm light. Cinematic split composition, photoreal. --ar 1:1 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay:</strong> left side "Guessing." / right side "Atlas." / bottom "Stop one. Start the other. CA$29.99/mo".</p>
-
-<p class="prompt-label">Prompt 2.B · Vertical (4:5)</p>
-<div class="prompt">Close-up macro photography of a hand drawing a confident upward trend line on a dark glass tablet, financial data ghosted behind the line, technical chart elements visible, royal blue glow under the fingertip, deep navy background, slight blue lens flare, hyperrealistic, --ar 4:5 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay:</strong> headline "You shouldn't have to guess." subhead "Atlas does the structured research. You make the call." CTA "Try free for 14 days".</p>
-
-<p class="prompt-label">Prompt 2.C · Carousel slide (1:1) — multi-frame</p>
-<div class="prompt">Frame 1 of a carousel: a single anxious-looking laptop screen at midnight surrounded by dozens of floating tabs labelled "Reddit", "Yahoo Finance", "Globe and Mail", "X", "StockTwits", everything dim and overwhelming, photographic, cinematic, --ar 1:1 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay frame 1:</strong> "How most retail investors research stocks" / Frame 2 prompt: same scene but tabs collapsed into a single Atlas dashboard / Frame 2 overlay: "How Atlas members research stocks". Slide 3: pricing CTA.</p>
-
-<h3 class="sub">Hook 03 — The Atlas Score</h3>
-
-<p class="prompt-label">Prompt 3.A · Square (1:1)</p>
-<div class="prompt">A glowing circular gauge dial centered on a dark glass surface, the dial reads "87 / 100" in a clean monospace numeral, the gauge fills with a vibrant green-to-blue gradient at 87 percent, ambient violet glow around the dial, particle dust in the air, sharp tilt-shift focus, financial dashboard aesthetic, deep navy background with subtle grid mesh, ultra-detailed, --ar 1:1 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay:</strong> headline "PLTR — Atlas Score 87." subhead "Bull case, bear case, scenario levels — all in your inbox tomorrow at 8 AM."</p>
-
-<p class="prompt-label">Prompt 3.B · Vertical (9:16)</p>
-<div class="prompt">Vertical hero composition of a translucent glass panel floating in dark space, the panel displays a 7-segment radial chart with each segment lit a different shade of blue and purple — labelled Momentum, Volume, Fundamentals, Sentiment, Technicals, Catalysts, Consensus — soft particle effects, deep navy backdrop, premium SaaS dashboard aesthetic, ultra detailed, octane render quality, --ar 9:16 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay:</strong> top "The Atlas Score" / center "7 factors. One number." / bottom CTA chip.</p>
-
-<h3 class="sub">Hook 04 — The Bloomberg comparison</h3>
-
-<p class="prompt-label">Prompt 4.A · Square (1:1)</p>
-<div class="prompt">A dramatic cinematic still: on the left, a Bloomberg-style multi-monitor terminal setup glowing orange and amber, retro corporate, expensive-looking; on the right, a single elegant tablet showing a clean blue-gradient dashboard, both desks at the same dark wood surface, comparing visual weight, premium product photography, photoreal, --ar 1:1 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay:</strong> left price tag "$24,000 / year" / right price tag "$360 / year" / bottom "Same rigour. 67× the price difference."</p>
-
-<p class="prompt-label">Prompt 4.B · Banner (1.91:1) for Google Display</p>
-<div class="prompt">Wide horizontal composition: an old amber CRT-style finance terminal on the left fading into a sleek modern blue tablet dashboard on the right, smooth gradient transition between the two halves, deep navy background with subtle mesh grid, cinematic, dramatic side lighting, photorealistic, --ar 16:9 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay:</strong> "Wall Street pays $24K. You can pay $30. Atlas Analysis."</p>
-
-<h3 class="sub">Hook 05 — The Sunday hours (retargeting)</h3>
-
-<p class="prompt-label">Prompt 5.A · Vertical (4:5)</p>
-<div class="prompt">A relaxed Sunday afternoon scene: warm golden hour light spilling through a window onto a couch, an open novel face-down on a knee, a steaming cup of tea, a closed laptop on a side table dimly visible, cozy domestic atmosphere, photoreal, soft warm tones with cool blue subtle accent from the closed laptop, --ar 4:5 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay:</strong> "You used to spend Sundays reading earnings transcripts. Now you don't." CTA "Atlas does the structured part."</p>
-
-<p class="prompt-label">Prompt 5.B · Square (1:1)</p>
-<div class="prompt">Top-down flat-lay of a cleared dining table with a closed silver MacBook, a fresh bagel with cream cheese, a half-finished newspaper crossword, a coffee mug — Sunday morning calm, photorealistic, soft natural daylight, deep navy table runner accent, --ar 1:1 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay:</strong> "Get your Sundays back. Atlas runs while you rest."</p>
-
-<h3 class="sub">Hook 06 — The 7-factor model (credibility)</h3>
-
-<p class="prompt-label">Prompt 6.A · Square (1:1)</p>
-<div class="prompt">A schematic exploded-view of a glass-paneled financial scoring engine: seven luminous data nodes labeled Momentum, Volume, Fundamentals, Sentiment, Technicals, Catalysts, Consensus arranged in a hexagonal-plus-center configuration, each connected by glowing data lines to a central composite "score" sphere, premium SaaS infographic aesthetic, photoreal, deep navy background with subtle mesh, royal-blue and violet glow, ultra-detailed, --ar 1:1 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay:</strong> "Not another black box. A 7-factor model you can audit."</p>
-
-<p class="prompt-label">Prompt 6.B · Banner (1.91:1)</p>
-<div class="prompt">Wide horizontal infographic-style composition with seven equally-spaced glowing icons across the frame, each representing a financial factor (graph trending up, bar chart, building, speech bubble, candlestick, calendar, person silhouette), connected by a thin luminous line, modern minimalist data-viz aesthetic, deep navy background, royal-blue glow, --ar 16:9 --style raw --v 6</div>
-<p style="font-size:12.5px;color:var(--tx-2)"><strong>Overlay:</strong> "Seven factors. One score. Every trading day."</p>
-
-<h2 class="sec">Platform-specific specs</h2>
-<table class="tbl">
-<thead><tr><th>Placement</th><th>Aspect ratio</th><th>Min resolution</th><th>Safe-zone</th></tr></thead>
-<tbody>
-<tr><td>Meta Feed (FB/IG)</td><td class="num">1:1 or 4:5</td><td class="num">1080×1080 / 1080×1350</td><td>20% text rule no longer enforced but still effective</td></tr>
-<tr><td>Meta Reels / Stories</td><td class="num">9:16</td><td class="num">1080×1920</td><td>Top 14% &amp; bottom 20% reserved for UI</td></tr>
-<tr><td>Google Display Banner</td><td class="num">1.91:1</td><td class="num">1200×628</td><td>Limit text to ~20% of image</td></tr>
-<tr><td>LinkedIn Single Image</td><td class="num">1.91:1 or 1:1</td><td class="num">1200×627 / 1200×1200</td><td>Professional-tone overlays only</td></tr>
-<tr><td>Email hero image</td><td class="num">2:1</td><td class="num">1200×600</td><td>Optimize for dark-mode rendering</td></tr>
-</tbody>
-</table>
-
-<h2 class="sec">CTA library — pair with any creative</h2>
-<table class="tbl">
-<thead><tr><th>Stage</th><th>CTA</th><th>Why it works</th></tr></thead>
-<tbody>
-<tr><td>Cold</td><td>"Start with Atlas Core — CA$29.99/mo"</td><td>Anchors price low, explicit currency</td></tr>
-<tr><td>Cold</td><td>"See tomorrow's research →"</td><td>Curiosity + low-friction</td></tr>
-<tr><td>Cold (lead magnet)</td><td>"Free Atlas Score Sample Report"</td><td>Trust ladder before paid ask</td></tr>
-<tr><td>Retargeting</td><td>"Try Atlas — cancel anytime"</td><td>Reduces commitment friction</td></tr>
-<tr><td>Retargeting</td><td>"Your sample report is ready"</td><td>Continues lead magnet thread</td></tr>
-<tr><td>Win-back</td><td>"Welcome back — first month 50% off"</td><td>Discount preserved for win-back only</td></tr>
-</tbody>
-</table>
-
-<h2 class="sec">Quality control checklist before any creative ships</h2>
-<ul>
-<li>No AI-generated text rendered inside the image (always overlay in Figma/Canva)</li>
-<li>No stock-photo cliches: handshakes, suits-pointing-at-screens, gold bars</li>
-<li>No "guaranteed returns" or "make $X from stocks" language (Meta &amp; Google reject)</li>
-<li>Disclaimer-friendly: avoid claims that imply personalized financial advice</li>
-<li>Atlas wordmark only — no "Atlas Analysis financial advisors" (we are not advisors)</li>
-<li>Dark mode primary; provide a light-mode variant for daytime feed performance</li>
-</ul>
-
-<div class="callout warn">
-<strong>Meta &amp; Google compliance reminder</strong>
-Both platforms classify Atlas as "financial services" content. Avoid: testimonials with specific dollar gains, "guaranteed", "best stock", "double your money". Use: "research", "analysis", "structured", "educational", "data-driven". Disclaimer in landing page footer that this is research, not advice.
-</div>
-
-<h2 class="sec">Production sprint plan (one weekend, 30 creatives)</h2>
-<ol>
-<li><strong>Saturday morning (3 hrs):</strong> Generate 4 images per prompt × 6 archetypes × 3 ratios = 72 raw images.</li>
-<li><strong>Saturday afternoon (2 hrs):</strong> Cull to top 30 in Lightroom / Photoshop. Color-grade for Atlas palette consistency.</li>
-<li><strong>Sunday morning (3 hrs):</strong> Build text overlay templates in Figma — one master file with auto-layout swaps for headline / sub / CTA. Apply to all 30.</li>
-<li><strong>Sunday afternoon (1 hr):</strong> Export at platform-specific resolutions, name with UTM-friendly conventions, upload to Meta + Google.</li>
-</ol>
-<p>Total cost: weekend of one founder + ~$30 in AI generation credits if using Midjourney / DALL-E paid tiers.</p>
 
 <hr>
-<p style="font-size:12px;color:var(--tx-2)"><em>Pair this doc with the Shotbreak Video Scripts for full creative coverage. The static prompts here generate images; the video doc covers motion creative for the same six hook archetypes.</em></p>
+
+<h2 class="sec">Hook 1 — "Stop Guessing"</h2>
+<p>Speaks to retail investors tired of Reddit tips and gut-feel trades. Best for cold audiences.</p>
+
+<p class="prompt-label">P1.1 — Meta feed (1:1 square)</p>
+<div class="prompt">A clean, modern fintech advertisement image. A dark navy background with a subtle grid mesh pattern. In the center, a glowing translucent triangular shield logo with electric blue and purple gradient. Around it, three abstract floating data cards showing a stock chart trending up, a numerical score "87", and a small candlestick chart. Soft cyan glow underneath. Empty space at the top for headline text. Minimalist, premium financial platform aesthetic. Aspect ratio 1:1.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> "Stop Guessing. Start with the Atlas Score." &nbsp; · &nbsp; <strong>CTA chip:</strong> "Get tomorrow's research →"</p>
+
+<p class="prompt-label">P1.2 — Reels / Stories (9:16 vertical)</p>
+<div class="prompt">Vertical 9:16 mobile-first ad. Top half: a confused retail investor at a desk, surrounded by floating Reddit threads and conflicting stock tickers, soft red glow indicating chaos. Bottom half: a clean, organized dashboard view with a single bright "Atlas Score: 87" panel, electric blue and purple gradient, calm and structured. Diagonal split between the two halves. Atlas Analysis branding bottom-right. Dark navy palette throughout. Aspect ratio 9:16.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> Top: "This used to be your portfolio research." &nbsp; Bottom: "Now it's this." &nbsp; · &nbsp; <strong>CTA:</strong> "Try Atlas — CA$29.99/mo"</p>
+
+<p class="prompt-label">P1.3 — Google Display (1.91:1 landscape)</p>
+<div class="prompt">A horizontal banner-style fintech ad. Left third: a chaotic stack of paper stock tip newsletters, ripped magazine clippings, and Reddit screenshots, slightly desaturated. Right two-thirds: a sleek dark dashboard interface showing a single ticker (PLTR) with a glowing Atlas Score circle of 87, bull/bear case panels, and a price chart. Smooth gradient transition from clutter on left to clarity on right. Premium financial platform aesthetic. Aspect ratio 1.91:1.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> "From noise to signal." &nbsp; · &nbsp; <strong>CTA:</strong> "Atlasanalysis.net"</p>
+
+<hr>
+
+<h2 class="sec">Hook 2 — "8 AM EST Briefing"</h2>
+<p>Anchors on the daily ritual: members open the app to fresh research before market open.</p>
+
+<p class="prompt-label">P2.1 — Meta feed (1:1)</p>
+<div class="prompt">An overhead shot of a minimalist morning desk: black coffee in a white ceramic mug, a sleek phone propped on a small stand displaying a stock research dashboard with electric blue accents and a triangular Atlas logo, a small open notebook with a pen. Soft morning sunlight from the upper left, warm and cool tones balanced. Atmospheric and aspirational, not cluttered. Premium fintech morning routine vibe. Aspect ratio 1:1.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> "Your 8 AM briefing is already running." &nbsp; · &nbsp; <strong>CTA chip:</strong> "Atlas — daily before market open"</p>
+
+<p class="prompt-label">P2.2 — Reels / Stories (9:16)</p>
+<div class="prompt">Vertical mobile ad. A dramatic overhead view of a laptop screen at dawn, showing the Atlas Analysis dashboard with multiple sector cards (Mining, AI, Tech, Biotech) glowing softly in dark navy and electric blue. The clock in the corner reads 7:58 AM. Coffee steam rising in the foreground out of focus. The whole composition feels calm, prepared, professional. Premium fintech morning routine. Aspect ratio 9:16.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> Top: "Markets open in 2 minutes." &nbsp; Middle: "You're already ready." &nbsp; · &nbsp; <strong>CTA:</strong> "Start with Atlas Core"</p>
+
+<p class="prompt-label">P2.3 — Meta feed (1:1) — type-driven variant</p>
+<div class="prompt">A bold typographic poster-style fintech ad. Pure dark navy background with subtle grid mesh. Centered, a large soft glowing electric blue circle with the number "8:00" inside in monospace font, surrounded by a faint purple ring. Below the circle, small icons of 8 sector glyphs (mining pickaxe, robot, computer, dna helix, lightning bolt, shield, screen, crystal ball) in a horizontal row, lit electric blue. Top left small Atlas triangle logo. Premium minimalist financial platform aesthetic. Aspect ratio 1:1.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> "Eight sectors. Sixty stocks. One briefing. Every trading day at 8 AM EST." &nbsp; · &nbsp; <strong>CTA:</strong> "atlasanalysis.net"</p>
+
+<hr>
+
+<h2 class="sec">Hook 3 — "Atlas Score" (the proprietary signal)</h2>
+<p>Leads with the proprietary scoring as the credibility anchor. Best for warm and retargeting audiences.</p>
+
+<p class="prompt-label">P3.1 — Meta feed (1:1)</p>
+<div class="prompt">A premium fintech infographic-style image. Centered, a large circular score gauge filled to 87% with a vibrant green-to-electric-blue gradient. The number "87" is displayed in monospace font in the center. Around the gauge, seven small horizontal bars labeled (Momentum, Volume, Fundamentals, Sentiment, Technicals, Catalysts, Analyst Consensus) each filled to different percentages with the same gradient. Dark navy background, soft purple glow. Atlas triangle logo top-left. Polished, data-rich, institutional-grade fintech aesthetic. Aspect ratio 1:1.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> "The Atlas Score. Seven factors. One signal." &nbsp; · &nbsp; <strong>CTA chip:</strong> "See yours →"</p>
+
+<p class="prompt-label">P3.2 — Stories (9:16)</p>
+<div class="prompt">Vertical mobile ad. Centered, a tall vertical glass-effect translucent panel showing a stock ticker (NVDA), a price ($142.30 in green), an Atlas Score circle of 92, and three small bars labeled bull case, bear case, time horizon. Background is dark navy with floating geometric particles in electric blue and purple. The whole panel glows softly. Premium institutional-grade fintech UI aesthetic. Aspect ratio 9:16.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> Top: "Every stock. Scored." &nbsp; Bottom: "Not another black box." &nbsp; · &nbsp; <strong>CTA:</strong> "Try Atlas Pro"</p>
+
+<p class="prompt-label">P3.3 — Google Display (1.91:1)</p>
+<div class="prompt">A horizontal fintech banner. Three premium dashboard cards floating side by side, each showing a different stock (AMD, PLTR, ABX) with a unique Atlas Score (84, 91, 76), a small chart preview, and a sector tag with color-coded stripe. Behind them, a soft gradient mesh of electric blue and purple. Dark navy background. Atlas Analysis logo + tagline lower-left. Premium institutional fintech vibe. Aspect ratio 1.91:1.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> "Sixty stocks. Scored daily." &nbsp; · &nbsp; <strong>CTA:</strong> "atlasanalysis.net"</p>
+
+<hr>
+
+<h2 class="sec">Hook 4 — "Bloomberg Without the Bloomberg Bill"</h2>
+<p>Comparison-style. Strong for cold audiences who feel locked out of "real" research tools.</p>
+
+<p class="prompt-label">P4.1 — Meta feed (1:1)</p>
+<div class="prompt">A split-screen fintech ad. Left half: a Bloomberg-style amber-on-black multi-monitor terminal setup, dense and intimidating, with a small price tag "$24,000/year" floating in red. Right half: a sleek single laptop on a clean desk showing the Atlas Analysis dashboard in dark navy and electric blue, with a price tag "CA$29.99/mo" floating in green. Diagonal split with a thin glowing line down the middle. Aspect ratio 1:1.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> "Same research depth. 1/800th the price." &nbsp; · &nbsp; <strong>CTA chip:</strong> "See Atlas →"</p>
+
+<p class="prompt-label">P4.2 — Reels / Stories (9:16)</p>
+<div class="prompt">Vertical mobile ad. Top third: a packed Bloomberg terminal with overwhelming amber data, slightly blurred. Middle: a glowing electric-blue arrow pointing down. Bottom two-thirds: a calm, single Atlas dashboard view on a phone, dark navy with one clean Atlas Score panel and a stock chart, sharp and focused. Caption-friendly clean space. Aspect ratio 9:16.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> Top: "$2,000 a month for this..." &nbsp; Bottom: "...or $30 a month for what you actually need." &nbsp; · &nbsp; <strong>CTA:</strong> "Atlas Core"</p>
+
+<hr>
+
+<h2 class="sec">Hook 5 — "Canadian-Built"</h2>
+<p>National-pride angle. Resonates with Canadian retail investors managing TFSAs/RRSPs who feel underserved by US-centric tools.</p>
+
+<p class="prompt-label">P5.1 — Meta feed (1:1)</p>
+<div class="prompt">A premium fintech ad. Centered, a sleek phone screen showing the Atlas Analysis dashboard with a TSX-listed stock highlighted (Barrick Gold ABX). A subtle Canadian flag detail in the upper right corner of the phone, almost invisible but recognizable. Around the phone, soft floating geometric mountain peaks in electric blue and purple gradient. Dark navy background with grid mesh. Premium institutional fintech aesthetic with a quietly Canadian tone. Aspect ratio 1:1.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> "Built in Canada. For Canadian portfolios." &nbsp; · &nbsp; <strong>CTA chip:</strong> "Atlas — TSX + NYSE coverage"</p>
+
+<p class="prompt-label">P5.2 — Stories (9:16)</p>
+<div class="prompt">Vertical mobile ad. A modern Toronto skyline silhouette in the lower third, rendered in deep navy and electric blue tones. Above the skyline, floating dashboard panels showing TSX tickers (ABX, TECK, ENB, CCO) with Atlas Scores. A subtle maple leaf glyph integrated into the Atlas triangle logo at the top. Premium financial-platform morning vibe. Aspect ratio 9:16.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> Top: "Made for the TSX." &nbsp; Bottom: "Atlas — daily research before market open." &nbsp; · &nbsp; <strong>CTA:</strong> "atlasanalysis.net"</p>
+
+<hr>
+
+<h2 class="sec">Hook 6 — "Sector Heat Maps"</h2>
+<p>Visual data-rich angle. Best as retargeting creative for visitors who already understand the product.</p>
+
+<p class="prompt-label">P6.1 — Meta feed (1:1)</p>
+<div class="prompt">A premium fintech infographic. A grid of 8 colored sector tiles in 2 rows of 4: Mining (orange), AI (purple), Tech (cyan), Biotech (green), Energy (amber), Defense (electric blue), Media (pink), Other (indigo). Each tile shows a small icon, a sector name, and a tiny chart. Behind the grid, soft glowing gradient mesh. Atlas triangle logo top-left. Dark navy background. Premium institutional fintech aesthetic. Aspect ratio 1:1.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> "Eight sectors. One platform." &nbsp; · &nbsp; <strong>CTA chip:</strong> "Explore →"</p>
+
+<p class="prompt-label">P6.2 — Google Display (1.91:1)</p>
+<div class="prompt">A horizontal fintech banner. The 8 Atlas sectors arranged in a flowing horizontal row of color-coded tiles, each glowing softly: Mining orange, AI purple, Tech cyan, Biotech green, Energy amber, Defense electric blue, Media pink, Diversified indigo. Each tile has a small icon and Atlas Score number. Atlas Analysis branding lower-left. Dark navy background with subtle grid mesh. Aspect ratio 1.91:1.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> "Sixty stocks. Scored daily. Refreshed before market open." &nbsp; · &nbsp; <strong>CTA:</strong> "atlasanalysis.net"</p>
+
+<hr>
+
+<h2 class="sec">Hook 7 — "Sample Report Lead Magnet"</h2>
+<p>Drives email capture, not direct subscribe. Use exclusively to promote a free sample research PDF.</p>
+
+<p class="prompt-label">P7.1 — Meta feed (1:1)</p>
+<div class="prompt">A premium fintech ad. Centered, a stack of 3 floating angled documents/PDFs, each showing the Atlas Analysis sample research report layout — header with stock ticker, Atlas Score circle, bull case and bear case panels, price chart. The top document is the most visible, slightly tilted forward with a soft electric blue glow. Behind: dark navy with grid mesh and subtle purple gradient. Atlas logo top-left. Aspect ratio 1:1.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> "Free sample report. See what members get daily." &nbsp; · &nbsp; <strong>CTA chip:</strong> "Download — no card needed"</p>
+
+<p class="prompt-label">P7.2 — Stories (9:16)</p>
+<div class="prompt">Vertical mobile ad. A single research report PDF tilted at 15 degrees, glowing softly, dominating the frame. The page shows a stock ticker (NVDA), Atlas Score 92, three KPI tiles (Upside, Downside, Sector Rank), and bull/bear case columns. Behind the PDF: floating geometric particles, dark navy background, electric blue and purple accents. Aspect ratio 9:16.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> Top: "What members see every morning." &nbsp; Bottom: "Free sample → your inbox." &nbsp; · &nbsp; <strong>CTA:</strong> "Get it free"</p>
+
+<hr>
+
+<h2 class="sec">Hook 8 — "Bull Case / Bear Case"</h2>
+<p>Highlights two-sided analysis as the differentiator vs newsletter-style hype. Strong on warm audiences.</p>
+
+<p class="prompt-label">P8.1 — Meta feed (1:1)</p>
+<div class="prompt">A premium fintech ad. Two glass-effect translucent panels side by side, separated by a thin glowing vertical line. Left panel labeled "BULL CASE" in green with a small upward arrow, containing 3 lines of mock analyst-style text. Right panel labeled "BEAR CASE" in red with a small downward arrow, containing 3 lines of mock text. Above both panels, a stock ticker (TSLA) and an Atlas Score of 78. Dark navy background, electric blue glow underneath. Aspect ratio 1:1.</div>
+<p style="font-size:13px;color:var(--tx-2)"><strong>Overlay text:</strong> "Both sides. On every stock. Every day." &nbsp; · &nbsp; <strong>CTA chip:</strong> "Try Atlas →"</p>
+
+<hr>
+
+<h2 class="sec">Quick reference — aspect ratios &amp; placements</h2>
+<table class="tbl">
+<thead><tr><th>Placement</th><th>Aspect ratio</th><th>Recommended pixel size</th></tr></thead>
+<tbody>
+<tr><td>Meta feed (Facebook + Instagram)</td><td class="num">1:1</td><td class="num">1080 × 1080</td></tr>
+<tr><td>Meta Reels / Stories / TikTok</td><td class="num">9:16</td><td class="num">1080 × 1920</td></tr>
+<tr><td>Meta carousel card</td><td class="num">1:1</td><td class="num">1080 × 1080</td></tr>
+<tr><td>Google Display banner</td><td class="num">1.91:1</td><td class="num">1200 × 628</td></tr>
+<tr><td>Google Display square</td><td class="num">1:1</td><td class="num">1200 × 1200</td></tr>
+<tr><td>YouTube companion</td><td class="num">1:1 or 1.91:1</td><td class="num">1200 × 1200 or 1200 × 628</td></tr>
+</tbody>
+</table>
+
+<h2 class="sec">Negative prompt — append if Gemini gives you junk</h2>
+<div class="prompt">Avoid: stock photo people, generic business clipart, stock chart screenshots from Yahoo Finance, anything with text or letters baked into the image, blurry low-quality renders, cluttered backgrounds, neon/cyberpunk overload, cheesy lens flares, watermarks.</div>
+<p style="font-size:13px;color:var(--tx-2)">Gemini doesn't always honor "no text in the image" — generate 4 variations and pick the cleanest. Add headline text in Canva/Figma after, never let Gemini try to render the headline (it will misspell it).</p>
 
 </main>
 
