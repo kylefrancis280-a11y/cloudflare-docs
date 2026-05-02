@@ -123,15 +123,32 @@ async function callAnthropic(agent, input, context) {
   let currentModel = agent.model;
   let fellBack = false;
 
-  async function tryModel(modelToUse, maxRetries, timeoutMs) {
+  // deadlineMs (optional): absolute wall-clock cutoff. Stops retrying once
+  // we wouldn't have time for another realistic attempt — prevents the
+  // Haiku retry loop from chaining stalls past Netlify's 26s ceiling and
+  // turning a recoverable transient into an opaque 502.
+  async function tryModel(modelToUse, maxRetries, timeoutMs, deadlineMs) {
     const effectiveTimeout = timeoutMs || SONNET_TIMEOUT_MS;
     let attempt = 0;
     const localBody = { ...body, model: modelToUse };
+    const stalledSentinel = () => ({
+      _stalled: true,
+      status:   599,
+      ok:       false,
+      headers:  { get: () => null },
+      text:     async () => '',
+    });
     while (true) {
+      if (deadlineMs && Date.now() + 1500 >= deadlineMs) return stalledSentinel();
+      const perAttemptTimeout = deadlineMs
+        ? Math.max(2000, Math.min(effectiveTimeout, deadlineMs - Date.now() - 500))
+        : effectiveTimeout;
       const abortCtrl = new AbortController();
-      const abortTimer = setTimeout(() => abortCtrl.abort(), effectiveTimeout);
+      const abortTimer = setTimeout(() => abortCtrl.abort(), perAttemptTimeout);
+      let r = null;
+      let stalled = false;
       try {
-        const r = await fetch(ANTHROPIC_URL, {
+        r = await fetch(ANTHROPIC_URL, {
           method: 'POST',
           headers: {
             'x-api-key':          process.env.ANTHROPIC_API_KEY,
@@ -143,27 +160,23 @@ async function callAnthropic(agent, input, context) {
           signal: abortCtrl.signal,
         });
         clearTimeout(abortTimer);
-        if (r.status !== 429 && r.status !== 529 && r.status !== 503) return r;
-        attempt++;
-        if (attempt > maxRetries) return r;
-        const retryAfter = parseInt(r.headers.get('retry-after') || '0', 10);
-        const backoffMs = Math.min(2000, 1000 * attempt);
-        const delay = (retryAfter > 0 && retryAfter < 3)
-          ? retryAfter * 1000
-          : backoffMs;
-        await new Promise(r => setTimeout(r, delay));
       } catch (e) {
         clearTimeout(abortTimer);
-        if (e.name === 'AbortError') {
-          // Convert timeout into a stall signal the caller can detect and
-          // route to Haiku fallback. Previously this was a hard throw, so
-          // a stalled (non-erroring) Sonnet pod meant the request died
-          // entirely. Now we surface it as a sentinel "stalled" response
-          // and let the orchestration layer flip models.
-          return { _stalled: true, status: 599, headers: { get: () => null } };
-        }
-        throw e;
+        if (e.name !== 'AbortError') throw e;
+        stalled = true;
       }
+      const retryable = stalled || (r && (r.status === 429 || r.status === 529 || r.status === 503));
+      if (!retryable) return r;
+      attempt++;
+      if (attempt > maxRetries) return stalled ? stalledSentinel() : r;
+      const retryAfter = r ? parseInt(r.headers.get('retry-after') || '0', 10) : 0;
+      const backoffMs = Math.min(2000, 1000 * attempt);
+      const baseDelay = (retryAfter > 0 && retryAfter < 3) ? retryAfter * 1000 : backoffMs;
+      const cappedDelay = deadlineMs
+        ? Math.min(baseDelay, Math.max(0, deadlineMs - Date.now() - 1500))
+        : baseDelay;
+      if (deadlineMs && cappedDelay <= 0) return stalled ? stalledSentinel() : r;
+      await new Promise(resolve => setTimeout(resolve, cappedDelay));
     }
   }
 
@@ -201,11 +214,15 @@ async function callAnthropic(agent, input, context) {
     currentModel = FALLBACK_MODEL;
     fellBack = true;
     // Give Haiku the remaining budget minus a 500ms safety margin for
-    // response parsing + any back-pressure.
+    // response parsing + any back-pressure. The deadline is shared across
+    // all retries so a stalled pod can't chain timeouts past Netlify's
+    // 26s ceiling.
     const haikuBudget = Math.max(FALLBACK_MIN_BUDGET_MS, remaining - 500);
-    // 2 retries on Haiku (its own pod might also be busy). With 12s Sonnet
-    // timeout we now have ~13.5s for Haiku — enough for 3 attempts at 4s each.
-    res = await tryModel(FALLBACK_MODEL, 2, haikuBudget);
+    const haikuDeadline = callStart + NETLIFY_BUDGET_MS - 500;
+    // Per-attempt cap of 6s (Haiku at 450 tok/s comfortably finishes 2000 tok
+    // in ~5s). With 2 retries + backoff the loop now self-bounds against
+    // haikuDeadline rather than running 3× per-attempt-timeout in worst case.
+    res = await tryModel(FALLBACK_MODEL, 2, Math.min(6000, haikuBudget), haikuDeadline);
     if (res._stalled === true) {
       throw new Error(`Anthropic stalled on both Sonnet and Haiku — agent ${agent.id} timed out twice. Anthropic may be experiencing a major incident; check status.anthropic.com.`);
     }

@@ -272,10 +272,20 @@ exports.handler = async (event) => {
       return respond(403, { error: "URL not from an allowed domain" });
     }
 
+    // Lambda response cap is 6MB. Anything larger MUST go through the edge
+    // function at /proxy-clip — base64-buffering a 50MB clip will OOM the fn.
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 20000);
     try {
-      const r = await fetch(url);
-      if (!r.ok) return respond(502, { error: "CDN fetch failed: HTTP " + r.status });
+      const r = await fetch(url, { signal: ctrl.signal });
+      if (!r.ok) return respond(r.status === 404 ? 404 : 502, { error: "CDN fetch failed: HTTP " + r.status });
       const buf = await r.arrayBuffer();
+      if (buf.byteLength > 5 * 1024 * 1024) {
+        return respond(413, {
+          error: "Clip too large for Lambda proxy (>5MB). Use /proxy-clip edge function.",
+          bytes: buf.byteLength,
+        });
+      }
       const ct = r.headers.get("content-type") || "video/mp4";
       return {
         statusCode: 200,
@@ -283,12 +293,15 @@ exports.handler = async (event) => {
           "Access-Control-Allow-Origin": "https://shotbreak.io",
           "Content-Type": ct,
           "Cache-Control": "public, max-age=3600",
+          "Accept-Ranges": "bytes",
         },
         body: Buffer.from(buf).toString("base64"),
         isBase64Encoded: true,
       };
     } catch (e) {
       return respond(502, { error: "Proxy fetch failed: " + e.message });
+    } finally {
+      clearTimeout(timer);
     }
   }
 

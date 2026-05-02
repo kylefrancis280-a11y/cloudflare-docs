@@ -1466,6 +1466,26 @@ async function hdrs(){const t=await getToken();if(!t)throw new Error("Not signed
 // Expose to window so code outside this IIFE (e.g. Media Hub) can use it.
 window.hdrs=hdrs;
 window.getToken=getToken;
+// Force a real file download for cross-origin clip URLs. The HTML `download`
+// attribute is ignored by browsers when the href is cross-origin, so we proxy
+// the bytes and hand the user a blob URL instead.
+window.sbDownloadClip=async function(url,filename){
+  try{
+    let blob;
+    if(url.startsWith('blob:')||url.startsWith('data:')){
+      blob=await (await fetch(url)).blob();
+    }else{
+      const h=await window.hdrs();
+      const r=await fetch('/proxy-clip',{method:'POST',headers:h,body:JSON.stringify({url})});
+      if(!r.ok)throw new Error('proxy-clip HTTP '+r.status);
+      blob=await r.blob();
+    }
+    const burl=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=burl;a.download=filename||'clip.mp4';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(burl),60000);
+  }catch(e){console.error('[sbDownloadClip]',e);alert('Download failed: '+(e.message||e))}
+};
 
 // Defensive response unpacking — handles WaveSpeed shape variations
 function pickStatus(d){return d&&(d.status||d.state||(d.data&&d.data.status))||"IN_QUEUE"}
@@ -1764,10 +1784,10 @@ V._updateUI=function(){
     const label=s==="COMPLETED"?"✓ Ready":s==="FAILED"?"✗ Failed":s==="IN_PROGRESS"?"⚙ Rendering...":"⏳ Queued — waiting for GPU";
     let h='<span class="vg-dot vg-dot-'+cls+'"></span><span style="color:'+col+';font-weight:600">'+label+'</span>';
     if(job.charLock)h+=' <span style="color:var(--green);font-size:9px;font-weight:700;margin-left:6px">🔒 '+job.charLock+'</span>';
-    if(job.videoUrl)h+=' <a href="'+job.videoUrl+'" download="SC'+job.scene+'_SH'+job.shot+'.mp4" style="color:var(--gold);font-size:10px;text-decoration:none;margin-left:6px">⬇ Download</a>';
+    if(job.videoUrl)h+=' <a href="#" onclick="event.preventDefault();window.sbDownloadClip(\''+job.videoUrl.replace(/\\/g,"\\\\").replace(/'/g,"\\'")+'\',\'SC'+job.scene+'_SH'+job.shot+'.mp4\')" style="color:var(--gold);font-size:10px;text-decoration:none;margin-left:6px">⬇ Download</a>';
     el.innerHTML=h;
     const pvEl=document.getElementById("vg-pv-"+job.scene+"-"+job.shot);
-    if(job.videoUrl&&pvEl&&!pvEl.querySelector("video")){pvEl.innerHTML='<div class="vg-preview"><video src="'+job.videoUrl+'" controls preload="metadata" style="max-width:100%;border-radius:6px;margin-top:6px"></video></div>'}
+    if(job.videoUrl&&pvEl&&!pvEl.querySelector("video")){pvEl.innerHTML='<div class="vg-preview"><video src="'+job.videoUrl+'" controls playsinline preload="metadata" style="max-width:100%;border-radius:6px;margin-top:6px"></video></div>'}
   });
 };
 
@@ -1779,14 +1799,14 @@ const clips=[...V.jobs.entries()].filter(([,j])=>j.videoUrl).sort((a,b)=>(a[1].s
 let h='<button class="vg-close" onclick="SBVideo._closeGallery()">✕</button><div class="vg-gallery"><h2>SHOT<span>BREAK</span> Generated Clips — '+clips.length+'</h2>';
 if(!clips.length)h+='<p style="color:var(--dim)">No clips yet. Generate some shots first.</p>';
 else{h+='<div style="margin-bottom:14px"><button class="b b-gold b-s" onclick="SBVideo._zipAll()">⬇ DOWNLOAD ALL AS ZIP</button></div><div class="vg-grid">';
-clips.forEach(([,j])=>{h+='<div class="vg-card"><video src="'+j.videoUrl+'" controls preload="metadata"></video><div class="vg-card-info"><strong>Scene '+j.scene+' — Shot '+j.shot+'</strong><br><a href="'+j.videoUrl+'" download="SC'+j.scene+'_SH'+j.shot+'.mp4" style="color:var(--gold)">Download</a></div></div>'});h+='</div>'}
+clips.forEach(([,j])=>{const _u=j.videoUrl.replace(/\\/g,"\\\\").replace(/'/g,"\\'");h+='<div class="vg-card"><video src="'+j.videoUrl+'" controls playsinline preload="metadata"></video><div class="vg-card-info"><strong>Scene '+j.scene+' — Shot '+j.shot+'</strong><br><a href="#" onclick="event.preventDefault();window.sbDownloadClip(\''+_u+'\',\'SC'+j.scene+'_SH'+j.shot+'.mp4\')" style="color:var(--gold)">Download</a></div></div>'});h+='</div>'}
 h+='</div>';ov.innerHTML=h;ov.classList.add("open")};
 V._closeGallery=function(){const ov=document.getElementById("vg-overlay");if(ov)ov.classList.remove("open")};
 
 V._zipAll=async function(){if(typeof JSZip==="undefined"){alert("JSZip not loaded");return}
 const clips=[...V.jobs.entries()].filter(([,j])=>j.videoUrl).sort((a,b)=>(a[1].scene*100+a[1].shot)-(b[1].scene*100+b[1].shot));if(!clips.length)return;
 const z=new JSZip(),f=z.folder("SHOTBREAK_Clips");const _zh=await window.hdrs();for(const[,j]of clips){try{const _zr=await fetch('/proxy-clip',{method:'POST',headers:_zh,body:JSON.stringify({url:j.videoUrl})});if(!_zr.ok)continue;const b=await _zr.blob();f.file("SC"+String(j.scene).padStart(2,"0")+"_SH"+String(j.shot).padStart(2,"0")+".mp4",b)}catch(e){}}
-const content=await z.generateAsync({type:"blob"});const a=document.createElement("a");a.href=URL.createObjectURL(content);a.download="SHOTBREAK_Clips.zip";a.click();URL.revokeObjectURL(a.href)};
+const content=await z.generateAsync({type:"blob"});const a=document.createElement("a");const _zu=URL.createObjectURL(content);a.href=_zu;a.download="SHOTBREAK_Clips.zip";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(_zu),60000)};
 
 // ═══════════════════════════════════════════════════════════════════════
 // STITCHER MODULE — FFmpeg.wasm in-browser editor
@@ -4777,10 +4797,11 @@ function mhRenderClipsGrid(){
   for(const j of done){
     const label='S'+(j.sceneIdx+1)+'.'+(j.shotIdx+1);
     h+='<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden">';
-    h+='<video src="'+j.videoUrl+'" controls style="width:100%;display:block;background:#000"></video>';
+    h+='<video src="'+j.videoUrl+'" controls playsinline preload="metadata" style="width:100%;display:block;background:#000"></video>';
     h+='<div style="padding:10px"><div style="color:var(--gold);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px">'+label+'</div>';
     h+='<div style="color:var(--dim);font-size:12px;line-height:1.3;max-height:48px;overflow:hidden">'+esc(j.prompt.substring(0,100))+'...</div>';
-    h+='<div style="margin-top:8px;display:flex;gap:4px"><a href="'+j.videoUrl+'" download="shotbreak_'+label+'.mp4" class="b b-g b-xs">⬇ Download</a><button class="b b-gold b-xs" onclick="mhEditAddClipByLabel(\''+label+'\')">+ Editor</button></div>';
+    const _mu=j.videoUrl.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+    h+='<div style="margin-top:8px;display:flex;gap:4px"><a href="#" onclick="event.preventDefault();window.sbDownloadClip(\''+_mu+'\',\'shotbreak_'+label+'.mp4\')" class="b b-g b-xs">⬇ Download</a><button class="b b-gold b-xs" onclick="mhEditAddClipByLabel(\''+label+'\')">+ Editor</button></div>';
     h+='</div></div>';
   }
   inner.innerHTML=h;
