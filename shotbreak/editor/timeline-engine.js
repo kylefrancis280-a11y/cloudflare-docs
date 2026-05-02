@@ -131,6 +131,7 @@
     state.timeline.forEach(inst => {
       const bc = binClipOf(inst);
       if (!bc) return;
+      if (!inst.transitionIn) inst.transitionIn = { type: 'hard_cut', duration: 0 };
       const lane = inst.track === 'V1' ? laneV1 : laneA1;
       const el = document.createElement('div');
       el.className = 'clip' + (inst.id === state.selectedClipId ? ' selected' : '');
@@ -167,7 +168,12 @@
     }
     const inst = state.timeline.find(c => c.id === state.selectedClipId);
     if (!inst) return;
+    if (!inst.transitionIn) inst.transitionIn = { type: 'hard_cut', duration: 0 };
     const bc = binClipOf(inst);
+    if (!bc) {
+      inspectorEl.innerHTML = `<h3>Inspector</h3><div class="inspector-empty">Source clip missing from bin.</div>`;
+      return;
+    }
     const clipDur = (inst.sourceOut - inst.sourceIn).toFixed(2);
     const srcDur = bc.duration.toFixed(2);
 
@@ -258,33 +264,16 @@
   // ---------- Clip interactions (drag, trim) ----------
 
   function attachClipInteractions(el, inst) {
-    // Select on mousedown
-    el.addEventListener('mousedown', e => {
-      if (e.target.classList.contains('handle')) return;
-      state.selectedClipId = inst.id;
-      renderAll();
-    });
-
-    // Drag to reorder
     let dragMode = null;     // 'move' | 'trim-l' | 'trim-r'
     let startX = 0, startStart = 0, startIn = 0, startOut = 0;
+    let moved = false;
 
-    const onDown = e => {
-      e.preventDefault();
-      startX = e.clientX;
-      startStart = inst.start;
-      startIn = inst.sourceIn;
-      startOut = inst.sourceOut;
-      if (e.target.dataset.edge === 'left') dragMode = 'trim-l';
-      else if (e.target.dataset.edge === 'right') dragMode = 'trim-r';
-      else dragMode = 'move';
-      document.addEventListener('mousemove', onMove);
-      document.addEventListener('mouseup', onUp);
-    };
     const onMove = e => {
       const dx = e.clientX - startX;
       const dSec = pxToSec(dx);
+      if (Math.abs(dx) > 2) moved = true;
       const bc = binClipOf(inst);
+      if (!bc) return;
       if (dragMode === 'move') {
         inst.start = Math.max(0, startStart + dSec);
       } else if (dragMode === 'trim-l') {
@@ -303,11 +292,31 @@
       document.removeEventListener('mouseup', onUp);
       dragMode = null;
     };
-    el.querySelector('.handle.left')?.addEventListener('mousedown', onDown);
-    el.querySelector('.handle.right')?.addEventListener('mousedown', onDown);
-    el.addEventListener('mousedown', e => {
-      if (!e.target.classList.contains('handle')) onDown(e);
-    });
+    const onDown = e => {
+      e.preventDefault();
+      e.stopPropagation();
+      startX = e.clientX;
+      startStart = inst.start;
+      startIn = inst.sourceIn;
+      startOut = inst.sourceOut;
+      moved = false;
+      if (e.target.dataset.edge === 'left') dragMode = 'trim-l';
+      else if (e.target.dataset.edge === 'right') dragMode = 'trim-r';
+      else dragMode = 'move';
+      // Select immediately, but defer renderAll to avoid destroying the element
+      // mid-event. Without this, the drag would still work via closures, but
+      // selection state would render stale until the next move.
+      if (state.selectedClipId !== inst.id) {
+        state.selectedClipId = inst.id;
+        renderInspector();
+        // Mark current el as selected without full re-render
+        document.querySelectorAll('.clip.selected').forEach(n => n.classList.remove('selected'));
+        el.classList.add('selected');
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    };
+    el.addEventListener('mousedown', onDown);
   }
 
   // ---------- Drop target: bin → timeline ----------
@@ -468,14 +477,20 @@
 
     // Audio: if the active video clip has no native audio usable or there's a separate A1 clip,
     // play A1 on previewB. Keep simple: previewB becomes an audio source if aClip differs from vClip.
-    if (aClip && (!vClip || binClipOf(aClip).id !== binClipOf(vClip).id)) {
+    const aBin = aClip ? binClipOf(aClip) : null;
+    const vBin = vClip ? binClipOf(vClip) : null;
+    if (aBin && (!vBin || aBin.id !== vBin.id)) {
       if (previewB.dataset.clipId !== aClip.id) {
         previewB.dataset.clipId = aClip.id;
-        previewB.src = binClipOf(aClip).src;
+        previewB.src = aBin.src;
         previewB.muted = false;
       }
       const relSec = (sec - aClip.start) + aClip.sourceIn;
       if (Math.abs(previewB.currentTime - relSec) > 0.1) previewB.currentTime = relSec;
+      // When the timeline has its own audio track, mute the video element to avoid double-audio.
+      previewA.muted = true;
+    } else {
+      previewA.muted = false;
     }
   }
 
@@ -493,6 +508,7 @@
       if (state.playhead >= total) state.playhead = 0;
       seekPreview();
       previewA.play().catch(() => {});
+      if (previewB.src) previewB.play().catch(() => {});
       const tickStart = performance.now();
       const startSec = state.playhead;
       state.playTimer = setInterval(() => {
@@ -513,7 +529,7 @@
 
   ruler.addEventListener('click', e => {
     const rect = ruler.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    const x = e.clientX - rect.left - 60; // ruler-inner is offset 60px to align with track lanes
     state.playhead = Math.max(0, pxToSec(x));
     seekPreview();
     renderPlayhead();
@@ -689,7 +705,7 @@
     await ff.deleteFile('list.txt').catch(() => {});
     await ff.deleteFile(outName).catch(() => {});
 
-    return new Blob([data.buffer], { type: 'video/mp4' });
+    return new Blob([data], { type: 'video/mp4' });
   }
 
   $('btn-render').addEventListener('click', async () => {
