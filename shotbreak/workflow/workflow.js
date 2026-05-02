@@ -3371,7 +3371,7 @@ function renderGenerateStep(p){
             <div class="shot-grid">
               ${Object.entries(clips).slice(0, 12).map(([key, c]) => `
                 <div class="shot-card" style="padding:10px">
-                  ${c.url ? `<video src="${esc(c.url)}" preload="metadata" muted style="width:100%;border-radius:6px;background:#000"></video>` : ''}
+                  ${c.url ? `<video src="${esc(c.url)}" preload="metadata" controls muted playsinline style="width:100%;border-radius:6px;background:#000"></video>` : ''}
                   <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-top:6px">
                     ${esc(key)}${c.model ? ` · ${esc(c.model)}` : ''}
                   </div>
