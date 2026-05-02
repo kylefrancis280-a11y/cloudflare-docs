@@ -126,15 +126,33 @@ async function callAnthropic(agent, input, context, callStart) {
     messages: [{ role: 'user', content: `${userMessage}${contextualBrief}` }],
   };
 
-  async function tryModel(modelToUse, maxRetries, timeoutMs) {
+  // deadlineMs (optional): absolute wall-clock cutoff. Stops the retry loop
+  // before it can overrun the Netlify 26s ceiling. Stalls are also retryable
+  // (counted against maxRetries like 429/529/503) — previously an AbortError
+  // returned the sentinel immediately, so a single bad pod killed the whole
+  // request even when retries were available.
+  async function tryModel(modelToUse, maxRetries, timeoutMs, deadlineMs) {
     const effectiveTimeout = timeoutMs || SONNET_TIMEOUT_MS;
     let attempt = 0;
     const localBody = { ...body, model: modelToUse };
+    const stalledSentinel = () => ({
+      _stalled: true,
+      status:   599,
+      ok:       false,
+      headers:  { get: () => null },
+      text:     async () => '',
+    });
     while (true) {
+      if (deadlineMs && Date.now() + 1500 >= deadlineMs) return stalledSentinel();
+      const perAttemptTimeout = deadlineMs
+        ? Math.max(2000, Math.min(effectiveTimeout, deadlineMs - Date.now() - 500))
+        : effectiveTimeout;
       const abortCtrl = new AbortController();
-      const abortTimer = setTimeout(() => abortCtrl.abort(), effectiveTimeout);
+      const abortTimer = setTimeout(() => abortCtrl.abort(), perAttemptTimeout);
+      let r = null;
+      let stalled = false;
       try {
-        const r = await fetch(ANTHROPIC_URL, {
+        r = await fetch(ANTHROPIC_URL, {
           method: 'POST',
           headers: {
             'x-api-key':                process.env.ANTHROPIC_API_KEY,
@@ -146,18 +164,23 @@ async function callAnthropic(agent, input, context, callStart) {
           signal: abortCtrl.signal,
         });
         clearTimeout(abortTimer);
-        if (r.status !== 429 && r.status !== 529 && r.status !== 503) return r;
-        attempt++;
-        if (attempt > maxRetries) return r;
-        const retryAfter = parseInt(r.headers.get('retry-after') || '0', 10);
-        const backoffMs  = Math.min(2000, 1000 * attempt);
-        const delay      = (retryAfter > 0 && retryAfter < 3) ? retryAfter * 1000 : backoffMs;
-        await new Promise(res => setTimeout(res, delay));
       } catch (e) {
         clearTimeout(abortTimer);
-        if (e.name === 'AbortError') return { _stalled: true, status: 599, headers: { get: () => null } };
-        throw e;
+        if (e.name !== 'AbortError') throw e;
+        stalled = true;
       }
+      const retryable = stalled || (r && (r.status === 429 || r.status === 529 || r.status === 503));
+      if (!retryable) return r;
+      attempt++;
+      if (attempt > maxRetries) return stalled ? stalledSentinel() : r;
+      const retryAfter = r ? parseInt(r.headers.get('retry-after') || '0', 10) : 0;
+      const backoffMs  = Math.min(2000, 1000 * attempt);
+      const baseDelay  = (retryAfter > 0 && retryAfter < 3) ? retryAfter * 1000 : backoffMs;
+      const cappedDelay = deadlineMs
+        ? Math.min(baseDelay, Math.max(0, deadlineMs - Date.now() - 1500))
+        : baseDelay;
+      if (deadlineMs && cappedDelay <= 0) return stalled ? stalledSentinel() : r;
+      await new Promise(resolve => setTimeout(resolve, cappedDelay));
     }
   }
 
@@ -165,7 +188,8 @@ async function callAnthropic(agent, input, context, callStart) {
   let currentModel = agent.model;
   let fellBack = false;
 
-  res = await tryModel(currentModel, 0);
+  const orchestrationDeadline = callStart + NETLIFY_BUDGET_MS - 500;
+  res = await tryModel(currentModel, 0, SONNET_TIMEOUT_MS, orchestrationDeadline);
 
   if (res._stalled || res.status === 429 || res.status === 529 || res.status === 503) {
     const elapsed    = Date.now() - callStart;
@@ -179,7 +203,7 @@ async function callAnthropic(agent, input, context, callStart) {
     }));
     currentModel = FALLBACK_MODEL;
     fellBack = true;
-    res = await tryModel(FALLBACK_MODEL, 1, Math.max(FALLBACK_MIN_BUDGET_MS, remaining - 500));
+    res = await tryModel(FALLBACK_MODEL, 1, Math.min(6000, Math.max(FALLBACK_MIN_BUDGET_MS, remaining - 500)), orchestrationDeadline);
     if (res._stalled) throw new Error(`Anthropic stalled on both Sonnet and Haiku — agent ${agent.id} timed out twice.`);
   }
 

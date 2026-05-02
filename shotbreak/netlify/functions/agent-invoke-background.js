@@ -115,14 +115,27 @@ async function callAnthropic(agent, input, context) {
     messages: [{ role: 'user', content: `${userMessage}${brief}` }],
   };
 
+  // Stalls (AbortError) are retryable here too — previously they returned
+  // the sentinel immediately, defeating the maxRetries=2/3 budget. In
+  // background mode we have 15 minutes, so a single bad pod is no excuse
+  // to give up.
   async function tryModel(model, timeoutMs, maxRetries = 2) {
     let attempt = 0;
     const localBody = { ...body, model };
+    const stalledSentinel = () => ({
+      _stalled: true,
+      status:   599,
+      ok:       false,
+      headers:  { get: () => null },
+      text:     async () => '',
+    });
     while (true) {
       const ctrl  = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+      let r = null;
+      let stalled = false;
       try {
-        const r = await fetch(ANTHROPIC_URL, {
+        r = await fetch(ANTHROPIC_URL, {
           method: 'POST',
           headers: {
             'x-api-key':         process.env.ANTHROPIC_API_KEY,
@@ -134,16 +147,20 @@ async function callAnthropic(agent, input, context) {
           signal: ctrl.signal,
         });
         clearTimeout(timer);
-        if (r.status !== 429 && r.status !== 529 && r.status !== 503) return r;
-        attempt++;
-        if (attempt > maxRetries) return r;
-        const retryAfter = parseInt(r.headers.get('retry-after') || '0', 10);
-        await new Promise(res => setTimeout(res, retryAfter > 0 && retryAfter < 10 ? retryAfter * 1000 : Math.min(4000, 1000 * attempt)));
       } catch (e) {
         clearTimeout(timer);
-        if (e.name === 'AbortError') return { _stalled: true, status: 599, headers: { get: () => null } };
-        throw e;
+        if (e.name !== 'AbortError') throw e;
+        stalled = true;
       }
+      const retryable = stalled || (r && (r.status === 429 || r.status === 529 || r.status === 503));
+      if (!retryable) return r;
+      attempt++;
+      if (attempt > maxRetries) return stalled ? stalledSentinel() : r;
+      const retryAfter = r ? parseInt(r.headers.get('retry-after') || '0', 10) : 0;
+      const baseDelay  = retryAfter > 0 && retryAfter < 10
+        ? retryAfter * 1000
+        : Math.min(4000, 1000 * attempt);
+      await new Promise(resolve => setTimeout(resolve, baseDelay));
     }
   }
 
