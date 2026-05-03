@@ -379,6 +379,23 @@ exports.handler = async function (event) {
   if (!agent_id)           { logTelemetry({ status: 'rejected', http_status: 400, error_code: 'NO_AGENT_ID' }); return respond(400, { error: 'agent_id required' }); }
   if (input === undefined) { logTelemetry({ status: 'rejected', http_status: 400, error_code: 'NO_INPUT', agent_id }); return respond(400, { error: 'input required' }); }
 
+  // Hard cap on raw input size. The per-key context trimmer downstream caps
+  // each context key at 15KB, but the `input` field has no cap — a 200KB+
+  // shot_list dump was burning the Netlify 26s budget waiting on Anthropic
+  // and surfacing as opaque 502s. Reject up-front with an actionable error
+  // so the frontend can chunk/trim instead of retrying a doomed request.
+  const inputSize = typeof input === 'string' ? input.length : JSON.stringify(input).length;
+  const INPUT_CAP_CHARS = 80 * 1024;
+  if (inputSize > INPUT_CAP_CHARS) {
+    logTelemetry({ agent_id, status: 'rejected', http_status: 413, error_code: 'INPUT_TOO_LARGE', error_msg: `input ${inputSize} > ${INPUT_CAP_CHARS}` });
+    return respond(413, {
+      error: 'Input too large',
+      detail: `Input is ${Math.round(inputSize/1024)}KB, max ${INPUT_CAP_CHARS/1024}KB. Trim shot_list or context before invoking.`,
+      input_size: inputSize,
+      max_size: INPUT_CAP_CHARS,
+    });
+  }
+
   let agent;
   try { agent = getAgent(agent_id); }
   catch (e) { logTelemetry({ agent_id, status: 'rejected', http_status: 404, error_code: 'AGENT_NOT_FOUND', error_msg: e.message }); return respond(404, { error: e.message }); }

@@ -437,9 +437,13 @@ function buildContext(p, extras, opts){
 // a healthy pod, we land most of the remaining ~5% of failed calls.
 // Backoff is 1.5s then 3s (escalating) — gives Anthropic real time to
 // recover instead of hammering a bad pod twice in quick succession.
-async function runPassive(agentId, input, p, onOk){
+async function runPassive(agentId, input, p, onOk, opts){
   CrewFeed.log(agentId, 'working');
-  const attempt = () => window.SB_Agents.invoke(agentId, input, { context: buildContext(p) });
+  // opts.noContext: skip context entirely (use when input is self-contained)
+  // opts.lean: strip crew_analysis (~5-10x payload reduction for one-off agents)
+  opts = opts || {};
+  const ctx = opts.noContext ? null : buildContext(p, null, { lean: !!opts.lean });
+  const attempt = () => window.SB_Agents.invoke(agentId, input, ctx ? { context: ctx } : {});
   const MAX_RETRIES = 2;
   const BACKOFFS_MS = [1500, 3000];
   try {
@@ -3410,6 +3414,9 @@ function wireGenerateStep(p){
       }, null, 2),
       p,
       (out) => {
+      // No-context: input already carries shot_list + character_bible inline.
+      // Shipping crew_analysis on top was pushing the request to 150-250KB and
+      // 502'ing on the Netlify 26s ceiling.
         const warnings = out.warnings || [];
         const host = document.querySelector('.main-body-inner');
         if (!host) return;
@@ -3431,7 +3438,8 @@ function wireGenerateStep(p){
         const firstCard = host.querySelector('.card');
         if (firstCard) host.insertBefore(el, firstCard);
         else host.appendChild(el);
-      }
+      },
+      { noContext: true }
     );
   })();
 
