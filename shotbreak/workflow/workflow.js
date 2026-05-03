@@ -37,8 +37,27 @@ else bootWhenReady();
 
 // ── Storage + state ───────────────────────────────────────────────────
 const STORAGE_KEY = 'SB_Projects_v1';
+// Hard cap on retained projects. Prevents unbounded localStorage growth as
+// users keep creating projects and never delete the old ones. Newest
+// (by updated_at, falling back to created_at) wins; oldest are dropped.
+const MAX_PROJECTS = 25;
+function capProjects(all){
+  if (!all || typeof all !== 'object') return all;
+  const ids = Object.keys(all);
+  if (ids.length <= MAX_PROJECTS) return all;
+  const sorted = ids
+    .map(id => [id, all[id]])
+    .sort((a, b) => (b[1].updated_at || b[1].created_at || 0) - (a[1].updated_at || a[1].created_at || 0));
+  const dropped = sorted.length - MAX_PROJECTS;
+  for (let i = MAX_PROJECTS; i < sorted.length; i++) delete all[sorted[i][0]];
+  console.warn('SB: dropped ' + dropped + ' old projects (cap ' + MAX_PROJECTS + ')');
+  return all;
+}
 function loadProjects(){
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e){ return {}; }
+  try {
+    const all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    return capProjects(all);
+  } catch(e){ return {}; }
 }
 
 // Heuristic: max localStorage budget before we proactively prune.
@@ -75,6 +94,7 @@ function pruneOldProjects(all, keepId){
 }
 
 function saveProjects(all, currentId){
+  capProjects(all);
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
   } catch(e){
@@ -531,6 +551,9 @@ async function runPassive(agentId, input, p, onOk, opts){
 async function runCrew(p, agentSpecs, step, targetEl, label){
   p.crew_analysis = p.crew_analysis || {};
   p.crew_analysis[step] = p.crew_analysis[step] || {};
+  // Capture project id at start — user may switch/delete the project mid-run
+  // (30-60s window) and we need to detect that before saving stale state.
+  const projectId = p.id;
 
   // Guard: if somehow targetEl is null (e.g. DOM not rendered yet), fail fast
   // with a user-visible message instead of crashing silently on innerHTML.
@@ -584,11 +607,38 @@ async function runCrew(p, agentSpecs, step, targetEl, label){
         row.querySelector('.crew-status').textContent = 'working';
         row.classList.add('working');
       }
+      // Pre-flight size check — agents queued through the throttle bypass the
+      // upfront checkInputSize that single-agent buttons do, so a fat shot_list
+      // or character_bible could POST to /agent-invoke and burn credits before
+      // the backend rejects. Skip locally instead.
+      if (!checkInputSize(spec.id, spec.input)) {
+        p.crew_analysis[step][spec.id] = { error: 'input_too_large', skipped: true };
+        done++;
+        if (counter) counter.textContent = `${done} / ${specs.length}`;
+        if (row) {
+          row.querySelector('.crew-dot').style.color = '#B03030';
+          row.querySelector('.crew-status').textContent = 'too large';
+          row.classList.remove('working');
+          row.classList.add('err');
+        }
+        continue;
+      }
       const r = await runPassive(spec.id, spec.input, p);
       done++;
       if (counter) counter.textContent = `${done} / ${specs.length}`;
       if (r.ok) {
         p.crew_analysis[step][spec.id] = r.output;
+        // Merge per-agent output onto the latest on-disk project so concurrent
+        // edits (or project switches) don't get clobbered by the stale `p`
+        // we've been holding for 30-60s.
+        const fresh = getProject(projectId);
+        if (!fresh) {
+          console.warn('runCrew: project ' + projectId + ' deleted mid-run, aborting save');
+        } else {
+          fresh.crew_analysis = fresh.crew_analysis || {};
+          fresh.crew_analysis[step] = Object.assign({}, fresh.crew_analysis[step] || {}, { [spec.id]: r.output });
+          saveProject(fresh);
+        }
         if (row) {
           row.querySelector('.crew-dot').style.color = '#2E6B3E';
           row.querySelector('.crew-status').textContent = 'complete';
@@ -606,7 +656,17 @@ async function runCrew(p, agentSpecs, step, targetEl, label){
 
   for (let i = 0; i < CONCURRENCY; i++) runners.push(worker());
   await Promise.all(runners);
-  saveProject(p);
+  // Final save — re-read the latest project and merge our crew_analysis[step]
+  // onto it. Avoids overwriting any other field the user (or another async
+  // task) may have updated while the crew was running.
+  const fresh = getProject(projectId);
+  if (!fresh) {
+    console.warn('runCrew: project ' + projectId + ' deleted mid-run, aborting save');
+  } else {
+    fresh.crew_analysis = fresh.crew_analysis || {};
+    fresh.crew_analysis[step] = Object.assign({}, fresh.crew_analysis[step] || {}, p.crew_analysis[step]);
+    saveProject(fresh);
+  }
 
   // Render collapsed summary of successful outputs WITH apply panels so the
   // user can push agent suggestions straight into project state.
@@ -1820,7 +1880,10 @@ function wireVisionStep(p){
     // into the latest-on-disk project in a single save. Previously each
     // onOk callback wrote independently — whichever finished second clobbered
     // the first's writes (fields outside its own write set were stale).
-    Promise.all([
+    // Use allSettled so one rejection doesn't skip the merge for the other.
+    // Promise.all would short-circuit on the first reject and the .then never
+    // fires — user sees the spinner clear (via .finally) but no result lands.
+    Promise.allSettled([
       runPassive('genre-specialist',
         JSON.stringify({ vision: p.vision, instruction: 'List 5-8 genre conventions for ' + genre + ' to honor in this project. Return {conventions: [string], visual_motifs: [string], avoid: [string]}.' }, null, 2),
         p, null
@@ -1832,15 +1895,18 @@ function wireVisionStep(p){
     ]).then(([genreRes, colorRes]) => {
       const latest = getProject(p.id) || p;
       let changed = false;
-      if (genreRes && genreRes.ok && genreRes.output) {
-        latest.genre_tags = genreRes.output;
+      if (genreRes.status === 'fulfilled' && genreRes.value && genreRes.value.ok && genreRes.value.output) {
+        // Object.assign onto existing genre_tags so manually-edited sibling
+        // fields (notes, references) survive the passive-agent merge.
+        latest.genre_tags = Object.assign(latest.genre_tags || {}, genreRes.value.output);
         changed = true;
       }
-      if (colorRes && colorRes.ok && colorRes.output) {
-        const out = colorRes.output;
+      if (colorRes.status === 'fulfilled' && colorRes.value && colorRes.value.ok && colorRes.value.output) {
+        const out = colorRes.value.output;
         if (out.primary || out.secondary || out.accent) {
           latest.vision = latest.vision || {};
-          latest.vision.palette = { primary: out.primary, secondary: out.secondary, accent: out.accent, rationale: out.rationale };
+          // Preserve sibling palette fields (notes, references) by merging.
+          latest.vision.palette = Object.assign(latest.vision.palette || {}, { primary: out.primary, secondary: out.secondary, accent: out.accent, rationale: out.rationale });
           changed = true;
         }
       }
@@ -3495,11 +3561,17 @@ function wireGenerateStep(p){
     for (const [name, c] of Object.entries(p.character_bible || {})) {
       if (!c) continue;
       slimBible[name] = {
-        consistency_phrase: c.consistency_phrase || '',
-        visual_anchors:     c.visual_anchors || [],
-        wardrobe_default:   c.wardrobe_default || '',
-        signature_props:    c.signature_props || [],
-        scenes_present:     c.scenes_present || 0,
+        consistency_phrase:    c.consistency_phrase || '',
+        visual_anchors:        c.visual_anchors || [],
+        wardrobe_default:      c.wardrobe_default || '',
+        signature_props:       c.signature_props || [],
+        scenes_present:        c.scenes_present || 0,
+        // Keep canonical_description and reference_image_url so downstream
+        // agents reusing this slim shape (prompt-smith, scene-architect) still
+        // have visual identity anchors. Both are short single strings — the
+        // size win came from dropping core_wound/moral_flaw/arc_trajectory.
+        canonical_description: c.canonical_description || '',
+        reference_image_url:   c.reference_image_url || '',
       };
     }
     const BATCH = 25;

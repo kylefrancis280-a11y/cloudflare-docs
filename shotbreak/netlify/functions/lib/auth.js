@@ -45,6 +45,17 @@ function rawTokenFromEvent(event) {
     .replace(/^Bearer\s+/i, '')).trim();
 }
 
+// Decode JWT claims (middle segment) without signature verification.
+// Used for sanity-checking aud/iss/exp before forwarding to identitytoolkit,
+// which performs the actual RSA signature check.
+function decodeJwtClaims(token) {
+  const parts = token.split('.');
+  if (parts.length !== 3) throw new Error('malformed token');
+  const padded = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+  const json = Buffer.from(padded, 'base64').toString('utf8');
+  return JSON.parse(json);
+}
+
 // ── Firebase token verification ─────────────────────────────────────────
 // Supports both the legacy HMAC owner token and Firebase idTokens.
 // Returns { uid, email?, isOwner, tier? }.
@@ -63,6 +74,23 @@ async function verifyToken(event) {
     (process.env.OWNER_EMAILS || 'kyle@shotbreak.io,scott@shotbreak.io,steve@shotbreak.io')
       .split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
   );
+
+  // Sanity-check JWT claims BEFORE forwarding to identitytoolkit. An idToken
+  // from a different Firebase project would otherwise be silently accepted
+  // by accounts:lookup if it shares our API key's project boundary.
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  let claims;
+  try { claims = decodeJwtClaims(tk); }
+  catch (e) { throw new Error('BAD_TOKEN_CLAIMS: malformed JWT'); }
+  if (claims.aud !== projectId) {
+    throw new Error('BAD_TOKEN_CLAIMS: audience mismatch');
+  }
+  if (claims.iss !== 'https://securetoken.google.com/' + projectId) {
+    throw new Error('BAD_TOKEN_CLAIMS: issuer mismatch');
+  }
+  if (!claims.exp || claims.exp <= Math.floor(Date.now() / 1000)) {
+    throw new Error('BAD_TOKEN_CLAIMS: token expired');
+  }
 
   const r = await fetch(
     'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' + process.env.FIREBASE_API_KEY,

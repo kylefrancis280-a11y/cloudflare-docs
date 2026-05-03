@@ -120,6 +120,18 @@ function stripeAbortController() {
   return { signal: ctrl.signal, clear: () => clearTimeout(timer) };
 }
 
+// Transient errors (network timeout, 408, 429, 5xx) are tagged so the outer
+// handler can return 500 and let Stripe retry. Permanent errors (4xx other
+// than 408/429) are NOT tagged — the caller may still treat as fatal but
+// retrying won't help.
+function makeTransient(err) {
+  err.transient = true;
+  return err;
+}
+function isTransientStatus(status) {
+  return status === 408 || status === 429 || (status >= 500 && status < 600);
+}
+
 async function stripeGet(path) {
   const { signal, clear } = stripeAbortController();
   try {
@@ -129,11 +141,19 @@ async function stripeGet(path) {
     });
     clear();
     const d = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(`STRIPE_GET_FAIL ${path} ${r.status}: ${JSON.stringify(d)}`);
+    if (!r.ok) {
+      const e = new Error(`STRIPE_GET_FAIL ${path} ${r.status}: ${JSON.stringify(d)}`);
+      if (isTransientStatus(r.status)) makeTransient(e);
+      throw e;
+    }
     return d;
   } catch (e) {
     clear();
-    if (e.name === "AbortError") throw new Error(`STRIPE_TIMEOUT ${path}`);
+    if (e.name === "AbortError") throw makeTransient(new Error(`STRIPE_TIMEOUT ${path}`));
+    // Network-level errors (DNS, ECONNRESET, fetch TypeError) are transient.
+    if (!e.transient && (e.name === "TypeError" || e.code === "ECONNRESET" || e.code === "ETIMEDOUT")) {
+      makeTransient(e);
+    }
     throw e;
   }
 }
@@ -152,11 +172,18 @@ async function stripePost(path, body) {
     });
     clear();
     const d = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(`STRIPE_POST_FAIL ${path} ${r.status}: ${JSON.stringify(d)}`);
+    if (!r.ok) {
+      const e = new Error(`STRIPE_POST_FAIL ${path} ${r.status}: ${JSON.stringify(d)}`);
+      if (isTransientStatus(r.status)) makeTransient(e);
+      throw e;
+    }
     return d;
   } catch (e) {
     clear();
-    if (e.name === "AbortError") throw new Error(`STRIPE_TIMEOUT ${path}`);
+    if (e.name === "AbortError") throw makeTransient(new Error(`STRIPE_TIMEOUT ${path}`));
+    if (!e.transient && (e.name === "TypeError" || e.code === "ECONNRESET" || e.code === "ETIMEDOUT")) {
+      makeTransient(e);
+    }
     throw e;
   }
 }
@@ -184,7 +211,11 @@ async function getSystemToken() {
     }
   );
   const d = await r.json();
-  if (!r.ok || !d.idToken) throw new Error("SYSTEM_AUTH_FAIL: " + JSON.stringify(d));
+  if (!r.ok || !d.idToken) {
+    const e = new Error("SYSTEM_AUTH_FAIL: " + JSON.stringify(d));
+    if (isTransientStatus(r.status)) makeTransient(e);
+    throw e;
+  }
   _systemTokenCache = { token: d.idToken, expires: now + (parseInt(d.expiresIn || "3600", 10) * 1000) };
   return d.idToken;
 }
@@ -194,7 +225,11 @@ async function readUser(uid, token) {
     headers: { Authorization: "Bearer " + token },
   });
   if (r.status === 404) return null;
-  if (!r.ok) throw new Error("USER_READ_FAIL_" + r.status);
+  if (!r.ok) {
+    const e = new Error("USER_READ_FAIL_" + r.status);
+    if (isTransientStatus(r.status)) makeTransient(e);
+    throw e;
+  }
   const d = await r.json();
   const f = d.fields || {};
   return {
@@ -202,6 +237,7 @@ async function readUser(uid, token) {
     credits: parseInt(f.credits?.integerValue || "0", 10),
     name: f.name?.stringValue || "",
     email: f.email?.stringValue || "",
+    lastProcessedStripeEvent: f.lastProcessedStripeEvent?.stringValue || "",
   };
 }
 
@@ -233,7 +269,9 @@ async function patchUser(uid, fields, token) {
   });
   if (!r.ok) {
     const errText = await r.text().catch(() => "");
-    throw new Error("USER_WRITE_FAIL_" + r.status + ": " + errText);
+    const e = new Error("USER_WRITE_FAIL_" + r.status + ": " + errText);
+    if (isTransientStatus(r.status)) makeTransient(e);
+    throw e;
   }
 }
 
@@ -267,7 +305,9 @@ async function claimWebhookEvent(eventId, token) {
   if (r.status === 409) return false;
   // For other errors (auth, network), surface so we don't silently drop events.
   const errText = await r.text().catch(() => "");
-  throw new Error("WEBHOOK_DEDUP_FAIL_" + r.status + ": " + errText);
+  const e = new Error("WEBHOOK_DEDUP_FAIL_" + r.status + ": " + errText);
+  if (isTransientStatus(r.status)) makeTransient(e);
+  throw e;
 }
 
 // ── Tier detection ──────────────────────────────────────────────────────
@@ -336,6 +376,20 @@ async function resolveSessionProduct(session) {
 // ── Event handlers ──────────────────────────────────────────────────────
 
 async function handleCheckoutCompleted(session, token, eventId) {
+  // ── IDEMPOTENCY DESIGN (do not reorder without reading) ──────────────
+  // To avoid the "user paid, gets nothing" race where claimWebhookEvent
+  // creates the global dedup doc BEFORE credit grant and any subsequent
+  // step throws (Stripe sees the doc on retry → no credits granted), we:
+  //   1. Do all read-only / Stripe-API work first (no Firestore writes).
+  //   2. Stamp the user doc with `lastProcessedStripeEvent = eventId` in
+  //      the SAME PATCH that grants credits / sets tier. Before granting,
+  //      we read the user doc and bail out idempotently if their
+  //      lastProcessedStripeEvent already matches this eventId — that
+  //      makes the credit grant safely re-runnable on Stripe retry.
+  //   3. Claim the global processedWebhooks/{eventId} doc LAST. If steps
+  //      1-2 throw, this never runs, so Stripe will retry, and the
+  //      user-doc check in step 2 prevents double-granting.
+  // ─────────────────────────────────────────────────────────────────────
   const uid = session.client_reference_id;
   if (!uid) {
     console.warn("[webhook] checkout.session.completed with no client_reference_id — session:", session.id);
@@ -346,18 +400,9 @@ async function handleCheckoutCompleted(session, token, eventId) {
     return { skipped: "invalid_client_reference_id" };
   }
 
-  // Idempotency: dedupe by Stripe event ID. If we've already processed this
-  // event, return early so retries don't grant credits twice. Create the
-  // dedup doc BEFORE granting credits so a concurrent retry can't slip past.
-  if (eventId) {
-    const claimed = await claimWebhookEvent(eventId, token);
-    if (!claimed) {
-      console.log(`[webhook] duplicate event ${eventId} — already processed`);
-      return { idempotent: true };
-    }
-  }
-
   // Figure out what was purchased by looking at the product name.
+  // resolveSessionProduct may throw a transient error (timeout, 5xx) — we
+  // let it propagate so the outer handler returns 500 and Stripe retries.
   const productName = await resolveSessionProduct(session);
   console.log(`[webhook] session ${session.id} product: "${productName}"`);
 
@@ -377,13 +422,28 @@ async function handleCheckoutCompleted(session, token, eventId) {
       console.warn("[webhook] credit pack for unknown user:", uid);
       return { skipped: "user_not_found" };
     }
-    const newCredits = (user.credits || 0) + creditsToAdd;
-    await patchUser(uid, {
-      credits: newCredits,
-      lastCreditPackAt: new Date(),
-    }, token);
-    console.log(`[webhook] credit pack: uid=${uid} +${creditsToAdd} → ${newCredits}`);
-    return { ok: true, newCredits };
+    // Per-user idempotency: if we already processed this event for this
+    // user, don't double-grant. (Guards against a retry that arrives
+    // before the global dedup doc was created.)
+    if (eventId && user.lastProcessedStripeEvent === eventId) {
+      console.log(`[webhook] event ${eventId} already applied to uid=${uid}, skipping grant`);
+    } else {
+      const newCredits = (user.credits || 0) + creditsToAdd;
+      const updates = {
+        credits: newCredits,
+        lastCreditPackAt: new Date(),
+      };
+      if (eventId) updates.lastProcessedStripeEvent = eventId;
+      await patchUser(uid, updates, token);
+      console.log(`[webhook] credit pack: uid=${uid} +${creditsToAdd} → ${newCredits}`);
+    }
+    // LAST WRITE: claim the global event record. If this fails transiently,
+    // Stripe will retry — the user-doc check above makes that safe.
+    if (eventId) {
+      const claimed = await claimWebhookEvent(eventId, token);
+      if (!claimed) console.log(`[webhook] event ${eventId} dedup doc already exists (expected on retry)`);
+    }
+    return { ok: true };
   }
 
   // NEW SUBSCRIPTION
@@ -398,6 +458,15 @@ async function handleCheckoutCompleted(session, token, eventId) {
     }
     const credits = TIER_CREDITS[tier];
 
+    // Per-user idempotency check before any writes.
+    const existingUser = await readUser(uid, token);
+    if (eventId && existingUser && existingUser.lastProcessedStripeEvent === eventId) {
+      console.log(`[webhook] event ${eventId} already applied to uid=${uid}, skipping subscription setup`);
+      const claimed = await claimWebhookEvent(eventId, token);
+      if (!claimed) console.log(`[webhook] event ${eventId} dedup doc already exists (expected on retry)`);
+      return { ok: true, tier, credits, idempotent: true };
+    }
+
     // Stamp firebase_uid + tier onto subscription metadata so future webhook
     // events (renewals, cancels) can find the user and know the tier without
     // re-fetching product info.
@@ -410,15 +479,23 @@ async function handleCheckoutCompleted(session, token, eventId) {
       },
     });
 
-    await patchUser(uid, {
+    const subUpdates = {
       tier,
       credits,
       stripeCustomerId: sub.customer,
       stripeSubscriptionId: subId,
       subscriptionStatus: sub.status,
       subscriptionStartedAt: new Date(),
-    }, token);
+    };
+    if (eventId) subUpdates.lastProcessedStripeEvent = eventId;
+    await patchUser(uid, subUpdates, token);
     console.log(`[webhook] new subscription: uid=${uid} tier=${tier} credits=${credits}`);
+
+    // LAST WRITE: claim the global event record.
+    if (eventId) {
+      const claimed = await claimWebhookEvent(eventId, token);
+      if (!claimed) console.log(`[webhook] event ${eventId} dedup doc already exists (expected on retry)`);
+    }
     return { ok: true, tier, credits };
   }
 
@@ -532,8 +609,10 @@ exports.handler = async (event) => {
     return respond(400, { error: "Invalid signature" });
   }
 
-  // Always return 200 for handled events — non-200 causes Stripe to retry,
-  // which we don't want for events we intentionally skip.
+  // Return 200 for events we intentionally skip or successfully handle.
+  // Return 500 for TRANSIENT failures (timeouts, Stripe/Firestore 5xx) so
+  // Stripe retries the webhook. Permanent failures still 200 (no point in
+  // retrying — the data is malformed or doesn't apply to us).
   try {
     const token = await getSystemToken();
     let result;
@@ -554,6 +633,10 @@ exports.handler = async (event) => {
     return respond(200, { received: true, ...result });
   } catch (err) {
     console.error("[webhook] handler error on", stripeEvent.type, err);
+    // Transient errors: 500 so Stripe retries. Permanent: 200 to ack.
+    if (err && err.transient) {
+      return respond(500, { received: false, error: String(err.message), transient: true });
+    }
     return respond(200, { received: true, error: String(err.message) });
   }
 };
