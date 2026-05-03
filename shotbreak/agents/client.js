@@ -13,11 +13,29 @@
   const ORCHESTRATE_URL  = '/.netlify/functions/agent-orchestrate';
   const BOOTSTRAP_URL    = '/.netlify/functions/bootstrap-user';                // create user doc on first login
 
-  // Polling config — exponential backoff from 1s → 5s, max 5 min wait
-  const POLL_INITIAL_MS   = 1000;
-  const POLL_MAX_MS       = 5000;
-  const POLL_BACKOFF      = 1.4;
+  // Polling config — exponential backoff. Tightened from 1s→5s to 600ms→3s
+  // because during Anthropic incidents the background path is the only path
+  // that works, and the user is already waiting. Slower polling here just
+  // means more wall-clock latency between "job done in Firestore" and
+  // "browser shows result."
+  const POLL_INITIAL_MS   = 600;
+  const POLL_MAX_MS       = 3000;
+  const POLL_BACKOFF      = 1.35;
   const POLL_TIMEOUT_MS   = 5 * 60 * 1000;
+
+  // ── Anthropic-slow detection ──────────────────────────────────────────
+  // When ANY agent stalls hard enough to trip the background fallback, mark
+  // Anthropic as "slow" for 60 seconds. Subsequent agent calls in that
+  // window skip the sync path entirely and go straight to background. This
+  // saves the user the 25-second sync stall on every queued agent during
+  // an Anthropic regional outage. Cleared automatically as the timestamp
+  // expires; no manual reset needed.
+  const SLOW_TTL_MS = 60 * 1000;
+  let _slowSince = 0;
+  function markSlow() { _slowSince = Date.now(); }
+  function isSlow()   { return Date.now() - _slowSince < SLOW_TTL_MS; }
+  // Expose so workflow.js can short-circuit optional enrichment agents.
+  window.SB_AnthropicSlow = isSlow;
 
   // Full 50-agent metadata mirror. Must match registry.js exactly.
   // Fields: id, name, wing, tier, manager, credits.
@@ -265,6 +283,16 @@
 
   const SB_Agents = {
     async invoke(agentId, input, opts = {}) {
+      // If we already saw Anthropic stall in the last 60s, skip the sync
+      // path entirely — it's just going to time out and waste 25 seconds.
+      // Go straight to background polling.
+      if (isSlow()) {
+        console.warn('[SB_Agents] Anthropic flagged slow recently — skipping sync path for', agentId);
+        if (typeof opts.onSlowFallback === 'function') {
+          try { opts.onSlowFallback(); } catch(_) {}
+        }
+        return invokeWithPolling(agentId, input, opts);
+      }
       // Try the fast sync path first. If it fails because Anthropic stalled
       // both Sonnet and Haiku within the Netlify 26s ceiling, fall through
       // to the background path which has a 15-minute budget.
@@ -272,6 +300,7 @@
         return await invokeSync(agentId, input, opts);
       } catch (e) {
         if (isStalledTwice(e)) {
+          markSlow();
           console.warn('[SB_Agents] sync path stalled (Anthropic incident likely), falling through to background polling for', agentId);
           if (typeof opts.onSlowFallback === 'function') {
             try { opts.onSlowFallback(); } catch(_) {}
