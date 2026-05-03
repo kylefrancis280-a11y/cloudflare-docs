@@ -434,7 +434,14 @@ function isTransientAgentError(e) {
 
 async function invokeAgent(agentId, input, opts){
   CrewFeed.log(agentId, 'working');
-  const doCall = () => window.SB_Agents.invoke(agentId, input, opts || {});
+  const _opts = opts || {};
+  const _slowFallback = () => {
+    const meta = window.SB_Agents && window.SB_Agents.agentMeta(agentId);
+    const label = (meta && meta.name) || agentId;
+    toast(`${label} is slow — Anthropic rerouted to background. Hang tight (~60s).`, 'ok');
+    if (typeof _opts.onSlowFallback === 'function') { try { _opts.onSlowFallback(); } catch(_) {} }
+  };
+  const doCall = () => window.SB_Agents.invoke(agentId, input, Object.assign({}, _opts, { onSlowFallback: _slowFallback }));
   const MAX_RETRIES = 2;
   const BACKOFFS_MS = [1200, 2500];
   try {
@@ -507,7 +514,11 @@ async function runPassive(agentId, input, p, onOk, opts){
   // opts.lean: strip crew_analysis (~5-10x payload reduction for one-off agents)
   opts = opts || {};
   const ctx = opts.noContext ? null : buildContext(p, null, { lean: !!opts.lean });
-  const attempt = () => window.SB_Agents.invoke(agentId, input, ctx ? { context: ctx } : {});
+  const _passiveSlowFallback = () => {
+    const meta = window.SB_Agents && window.SB_Agents.agentMeta(agentId);
+    toast(`${(meta && meta.name) || agentId} rerouted to background — enrichment may take ~60s.`, 'ok');
+  };
+  const attempt = () => window.SB_Agents.invoke(agentId, input, Object.assign(ctx ? { context: ctx } : {}, { onSlowFallback: _passiveSlowFallback }));
   const MAX_RETRIES = 2;
   const BACKOFFS_MS = [1500, 3000];
   try {
@@ -1833,7 +1844,11 @@ function wireVisionStep(p){
       tone_hint: 'user-supplied logline captures intended tone',
     };
     if (!checkInputSize('auteur', brief)) { stop(); document.getElementById('vision-status').textContent = ''; return; }
-    const r = await invokeAgent('auteur', JSON.stringify(brief, null, 2));
+    const r = await invokeAgent('auteur', JSON.stringify(brief, null, 2), {
+      onSlowFallback: () => {
+        document.getElementById('vision-status').textContent = 'Anthropic is slow — running in background (~60s)…';
+      },
+    });
 
     stop();
     document.getElementById('vision-status').textContent = '';
