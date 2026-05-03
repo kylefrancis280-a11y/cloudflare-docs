@@ -33,8 +33,9 @@ function respond(statusCode, body) {
 async function readJob(docId) {
   const store = getStore({ name: 'agent_jobs', consistency: 'strong' });
   try {
-    const data = await store.get(docId, { type: 'json' });
-    return data || null;
+    const raw = await store.get(docId);
+    if (!raw) return null;
+    return typeof raw === 'string' ? JSON.parse(raw) : raw;
   } catch (_) {
     return null;
   }

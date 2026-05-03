@@ -43,7 +43,7 @@ async function writeJob(docId, fields) {
   const serialized = Object.fromEntries(
     Object.entries(fields).map(([k, v]) => [k, v instanceof Date ? v.toISOString() : v])
   );
-  await store.setJSON(docId, { ...existing, ...serialized });
+  await store.set(docId, JSON.stringify({ ...existing, ...serialized }));
 }
 
 // ── Partial JSON salvage ────────────────────────────────────────────────
