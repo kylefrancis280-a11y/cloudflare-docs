@@ -28,8 +28,10 @@ const FIRESTORE_BASE = () =>
   `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
 // ── Firestore job helpers ───────────────────────────────────────────────
-async function writeJob(docId, fields) {
-  const token = await getSystemToken();
+// token param: pass the user's own Firebase JWT to avoid needing the system
+// account for writes. Falls back to getSystemToken() if token is absent.
+async function writeJob(docId, fields, token) {
+  if (!token) token = await getSystemToken();
   const mask  = Object.keys(fields).map(k => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
   const r = await fetch(`${FIRESTORE_BASE()}/agent_jobs/${docId}?${mask}`, {
     method: 'PATCH',
@@ -224,6 +226,15 @@ exports.handler = async (event) => {
   const { agent_id, input, context, job_id: clientJobId } = payload;
   if (!clientJobId) return { statusCode: 400 };  // can't even create a doc without this
 
+  // Extract the raw Firebase JWT from the Authorization header. We pass this
+  // directly to writeJob so Firestore writes use the user's own identity —
+  // no system-account credentials required on the write path. Owner tokens
+  // (owner:…) are HMAC-signed strings, not Firebase JWTs, so they can't be
+  // forwarded to Firestore; those fall back to getSystemToken().
+  const rawToken = ((event.headers.authorization || event.headers.Authorization || '')
+    .replace(/^Bearer\s+/i, '')).trim() || null;
+  const firestoreToken = (rawToken && !rawToken.startsWith('owner:')) ? rawToken : null;
+
   // 2. Auth FIRST so we have a uid to scope the doc to.
   let auth;
   try { auth = await verifyToken(event); }
@@ -240,7 +251,7 @@ exports.handler = async (event) => {
       agent_id:  agent_id || 'unknown',
       status:    'running',
       createdAt: new Date(),
-    });
+    }, firestoreToken);
   } catch (e) {
     console.error('SB_BG_JOB_CREATE_FAIL', e.message);
     return { statusCode: 500 };
@@ -248,13 +259,18 @@ exports.handler = async (event) => {
 
   // Helper: write error to the doc and return the given HTTP status.
   const fail = async (code, msg) => {
-    await writeJob(docId, { status: 'error', error: msg, completedAt: new Date() }).catch(() => {});
+    await writeJob(docId, { status: 'error', error: msg, completedAt: new Date() }, firestoreToken).catch(() => {});
     return { statusCode: code };
   };
 
   // 4. Now run the validations that previously returned early. Each writes
   //    the failure into the doc so the polling client sees it.
-  const missingEnv = REQUIRED_ENV.filter(k => !process.env[k]);
+  // Owners skip credit management entirely, so SYSTEM_EMAIL/SYSTEM_PASSWORD
+  // are not needed in that path.
+  const missingEnv = REQUIRED_ENV.filter(k => {
+    if (auth.isOwner && (k === 'SYSTEM_EMAIL' || k === 'SYSTEM_PASSWORD')) return false;
+    return !process.env[k];
+  });
   if (missingEnv.length) return fail(500, 'Server misconfigured (missing env): ' + missingEnv.join(', '));
 
   if (!agent_id || input === undefined) return fail(400, 'Missing agent_id or input');
@@ -299,7 +315,7 @@ exports.handler = async (event) => {
     is_owner:          auth.isOwner,
     model_used:        result.model_used,
     completedAt:       new Date(),
-  }).catch(e => console.error('SB_BG_JOB_COMPLETE_FAIL', e.message));
+  }, firestoreToken).catch(e => console.error('SB_BG_JOB_COMPLETE_FAIL', e.message));
 
   console.log(JSON.stringify({
     tag: 'SB_BG_COMPLETE', agent_id, uid: auth.uid,
