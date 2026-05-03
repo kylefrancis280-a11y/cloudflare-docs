@@ -1886,6 +1886,17 @@ function wireVisionStep(p){
     // in the background. These don't cost the user a button click; they
     // fill in genre conventions and palette refinements so every downstream
     // specialist inherits a richer vision.
+    //
+    // SKIP these during an Anthropic incident. They're optional enrichment;
+    // running them stacks 2 more sync-stalls + background polls on top of
+    // the vision-director call the user is already waiting on. Vision-
+    // director is the only agent the user actively waits for here, so we
+    // protect that hot path and leave enrichment for next time.
+    if (typeof window.SB_AnthropicSlow === 'function' && window.SB_AnthropicSlow()) {
+      console.warn('[SB] Anthropic slow — skipping passive enrichment (genre + color)');
+      document.getElementById('vision-status') && (document.getElementById('vision-status').textContent = '');
+      return;
+    }
     document.getElementById('vision-status') && (document.getElementById('vision-status').textContent = 'Genre & palette analysis...');
     // Both callbacks merge into the *current* project on disk rather than the
     // closure-captured `p`. Otherwise any edits the user makes between locking
