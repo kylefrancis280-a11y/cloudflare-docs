@@ -3404,43 +3404,54 @@ function wireGenerateStep(p){
 
   // Passive Continuity Supervisor check — silent background run when the
   // Generate step opens. If it finds warnings, inline them above the CTA.
+  // Chunked: a 140-shot list serializes to ~120-150KB which blows the agent
+  // input cap (80KB) and Anthropic's 26s response budget. Split into batches
+  // of 25 shots, run sequentially, merge warnings. Each batch is ~25KB and
+  // returns in <10s, so the whole pass finishes in ~30-60s without 502s.
   (async () => {
-    if (!(p.shot_list || []).length) return;
-    const r = await runPassive('continuity-supervisor',
-      JSON.stringify({
-        shot_list: p.shot_list.map(sh => ({ id: sh.id, scene_id: sh.scene_id, slot: sh.slot, characters_in_frame: sh.characters_in_frame, shot_brief: sh.shot_brief })),
-        character_bible: p.character_bible,
-        instruction: 'Scan for continuity issues across shots — wardrobe drift, prop disappearance, character presence inconsistencies. Return {warnings: [{shot_ids: [string], issue: string, severity: "low"|"medium"|"high"}]}.',
-      }, null, 2),
-      p,
-      (out) => {
-      // No-context: input already carries shot_list + character_bible inline.
-      // Shipping crew_analysis on top was pushing the request to 150-250KB and
-      // 502'ing on the Netlify 26s ceiling.
-        const warnings = out.warnings || [];
-        const host = document.querySelector('.main-body-inner');
-        if (!host) return;
-        const el = document.createElement('div');
-        el.className = 'suggest';
-        if (!warnings.length) {
-          el.style.borderColor = 'var(--green-border,#4a7c59)';
-          el.style.background = 'var(--green-bg,rgba(74,124,89,0.1))';
-          el.innerHTML = `<div class="suggest-head" style="color:var(--green,#6abe7f)">✓ Continuity check passed — no issues found</div>`;
-        } else {
-          el.style.borderColor = 'var(--amber-border)';
-          el.style.background = 'var(--amber-bg)';
-          el.innerHTML = `
-            <div class="suggest-head" style="color:var(--amber)">Continuity warnings · ${warnings.length}</div>
-            <div class="suggest-diff">${esc(warnings.map(w => `[${w.severity}] ${w.issue} (${(w.shot_ids || []).join(', ')})`).join('\n'))}</div>
-          `;
-        }
-        // Insert above the "Open Media Hub" card
-        const firstCard = host.querySelector('.card');
-        if (firstCard) host.insertBefore(el, firstCard);
-        else host.appendChild(el);
-      },
-      { noContext: true }
-    );
+    const allShots = (p.shot_list || []);
+    if (!allShots.length) return;
+    const BATCH = 25;
+    const batches = [];
+    for (let i = 0; i < allShots.length; i += BATCH) batches.push(allShots.slice(i, i + BATCH));
+    const allWarnings = [];
+    for (let bi = 0; bi < batches.length; bi++) {
+      const batch = batches[bi];
+      const r = await runPassive('continuity-supervisor',
+        JSON.stringify({
+          shot_list: batch.map(sh => ({ id: sh.id, scene_id: sh.scene_id, slot: sh.slot, characters_in_frame: sh.characters_in_frame, shot_brief: sh.shot_brief })),
+          character_bible: p.character_bible,
+          batch_info: `Batch ${bi + 1} of ${batches.length} — ${batch.length} shots`,
+          instruction: 'Scan this batch of shots for continuity issues — wardrobe drift, prop disappearance, character presence inconsistencies. Return {warnings: [{shot_ids: [string], issue: string, severity: "low"|"medium"|"high"}]}.',
+        }),
+        p,
+        null,
+        { noContext: true }
+      );
+      if (r && r.ok) {
+        const out = r.output || {};
+        if (Array.isArray(out.warnings)) allWarnings.push(...out.warnings);
+      }
+    }
+    const host = document.querySelector('.main-body-inner');
+    if (!host) return;
+    const el = document.createElement('div');
+    el.className = 'suggest';
+    if (!allWarnings.length) {
+      el.style.borderColor = 'var(--green-border,#4a7c59)';
+      el.style.background = 'var(--green-bg,rgba(74,124,89,0.1))';
+      el.innerHTML = `<div class="suggest-head" style="color:var(--green,#6abe7f)">✓ Continuity check passed — no issues found</div>`;
+    } else {
+      el.style.borderColor = 'var(--amber-border)';
+      el.style.background = 'var(--amber-bg)';
+      el.innerHTML = `
+        <div class="suggest-head" style="color:var(--amber)">Continuity warnings · ${allWarnings.length}</div>
+        <div class="suggest-diff">${esc(allWarnings.map(w => `[${w.severity}] ${w.issue} (${(w.shot_ids || []).join(', ')})`).join('\n'))}</div>
+      `;
+    }
+    const firstCard = host.querySelector('.card');
+    if (firstCard) host.insertBefore(el, firstCard);
+    else host.appendChild(el);
   })();
 
   document.getElementById('btn-stage-mediahub')?.addEventListener('click', () => {
