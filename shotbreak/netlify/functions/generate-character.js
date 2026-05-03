@@ -105,15 +105,32 @@ exports.handler = async (event) => {
       else if (aspect_ratio === '9:16') { w = 720;  h = 1280; }
       else if (aspect_ratio === '4:3')  { w = 1024; h = 768;  }
 
-      const r = await fetch(cfg.endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Key ' + FAL,
-        },
-        body: JSON.stringify({ prompt, image_size: { width: w, height: h }, num_images: 1 }),
-      });
-      const d = await r.json();
+      const ctrl  = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 25000);
+      let r, d;
+      try {
+        r = await fetch(cfg.endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Key ' + FAL,
+          },
+          body: JSON.stringify({ prompt, image_size: { width: w, height: h }, num_images: 1 }),
+          signal: ctrl.signal,
+        });
+        d = await r.json();
+      } catch (e) {
+        if (e.name === 'AbortError') {
+          if (!auth.isOwner && deductedCredits > 0) {
+            const current = (await getOrCreateUser(auth.uid).catch(() => null))?.credits || 0;
+            await setCredits(auth.uid, current + deductedCredits).catch(() => {});
+          }
+          return respond(504, { error: 'fal.ai timed out after 25s. Try again.' });
+        }
+        throw e;
+      } finally {
+        clearTimeout(timer);
+      }
 
       if (!r.ok) {
         if (!auth.isOwner && deductedCredits > 0) {

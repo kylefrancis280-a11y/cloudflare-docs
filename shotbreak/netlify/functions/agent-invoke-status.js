@@ -87,10 +87,11 @@ exports.handler = async (event) => {
   try { job = await readJob(docId); }
   catch (e) { return respond(500, { error: 'Job lookup failed: ' + e.message }); }
 
-  // Not created yet (background function hasn't started) → report pending.
-  if (!job) return respond(200, { status: 'pending', job_id: clientJobId });
+  // Job not found — return 404 to avoid leaking existence via brute-force enumeration.
+  if (!job) return respond(404, { error: 'Job not found' });
 
   // Owners can access any job; regular users can only access their own.
+  // (docId is already prefixed with auth.uid above, so this is belt-and-suspenders.)
   if (!auth.isOwner && job.uid !== auth.uid) {
     return respond(403, { error: 'Forbidden' });
   }

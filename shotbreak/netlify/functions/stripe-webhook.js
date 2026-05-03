@@ -237,6 +237,39 @@ async function patchUser(uid, fields, token) {
   }
 }
 
+// ── Webhook idempotency (dedup by Stripe event ID) ──────────────────────
+// Try to create a doc at processedWebhooks/{eventId} with createDocument,
+// which fails if the doc already exists. Returns true if WE just claimed
+// the event (proceed with processing), false if it was already processed.
+async function claimWebhookEvent(eventId, token) {
+  const safeId = String(eventId).replace(/[^a-zA-Z0-9_-]/g, "");
+  if (!safeId) return true; // can't dedup — fail open rather than block legit events
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+  const url =
+    `${FIRESTORE_BASE()}/processedWebhooks?documentId=${encodeURIComponent(safeId)}`;
+  const body = {
+    fields: toFirestoreFields({
+      event_id: safeId,
+      processed_at: new Date(),
+      expires_at: expiresAt,
+    }),
+  };
+  const r = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  if (r.ok) return true;
+  // 409 ALREADY_EXISTS → already processed.
+  if (r.status === 409) return false;
+  // For other errors (auth, network), surface so we don't silently drop events.
+  const errText = await r.text().catch(() => "");
+  throw new Error("WEBHOOK_DEDUP_FAIL_" + r.status + ": " + errText);
+}
+
 // ── Tier detection ──────────────────────────────────────────────────────
 // We infer the tier from the Stripe product name rather than requiring
 // metadata on every Payment Link. Product names are:
@@ -302,11 +335,26 @@ async function resolveSessionProduct(session) {
 
 // ── Event handlers ──────────────────────────────────────────────────────
 
-async function handleCheckoutCompleted(session, token) {
+async function handleCheckoutCompleted(session, token, eventId) {
   const uid = session.client_reference_id;
   if (!uid) {
     console.warn("[webhook] checkout.session.completed with no client_reference_id — session:", session.id);
     return { skipped: "no_uid" };
+  }
+  if (!/^[a-zA-Z0-9_-]{20,128}$/.test(uid)) {
+    console.warn("[webhook] checkout.session.completed with invalid client_reference_id format:", uid);
+    return { skipped: "invalid_client_reference_id" };
+  }
+
+  // Idempotency: dedupe by Stripe event ID. If we've already processed this
+  // event, return early so retries don't grant credits twice. Create the
+  // dedup doc BEFORE granting credits so a concurrent retry can't slip past.
+  if (eventId) {
+    const claimed = await claimWebhookEvent(eventId, token);
+    if (!claimed) {
+      console.log(`[webhook] duplicate event ${eventId} — already processed`);
+      return { idempotent: true };
+    }
   }
 
   // Figure out what was purchased by looking at the product name.
@@ -491,7 +539,7 @@ exports.handler = async (event) => {
     let result;
     switch (stripeEvent.type) {
       case "checkout.session.completed":
-        result = await handleCheckoutCompleted(stripeEvent.data.object, token); break;
+        result = await handleCheckoutCompleted(stripeEvent.data.object, token, stripeEvent.id); break;
       case "customer.subscription.updated":
         result = await handleSubscriptionUpdated(stripeEvent.data.object, token); break;
       case "customer.subscription.deleted":

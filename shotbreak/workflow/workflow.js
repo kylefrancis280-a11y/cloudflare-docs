@@ -85,13 +85,35 @@ function saveProjects(all, currentId){
         localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
         toast(`Storage was full — pruned old crew analysis to make room (${Math.round(freed/1024)}KB freed).`, 'ok');
         return;
-      } catch(e2) { /* fall through */ }
+      } catch(e2) {
+        // Retry after pruning STILL failed — surface to user and rethrow so
+        // callers don't silently believe the save succeeded.
+        console.error('SB_SAVE_FAILED', e2);
+        try { alert('⚠ Could not save project — local storage is full. Export your project to back up your work.'); } catch(_){}
+        toast('Browser storage FULL — delete old projects or export current project before continuing. Your latest changes may NOT be saved.', 'err');
+        throw e2;
+      }
     }
-    // Still failing — tell user clearly instead of silently losing data
+    // Still failing (no pruning possible) — tell user clearly and rethrow
+    console.error('SB_SAVE_FAILED', e);
+    try { alert('⚠ Could not save project — local storage is full. Export your project to back up your work.'); } catch(_){}
     toast('Browser storage FULL — delete old projects or export current project before continuing. Your latest changes may NOT be saved.', 'err');
-    console.error('[saveProjects] Quota exceeded even after pruning:', e);
+    throw e;
   }
 }
+// Guard against shipping multi-megabyte payloads to /invoke that 502 the
+// edge function. 70KB is comfortably under Anthropic's input window for
+// our agents and well under Netlify's 6MB limit, but small enough that
+// big-project shot-list + character-bible bundles must be trimmed first.
+function checkInputSize(name, input){
+  const sz = (typeof input === 'string' ? input.length : JSON.stringify(input).length);
+  if (sz > 70000) {
+    try { alert('Input for ' + name + ' is ' + Math.round(sz/1024) + 'KB (max 70KB). Reduce shot list or character bible size.'); } catch(_){}
+    return false;
+  }
+  return true;
+}
+
 function getProject(id){ return loadProjects()[id] || null; }
 function saveProject(p){
   p.updated_at = Date.now();
@@ -122,9 +144,30 @@ function newProject(){
   };
 }
 
+// ── Owner token (private; not exposed on window for exfil-resistance) ──
+// External pages (app.html, workflow/index.html) may set window.SB_OWNER_TOKEN
+// before this script loads. We capture it once into a module-private slot
+// and immediately delete the window field so it can't be read by extensions
+// or other scripts after capture. New writes from outside should go through
+// window.SB_setOwnerToken().
+let _sbOwnerToken = null;
+(function captureOwnerToken(){
+  try {
+    if (window.SB_OWNER_TOKEN) {
+      _sbOwnerToken = window.SB_OWNER_TOKEN;
+      try { delete window.SB_OWNER_TOKEN; } catch(e){ window.SB_OWNER_TOKEN = undefined; }
+    }
+  } catch(e){}
+})();
+function getOwnerToken(){ return _sbOwnerToken; }
+window.SB_setOwnerToken = function(t){
+  _sbOwnerToken = t || null;
+  try { delete window.SB_OWNER_TOKEN; } catch(e){ window.SB_OWNER_TOKEN = undefined; }
+};
+
 // ── Auth check ────────────────────────────────────────────────────────
 function isSignedIn(){
-  if (window.SB_OWNER_TOKEN) return true;
+  if (getOwnerToken()) return true;
   try { return !!(firebase.auth && firebase.auth().currentUser); } catch(e){ return false; }
 }
 function currentUserLabel(){
@@ -142,8 +185,9 @@ function currentUserLabel(){
 // rather than through the SB_Agents async-job pipeline.
 async function authHeaders(){
   const headers = { 'Content-Type': 'application/json' };
-  if (window.SB_OWNER_TOKEN) {
-    headers.Authorization = 'Bearer ' + window.SB_OWNER_TOKEN;
+  const _tk = getOwnerToken();
+  if (_tk) {
+    headers.Authorization = 'Bearer ' + _tk;
     return headers;
   }
   try {
@@ -462,7 +506,7 @@ async function runPassive(agentId, input, p, onOk, opts){
     }
     if (lastErr) throw lastErr;
     const out = r.output ?? r.result ?? r.raw;
-    if (out == null || (typeof out === 'object' && Object.keys(out).length === 0)) {
+    if (out == null || out === '' || (typeof out === 'object' && !Array.isArray(out) && Object.keys(out).length === 0)) {
       CrewFeed.log(agentId, 'err', 'empty output');
       console.warn('passive ' + agentId + ' returned empty output');
       return { ok: false, reason: 'empty' };
@@ -926,7 +970,7 @@ function wireCrewButton(p, step){
       const specs = getCrewSpecsFor(step, p);
       if (!specs.length) { toast('No crew configured for this step.', 'err'); return; }
       const totalCredits = specs.reduce((sum, s) => sum + (s.credits || 0), 0);
-      const isOwner = !!(window.SB_OWNER_TOKEN);
+      const isOwner = !!getOwnerToken();
       const confirmMsg = isOwner
         ? `Run ${specs.length}-agent crew? (owner account — no credit charge)`
         : `Run ${specs.length} agents for ${totalCredits} credits? This fires the full crew for this step and can take 30–90 seconds.`;
@@ -956,7 +1000,7 @@ function wireCrewButton(p, step){
       const missingSpecs = allSpecs.filter(s => !p?.crew_analysis?.[step]?.[s.id]);
       if (!missingSpecs.length) { toast('Nothing to retry — all agents are complete.', 'err'); return; }
       const credits = missingSpecs.reduce((sum, s) => sum + (s.credits || 0), 0);
-      const isOwner = !!(window.SB_OWNER_TOKEN);
+      const isOwner = !!getOwnerToken();
       const names = missingSpecs.map(s => s.label || s.id).join(', ');
       const confirmMsg = isOwner
         ? `Retry ${missingSpecs.length} failed agent${missingSpecs.length === 1 ? '' : 's'}? (${names})`
@@ -1728,6 +1772,7 @@ function wireVisionStep(p){
       aspect_ratio: ratio,
       tone_hint: 'user-supplied logline captures intended tone',
     };
+    if (!checkInputSize('auteur', brief)) { stop(); document.getElementById('vision-status').textContent = ''; return; }
     const r = await invokeAgent('auteur', JSON.stringify(brief, null, 2));
 
     stop();
@@ -1771,27 +1816,39 @@ function wireVisionStep(p){
     // closure-captured `p`. Otherwise any edits the user makes between locking
     // vision and these background calls returning (typically 30-90s) get
     // silently clobbered when we save the stale snapshot.
-    runPassive('genre-specialist',
-      JSON.stringify({ vision: p.vision, instruction: 'List 5-8 genre conventions for ' + genre + ' to honor in this project. Return {conventions: [string], visual_motifs: [string], avoid: [string]}.' }, null, 2),
-      p,
-      (out) => {
-        const latest = getProject(p.id) || p;
-        latest.genre_tags = out;
-        saveProject(latest);
+    // Run both passive enrichment agents in parallel, then merge BOTH outputs
+    // into the latest-on-disk project in a single save. Previously each
+    // onOk callback wrote independently — whichever finished second clobbered
+    // the first's writes (fields outside its own write set were stale).
+    Promise.all([
+      runPassive('genre-specialist',
+        JSON.stringify({ vision: p.vision, instruction: 'List 5-8 genre conventions for ' + genre + ' to honor in this project. Return {conventions: [string], visual_motifs: [string], avoid: [string]}.' }, null, 2),
+        p, null
+      ),
+      runPassive('color-theorist',
+        JSON.stringify({ vision: p.vision, instruction: 'Refine the palette. Return {primary, secondary, accent, rationale} as hex colors and a one-line rationale tied to the genre.' }, null, 2),
+        p, null
+      ),
+    ]).then(([genreRes, colorRes]) => {
+      const latest = getProject(p.id) || p;
+      let changed = false;
+      if (genreRes && genreRes.ok && genreRes.output) {
+        latest.genre_tags = genreRes.output;
+        changed = true;
       }
-    ).then(() => runPassive('color-theorist',
-      JSON.stringify({ vision: p.vision, instruction: 'Refine the palette. Return {primary, secondary, accent, rationale} as hex colors and a one-line rationale tied to the genre.' }, null, 2),
-      p,
-      (out) => {
+      if (colorRes && colorRes.ok && colorRes.output) {
+        const out = colorRes.output;
         if (out.primary || out.secondary || out.accent) {
-          const latest = getProject(p.id) || p;
           latest.vision = latest.vision || {};
           latest.vision.palette = { primary: out.primary, secondary: out.secondary, accent: out.accent, rationale: out.rationale };
-          saveProject(latest);
-          render();
+          changed = true;
         }
       }
-    )).finally(() => {
+      if (changed) {
+        saveProject(latest);
+        render();
+      }
+    }).finally(() => {
       const el = document.getElementById('vision-status');
       if (el) el.textContent = '';
     });
@@ -1937,6 +1994,7 @@ function wireStoryStep(p){
         raw_scene: scene.raw,
         instruction: 'Tighten this scene. Keep it the same length or shorter. Keep the voice. Return only the revised scene as plain screenwriting format.',
       };
+      if (!checkInputSize('script-doctor', input)) { stop(); return; }
       const r = await invokeAgent('script-doctor', JSON.stringify(input, null, 2), { context: buildContext(p, null, {lean: true}) });
       stop();
 
@@ -2426,7 +2484,7 @@ function wireCastStep(p){
       // Mirrors how Location Scout works (which runs fine from an empty description).
       const std = current ? window.SB_Normalize.standardizeCharacterBrief(current) : { tags: [] };
       const stop = showSpinnerOn(btn);
-      const r = await invokeAgent('character-sculptor', JSON.stringify({
+      const _csInput = {
         name,
         current_description: current || '',
         standardized_tags: std.tags,
@@ -2434,7 +2492,9 @@ function wireCastStep(p){
         instruction: current
           ? 'Return a polished, reusable character prompt (50 words max) optimized for consistency across Flux image generations and video generation. Return only the polished description as plain text.'
           : `No description yet — build one from scratch using the script context in [CONTEXT FROM UPSTREAM AGENTS] (character dialogue, scenes, actions). Infer age, build, hair, wardrobe, demeanor from what the script shows. Return a polished, reusable character prompt (50 words max) optimized for Flux image generation + video-gen consistency. Return only the description as plain text.`,
-      }, null, 2), { context: buildContext(p, null, {lean: true}) });
+      };
+      if (!checkInputSize('character-sculptor', _csInput)) { stop(); return; }
+      const r = await invokeAgent('character-sculptor', JSON.stringify(_csInput, null, 2), { context: buildContext(p, null, {lean: true}) });
       stop();
       const sugEl = document.querySelector(`[data-sug-char="${CSS.escape(name)}"]`);
       if (!r.ok) { sugEl.innerHTML = `<div class="suggest" style="border-color:var(--red-border);background:var(--red-bg)"><div class="suggest-body">${esc(r.error)}</div></div>`; return; }
@@ -2485,11 +2545,13 @@ function wireCastStep(p){
       const name = btn.dataset.char;
       const c = p.character_bible[name];
       const stop = showSpinnerOn(btn);
-      const r = await invokeAgent('wardrobe-props', JSON.stringify({
+      const _wpInput = {
         character_name: name,
         character_description: c.canonical_description,
         instruction: 'Suggest a signature wardrobe and 1-2 signature props. Return as {wardrobe: string, props: [string]}.',
-      }, null, 2), { context: buildContext(p, null, {lean: true}) });
+      };
+      if (!checkInputSize('wardrobe-props', _wpInput)) { stop(); return; }
+      const r = await invokeAgent('wardrobe-props', JSON.stringify(_wpInput, null, 2), { context: buildContext(p, null, {lean: true}) });
       stop();
       const sugEl = document.querySelector(`[data-sug-char="${CSS.escape(name)}"]`);
       if (!r.ok) { sugEl.innerHTML = `<div class="suggest" style="border-color:var(--red-border);background:var(--red-bg)"><div class="suggest-body">${esc(r.error)}</div></div>`; return; }
@@ -2563,7 +2625,7 @@ function wireCastStep(p){
       // (SB_OWNER_TOKEN is the legacy HMAC path, now removed).
       const _ownerEmails = new Set(['kyle@shotbreak.io','scott@shotbreak.io','steve@shotbreak.io']);
       const _fbUser = typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser;
-      const isOwner = !!window.SB_OWNER_TOKEN || (_fbUser && _ownerEmails.has((_fbUser.email||'').toLowerCase()));
+      const isOwner = !!getOwnerToken() || (_fbUser && _ownerEmails.has((_fbUser.email||'').toLowerCase()));
       const confirmMsg = isOwner
         ? `Generate reference image for ${name} via Flux Dev? (owner — no charge)`
         : `Generate reference image for ${name} via Flux Dev? Costs 15 credits. Without a reference, every shot featuring ${name} will use a different face.`;
@@ -2712,11 +2774,13 @@ function wireCastStep(p){
       const name = btn.dataset.loc;
       const l = p.location_library[name];
       const stop = showSpinnerOn(btn);
-      const r = await invokeAgent('location-scout', JSON.stringify({
+      const _lsInput = {
         location_name: name,
         current_description: l.description || '',
         instruction: 'Describe this location for generation — setting, light, atmosphere, texture. One paragraph. Return as plain text.',
-      }, null, 2), { context: buildContext(p, null, {lean: true}) });
+      };
+      if (!checkInputSize('location-scout', _lsInput)) { stop(); return; }
+      const r = await invokeAgent('location-scout', JSON.stringify(_lsInput, null, 2), { context: buildContext(p, null, {lean: true}) });
       stop();
       const sugEl = document.querySelector(`[data-sug-loc="${CSS.escape(name)}"]`);
       if (!r.ok) { sugEl.innerHTML = `<div class="suggest" style="border-color:var(--red-border);background:var(--red-bg)"><div class="suggest-body">${esc(r.error)}</div></div>`; return; }
@@ -2951,7 +3015,7 @@ function wireCoverageStep(p){
       };
 
       const stop = showSpinnerOn(btn);
-      const r = await invokeAgent('scene-architect', JSON.stringify({
+      const _saInput = {
         scene: {
           id: scene.id,
           slug: scene.slug,
@@ -2962,7 +3026,9 @@ function wireCoverageStep(p){
           dialogue: scene.dialogue,
         },
         instruction: 'Break this scene into 3-6 shots with coverage logic (master, coverage, reaction, insert). For each shot return {slot, shot, action, mood, duration_target_seconds, characters_in_frame}. Return ONLY JSON in the shape {"shots":[...]} — do NOT skip, do NOT return prose. Every scene has coverage.',
-      }, null, 2), { context: buildContext(p, null, {lean: true}) });
+      };
+      if (!checkInputSize('scene-architect', _saInput)) { stop(); return; }
+      const r = await invokeAgent('scene-architect', JSON.stringify(_saInput, null, 2), { context: buildContext(p, null, {lean: true}) });
       stop();
 
       if (!r.ok) {
@@ -3030,13 +3096,15 @@ function wireCoverageStep(p){
       const stop = showSpinnerOn(btn);
       const current = [shot.shot_brief?.shot, shot.shot_brief?.action, shot.shot_brief?.mood].filter(Boolean).join(' | ');
       const std = window.SB_Normalize.standardizeShotBrief(current);
-      const r = await invokeAgent('prompt-smith', JSON.stringify({
+      const _psInput = {
         current_shot: std,
         scene: p.script.normalized.scenes.find(s => s.id === shot.scene_id),
         characters: shot.characters_in_frame.map(n => p.character_bible[n]).filter(Boolean),
         target_model: shot.model_target || 'seedance-turbo',
         instruction: 'Rewrite this shot as an optimized video-gen prompt. Return {shot, action, mood, final_prompt, negative_prompt, model_target, character_refs_used}.',
-      }, null, 2), { context: buildContext(p, null, {lean: true}) });
+      };
+      if (!checkInputSize('prompt-smith', _psInput)) { stop(); return; }
+      const r = await invokeAgent('prompt-smith', JSON.stringify(_psInput, null, 2), { context: buildContext(p, null, {lean: true}) });
       stop();
 
       const sugEl = document.querySelector(`[data-sug-shot="${CSS.escape(shotId)}"]`);
@@ -3091,12 +3159,14 @@ function wireCoverageStep(p){
       const existingShots = p.shot_list.filter(sh => sh.scene_id === sceneId);
       if (!scene) return;
       const stop = showSpinnerOn(btn);
+      const _cinInput = {
+        scene: { id: scene.id, slug: scene.slug, action: scene.action, characters_present: scene.characters_present },
+        existing_shots: existingShots.map(s => ({ slot: s.slot, shot: s.shot_brief?.shot, action: s.shot_brief?.action })),
+        instruction: 'What coverage is missing? Propose 1-3 additional shots (master / close-up / reaction / insert / OTS / wide) that fill gaps. For each return {slot, shot, action, mood, framing, lens, duration_target_seconds, characters_in_frame, reason}. Return {additional_shots: [...]}.',
+      };
+      if (!checkInputSize('cinematographer', _cinInput)) { stop(); return; }
       const r = await invokeAgent('cinematographer',
-        JSON.stringify({
-          scene: { id: scene.id, slug: scene.slug, action: scene.action, characters_present: scene.characters_present },
-          existing_shots: existingShots.map(s => ({ slot: s.slot, shot: s.shot_brief?.shot, action: s.shot_brief?.action })),
-          instruction: 'What coverage is missing? Propose 1-3 additional shots (master / close-up / reaction / insert / OTS / wide) that fill gaps. For each return {slot, shot, action, mood, framing, lens, duration_target_seconds, characters_in_frame, reason}. Return {additional_shots: [...]}.',
-        }, null, 2),
+        JSON.stringify(_cinInput, null, 2),
         { context: buildContext(p, null, {lean: true}) }
       );
       stop();
@@ -3155,11 +3225,13 @@ function wireCoverageStep(p){
       const scene = p.script.normalized.scenes.find(s => s.id === sceneId);
       if (!scene) return;
       const stop = showSpinnerOn(btn);
+      const _ldInput = {
+        scene: { id: scene.id, slug: scene.slug, setting: scene.setting, time: scene.time, action: scene.action },
+        instruction: 'Design the lighting plan. Return {key_light, fill_light, rim_light, motivated_source, mood_note} — each a short descriptive phrase.',
+      };
+      if (!checkInputSize('lighting-designer', _ldInput)) { stop(); return; }
       const r = await invokeAgent('lighting-designer',
-        JSON.stringify({
-          scene: { id: scene.id, slug: scene.slug, setting: scene.setting, time: scene.time, action: scene.action },
-          instruction: 'Design the lighting plan. Return {key_light, fill_light, rim_light, motivated_source, mood_note} — each a short descriptive phrase.',
-        }, null, 2),
+        JSON.stringify(_ldInput, null, 2),
         { context: buildContext(p, null, {lean: true}) }
       );
       stop();
@@ -3208,12 +3280,14 @@ function wireCoverageStep(p){
       const shots = p.shot_list.filter(sh => sh.scene_id === sceneId);
       if (!scene) return;
       const stop = showSpinnerOn(btn);
+      const _mcInput = {
+        scene: { id: scene.id, slug: scene.slug, action: scene.action },
+        shots: shots.map(sh => ({ id: sh.id, slot: sh.slot, shot: sh.shot_brief?.shot })),
+        instruction: 'Recommend camera movement per shot — stillness vs motion, considering the pacing contract. Return {per_shot: [{shot_id, movement, rationale}]}.',
+      };
+      if (!checkInputSize('movement-choreographer', _mcInput)) { stop(); return; }
       const r = await invokeAgent('movement-choreographer',
-        JSON.stringify({
-          scene: { id: scene.id, slug: scene.slug, action: scene.action },
-          shots: shots.map(sh => ({ id: sh.id, slot: sh.slot, shot: sh.shot_brief?.shot })),
-          instruction: 'Recommend camera movement per shot — stillness vs motion, considering the pacing contract. Return {per_shot: [{shot_id, movement, rationale}]}.',
-        }, null, 2),
+        JSON.stringify(_mcInput, null, 2),
         { context: buildContext(p, null, {lean: true}) }
       );
       stop();
@@ -3271,7 +3345,7 @@ function wireCoverageStep(p){
         const scene = queue.shift();
         if (!scene) break;
         try {
-          const r = await invokeAgent('scene-architect', JSON.stringify({
+          const _saBulkInput = {
             scene: {
               id: scene.id,
               slug: scene.slug,
@@ -3282,7 +3356,9 @@ function wireCoverageStep(p){
               dialogue: scene.dialogue,
             },
             instruction: 'Break this scene into 3-6 shots with coverage logic (master, coverage, reaction, insert). For each shot return {slot, shot, action, mood, duration_target_seconds, characters_in_frame}. Return ONLY JSON in the shape {"shots":[...]} — do NOT skip, do NOT return prose. Every scene has coverage.',
-          }, null, 2), { context: buildContext(p, null, {lean: true}) });
+          };
+          if (!checkInputSize('scene-architect', _saBulkInput)) { failCount++; continue; }
+          const r = await invokeAgent('scene-architect', JSON.stringify(_saBulkInput, null, 2), { context: buildContext(p, null, {lean: true}) });
 
           // Reuse the same diagnostic pipeline as the per-scene break, just
           // recording errors silently per-scene instead of toasting each one.
@@ -3715,8 +3791,10 @@ function wireEditStep(p){
     if (!btn) return;
     btn.addEventListener('click', async () => {
       const stop = showSpinnerOn(btn);
+      const _abInput = { timeline: p.timeline, vision: p.vision, instruction };
+      if (!checkInputSize(agentId, _abInput)) { stop(); return; }
       const r = await invokeAgent(agentId,
-        JSON.stringify({ timeline: p.timeline, vision: p.vision, instruction }, null, 2),
+        JSON.stringify(_abInput, null, 2),
         { context: buildContext(p, null, {lean: true}) }
       );
       stop();
@@ -3832,8 +3910,10 @@ function wireDeliverStep(p){
     if (!btn) return;
     btn.addEventListener('click', async () => {
       const stop = showSpinnerOn(btn);
+      const _acInput = { ...inputObj, instruction };
+      if (!checkInputSize(agentId, _acInput)) { stop(); return; }
       const r = await invokeAgent(agentId,
-        JSON.stringify({ ...inputObj, instruction }, null, 2),
+        JSON.stringify(_acInput, null, 2),
         { context: buildContext(p, null, {lean: true}) }
       );
       stop();
