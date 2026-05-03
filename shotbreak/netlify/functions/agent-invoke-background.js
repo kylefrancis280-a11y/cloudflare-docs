@@ -3,7 +3,7 @@
 //
 //  Netlify detects the -background.js suffix and grants a 15-minute execution
 //  window. The client gets a 202 immediately; this function runs to completion
-//  and writes the result to Firestore for the status endpoint to serve.
+//  and writes the result to Netlify Blobs for the status endpoint to serve.
 //
 //  POST /.netlify/functions/agent-invoke-background
 //  Headers:  Authorization: Bearer <token>
@@ -16,43 +16,34 @@
 
 'use strict';
 
+const { getStore }                                        = require('@netlify/blobs');
 const { getAgent }                                        = require('../../agents/registry');
-const { verifyToken, getOrCreateUser, setCredits, getSystemToken } = require('./lib/auth');
+const { verifyToken, getOrCreateUser, setCredits }        = require('./lib/auth');
 
 const ANTHROPIC_URL     = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
 const FALLBACK_MODEL    = 'claude-haiku-4-5-20251001';
 const VALID_DEDUCTIONS  = new Set([5, 15, 20, 50, 75, 150, 250]);
 
-const FIRESTORE_BASE = () =>
-  `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents`;
+// ── Netlify Blobs job helpers ───────────────────────────────────────────
+// Uses Netlify's built-in key-value store — no Firestore, no credentials,
+// no external config. Available in all Netlify plans out of the box.
+function getJobStore() {
+  return getStore({ name: 'agent_jobs', consistency: 'strong' });
+}
 
-// ── Firestore job helpers ───────────────────────────────────────────────
-// token param: pass the user's own Firebase JWT to avoid needing the system
-// account for writes. Falls back to getSystemToken() if token is absent.
-async function writeJob(docId, fields, token) {
-  if (!token) token = await getSystemToken();
-  const mask  = Object.keys(fields).map(k => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
-  const r = await fetch(`${FIRESTORE_BASE()}/agent_jobs/${docId}?${mask}`, {
-    method: 'PATCH',
-    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      fields: Object.fromEntries(
-        Object.entries(fields).map(([k, v]) => {
-          if (v === null || v === undefined) return [k, { nullValue: null }];
-          if (typeof v === 'number')  return [k, { integerValue: String(v) }];
-          if (typeof v === 'boolean') return [k, { booleanValue: v }];
-          if (v instanceof Date)      return [k, { timestampValue: v.toISOString() }];
-          if (typeof v === 'object')  return [k, { stringValue: JSON.stringify(v) }];
-          return [k, { stringValue: String(v) }];
-        })
-      ),
-    }),
-  });
-  if (!r.ok) {
-    const txt = await r.text().catch(() => '');
-    throw new Error('JOB_WRITE_FAIL_' + r.status + ': ' + txt);
-  }
+async function writeJob(docId, fields) {
+  const store = getJobStore();
+  let existing = {};
+  try {
+    const cur = await store.get(docId, { type: 'json' });
+    if (cur) existing = cur;
+  } catch (_) {}
+  // Dates → ISO strings so they survive JSON serialization
+  const serialized = Object.fromEntries(
+    Object.entries(fields).map(([k, v]) => [k, v instanceof Date ? v.toISOString() : v])
+  );
+  await store.setJSON(docId, { ...existing, ...serialized });
 }
 
 // ── Partial JSON salvage ────────────────────────────────────────────────
@@ -203,7 +194,9 @@ async function callAnthropic(agent, input, context) {
 
 // Required env vars for this handler. Checked at the top of the handler so
 // a misconfigured deploy fails with a clear 500 instead of a downstream 401.
+// FIREBASE_* / SYSTEM_* are only needed for non-owner credit management.
 const REQUIRED_ENV = ['ANTHROPIC_API_KEY', 'FIREBASE_PROJECT_ID', 'FIREBASE_API_KEY', 'SYSTEM_EMAIL', 'SYSTEM_PASSWORD'];
+const OWNER_REQUIRED_ENV = ['ANTHROPIC_API_KEY'];
 
 // ── Handler ─────────────────────────────────────────────────────────────
 exports.handler = async (event) => {
@@ -224,16 +217,7 @@ exports.handler = async (event) => {
   catch { return { statusCode: 400 }; }
 
   const { agent_id, input, context, job_id: clientJobId } = payload;
-  if (!clientJobId) return { statusCode: 400 };  // can't even create a doc without this
-
-  // Extract the raw Firebase JWT from the Authorization header. We pass this
-  // directly to writeJob so Firestore writes use the user's own identity —
-  // no system-account credentials required on the write path. Owner tokens
-  // (owner:…) are HMAC-signed strings, not Firebase JWTs, so they can't be
-  // forwarded to Firestore; those fall back to getSystemToken().
-  const rawToken = ((event.headers.authorization || event.headers.Authorization || '')
-    .replace(/^Bearer\s+/i, '')).trim() || null;
-  const firestoreToken = (rawToken && !rawToken.startsWith('owner:')) ? rawToken : null;
+  if (!clientJobId) return { statusCode: 400 };  // can't create a blob without this
 
   // 2. Auth FIRST so we have a uid to scope the doc to.
   let auth;
@@ -242,8 +226,8 @@ exports.handler = async (event) => {
 
   const docId = `${auth.uid}_${String(clientJobId).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64)}`;
 
-  // 3. Write 'running' doc IMMEDIATELY. From this point on, every error
-  //    path updates the doc with an error message instead of silently
+  // 3. Write 'running' blob IMMEDIATELY. From this point on, every error
+  //    path updates the blob with an error message instead of silently
   //    returning. Polling will see real errors instead of 404 loops.
   try {
     await writeJob(docId, {
@@ -251,26 +235,22 @@ exports.handler = async (event) => {
       agent_id:  agent_id || 'unknown',
       status:    'running',
       createdAt: new Date(),
-    }, firestoreToken);
+    });
   } catch (e) {
     console.error('SB_BG_JOB_CREATE_FAIL', e.message);
     return { statusCode: 500 };
   }
 
-  // Helper: write error to the doc and return the given HTTP status.
+  // Helper: write error to the blob and return the given HTTP status.
   const fail = async (code, msg) => {
-    await writeJob(docId, { status: 'error', error: msg, completedAt: new Date() }, firestoreToken).catch(() => {});
+    await writeJob(docId, { status: 'error', error: msg, completedAt: new Date() }).catch(() => {});
     return { statusCode: code };
   };
 
   // 4. Now run the validations that previously returned early. Each writes
   //    the failure into the doc so the polling client sees it.
-  // Owners skip credit management entirely, so SYSTEM_EMAIL/SYSTEM_PASSWORD
-  // are not needed in that path.
-  const missingEnv = REQUIRED_ENV.filter(k => {
-    if (auth.isOwner && (k === 'SYSTEM_EMAIL' || k === 'SYSTEM_PASSWORD')) return false;
-    return !process.env[k];
-  });
+  const envList = auth.isOwner ? OWNER_REQUIRED_ENV : REQUIRED_ENV;
+  const missingEnv = envList.filter(k => !process.env[k]);
   if (missingEnv.length) return fail(500, 'Server misconfigured (missing env): ' + missingEnv.join(', '));
 
   if (!agent_id || input === undefined) return fail(400, 'Missing agent_id or input');
@@ -315,7 +295,7 @@ exports.handler = async (event) => {
     is_owner:          auth.isOwner,
     model_used:        result.model_used,
     completedAt:       new Date(),
-  }, firestoreToken).catch(e => console.error('SB_BG_JOB_COMPLETE_FAIL', e.message));
+  }).catch(e => console.error('SB_BG_JOB_COMPLETE_FAIL', e.message));
 
   console.log(JSON.stringify({
     tag: 'SB_BG_COMPLETE', agent_id, uid: auth.uid,
