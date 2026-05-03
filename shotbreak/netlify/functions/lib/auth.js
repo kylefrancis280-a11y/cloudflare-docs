@@ -51,7 +51,13 @@ function rawTokenFromEvent(event) {
 function decodeJwtClaims(token) {
   const parts = token.split('.');
   if (parts.length !== 3) throw new Error('malformed token');
-  const padded = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+  // base64url -> base64: swap chars and re-pad to a multiple of 4. Without
+  // the `=` padding, Buffer.from silently truncates payloads whose length
+  // isn't already a multiple of 4, causing JSON.parse to throw on valid
+  // Firebase idTokens.
+  const segment = parts[1];
+  const padding = '='.repeat((4 - (segment.length % 4)) % 4);
+  const padded = segment.replace(/-/g, '+').replace(/_/g, '/') + padding;
   const json = Buffer.from(padded, 'base64').toString('utf8');
   return JSON.parse(json);
 }

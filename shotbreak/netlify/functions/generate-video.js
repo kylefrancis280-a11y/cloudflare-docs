@@ -226,6 +226,10 @@ function extractStatus(d) {
   return d?.data?.status || d?.status || "queued";
 }
 
+// Required env vars for this handler. Checked at the top of the handler so
+// a misconfigured deploy fails with a clear 500 instead of a downstream 401.
+const REQUIRED_ENV = ['WAVESPEED_API_KEY', 'FIREBASE_PROJECT_ID', 'FIREBASE_API_KEY', 'SYSTEM_EMAIL', 'SYSTEM_PASSWORD'];
+
 // ════════════════════════════════════════════════════════════════════════
 // HANDLER
 // ════════════════════════════════════════════════════════════════════════
@@ -233,6 +237,9 @@ exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return respond(204, {});
   if (event.httpMethod !== "POST")
     return respond(405, { error: "Method not allowed" });
+
+  const missingEnv = REQUIRED_ENV.filter(k => !process.env[k]);
+  if (missingEnv.length) return respond(500, { error: 'misconfigured', missing: missingEnv });
 
   let body;
   try { body = JSON.parse(event.body || "{}"); }
