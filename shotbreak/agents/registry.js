@@ -1996,7 +1996,7 @@ SAY NO:
 Sometimes the right note is "no edit needed." A weak Editor proposes busywork. A strong Editor can look at a clip and say "this is as tight as it gets." Only flag clips that actually need work.
 
 INPUT: timeline object with ordered clips, durations, shot metadata.
-OUTPUT (JSON): {"edits":[{"clip_id":"<>","change":"trim_start|trim_end|reorder|remove|split","value":"<specific — seconds, frames, position>","reason":"<craft-principled why>"}]}`),
+OUTPUT (JSON): {"edits":[{"clip_id":"<>","change":"trim_start|trim_end|reorder|remove|split","value":"<specific — seconds, frames, position>","reason":"<craft-principled why>"}]}`,
   { maxTokens: 1500 }),
 
   specialist('transition-designer', 'Transition Designer', 'editors', 'timeline-editor', CREDITS.SMALL,
@@ -2325,6 +2325,9 @@ function getAgent(id) {
     if (!a.tier || ![1, 2].includes(a.tier)) throw new Error(`registry: ${a.id} bad tier`);
     if (a.tier === 2 && !a.manager) throw new Error(`registry: ${a.id} tier-2 needs manager`);
     if (a.tier === 1 && !Array.isArray(a.manages)) throw new Error(`registry: ${a.id} tier-1 needs manages[]`);
+    if (!a.outputFormat || !['json', 'text'].includes(a.outputFormat)) {
+      throw new Error(`registry: ${a.id} bad outputFormat ${a.outputFormat} (must be 'json' or 'text')`);
+    }
   }
   for (const a of AGENTS.filter(x => x.tier === 2)) {
     if (!AGENT_INDEX[a.manager]) throw new Error(`registry: ${a.id} manager ${a.manager} missing`);

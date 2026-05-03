@@ -19,6 +19,14 @@ service cloud.firestore {
       return isSystemUser();
     }
 
+    // Fields a client may write/update on its own user doc. Anything else
+    // (tier, credits, stripe*, subscription*, lastRenewalAt, lastCreditPackAt,
+    // lastProcessedStripeEvent, etc.) is system-only. Allow-by-list, not
+    // deny-by-list — new privileged fields stay locked down by default.
+    function clientWritableFields() {
+      return ['name', 'email', 'avatar_url', 'preferences'];
+    }
+
     // ── users collection ────────────────────────────────────────────────
     match /users/{userId} {
       allow read: if isSystemUser()
@@ -34,15 +42,20 @@ service cloud.firestore {
       allow update: if isSystemUser()
                     || (request.auth != null
                         && request.auth.uid == userId
-                        && !request.resource.data.diff(resource.data).affectedKeys()
-                           .hasAny([
-                             'tier','credits','stripeCustomerId',
-                             'stripeSubscriptionId','subscriptionStatus',
-                             'subscriptionStartedAt','subscriptionEndedAt',
-                             'lastRenewalAt','lastCreditPackAt'
-                           ]));
+                        && request.resource.data.diff(resource.data).affectedKeys()
+                           .hasOnly(clientWritableFields()));
 
       allow delete: if isSystemUser();
+    }
+
+    // ── processedWebhooks collection ────────────────────────────────────
+    // Stripe-webhook idempotency ledger. The webhook server (signed in as
+    // SYSTEM_EMAIL) creates one doc per event.id before granting credits,
+    // so a retry can detect "already processed" and skip. Clients have no
+    // business reading or writing this — system-only on every op.
+    match /processedWebhooks/{eventId} {
+      allow read, create: if isSystemUser();
+      allow update, delete: if false;
     }
 
     // ── agent_jobs collection ───────────────────────────────────────────

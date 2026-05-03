@@ -45,13 +45,19 @@ function respond(statusCode, body) {
 
 const { verifyToken, getOrCreateUser, setCredits } = require('./lib/auth');
 
+// Required env vars for this handler. Checked at the top of the handler so
+// a misconfigured deploy fails with a clear 500 instead of a downstream 401.
+const REQUIRED_ENV = ['FAL_KEY', 'FIREBASE_PROJECT_ID', 'FIREBASE_API_KEY', 'SYSTEM_EMAIL', 'SYSTEM_PASSWORD'];
+
 // ── Handler ─────────────────────────────────────────────────────────────
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return respond(204, {});
   if (event.httpMethod !== 'POST')    return respond(405, { error: 'POST only' });
 
+  const missingEnv = REQUIRED_ENV.filter(k => !process.env[k]);
+  if (missingEnv.length) return respond(500, { error: 'misconfigured', missing: missingEnv });
+
   const FAL = process.env.FAL_KEY;
-  if (!FAL) return respond(500, { error: 'FAL_KEY missing' });
 
   let body;
   try { body = JSON.parse(event.body || '{}'); }

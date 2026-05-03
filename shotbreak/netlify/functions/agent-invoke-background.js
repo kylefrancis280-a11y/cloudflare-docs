@@ -199,10 +199,23 @@ async function callAnthropic(agent, input, context) {
   return { raw: textBlocks, structured, parse_error: parseError, usage: parsed.usage || null, model_used: currentModel };
 }
 
+// Required env vars for this handler. Checked at the top of the handler so
+// a misconfigured deploy fails with a clear 500 instead of a downstream 401.
+const REQUIRED_ENV = ['ANTHROPIC_API_KEY', 'FIREBASE_PROJECT_ID', 'FIREBASE_API_KEY', 'SYSTEM_EMAIL', 'SYSTEM_PASSWORD'];
+
 // ── Handler ─────────────────────────────────────────────────────────────
 exports.handler = async (event) => {
   // Background functions always return 202 to the client immediately.
   // All real work happens after this point and is invisible to the requester.
+
+  const missingEnv = REQUIRED_ENV.filter(k => !process.env[k]);
+  if (missingEnv.length) {
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'misconfigured', missing: missingEnv }),
+    };
+  }
 
   let payload;
   try { payload = JSON.parse(event.body || '{}'); }

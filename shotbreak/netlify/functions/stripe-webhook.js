@@ -254,6 +254,50 @@ function toFirestoreFields(obj) {
   return out;
 }
 
+// Bootstrap a fresh user doc on demand. Used when a Stripe webhook fires
+// before the user has ever signed into Firebase (anon checkout, or signup
+// flow that lands on Stripe before the app). Mirrors lib/auth.js
+// getOrCreateUser semantics: tier=free, credits=0, created_at, updated_at.
+// Throws transient on Firestore 5xx so Stripe retries.
+async function createUser(uid, token, seed) {
+  const now = new Date();
+  const fields = {
+    tier: (seed && seed.tier) || "free",
+    credits: (seed && typeof seed.credits === "number") ? seed.credits : 0,
+    createdAt: now,
+    updatedAt: now,
+  };
+  const url = `${FIRESTORE_BASE()}/users?documentId=${encodeURIComponent(uid)}`;
+  const r = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ fields: toFirestoreFields(fields) }),
+  });
+  if (r.ok) {
+    return {
+      tier: fields.tier,
+      credits: fields.credits,
+      name: "",
+      email: "",
+      lastProcessedStripeEvent: "",
+    };
+  }
+  // 409 ALREADY_EXISTS → race: another concurrent webhook just created it.
+  // Re-read so caller gets current state (including any lastProcessedStripeEvent).
+  if (r.status === 409) {
+    const existing = await readUser(uid, token);
+    if (existing) return existing;
+    // Fall through to error if read still returns null (shouldn't happen).
+  }
+  const errText = await r.text().catch(() => "");
+  const e = new Error("USER_CREATE_FAIL_" + r.status + ": " + errText);
+  if (isTransientStatus(r.status)) makeTransient(e);
+  throw e;
+}
+
 async function patchUser(uid, fields, token) {
   const mask = Object.keys(fields)
     .map((k) => `updateMask.fieldPaths=${encodeURIComponent(k)}`)
@@ -417,10 +461,18 @@ async function handleCheckoutCompleted(session, token, eventId) {
       console.warn("[webhook] credit pack with no parseable credit count:", productName);
       return { skipped: "no_credit_amount" };
     }
-    const user = await readUser(uid, token);
+    let user = await readUser(uid, token);
     if (!user) {
-      console.warn("[webhook] credit pack for unknown user:", uid);
-      return { skipped: "user_not_found" };
+      // First-time Stripe purchase by a user without an existing Firestore
+      // doc (anon checkout, or signed up via Stripe before app). Bootstrap
+      // the doc so we don't silently drop the credits they paid for.
+      console.log(`[webhook] bootstrapping user doc for credit pack: uid=${uid}`);
+      try {
+        user = await createUser(uid, token, { tier: "free", credits: 0 });
+      } catch (e) {
+        if (!e.transient) makeTransient(e);
+        throw e;
+      }
     }
     // Per-user idempotency: if we already processed this event for this
     // user, don't double-grant. (Guards against a retry that arrives
@@ -459,7 +511,18 @@ async function handleCheckoutCompleted(session, token, eventId) {
     const credits = TIER_CREDITS[tier];
 
     // Per-user idempotency check before any writes.
-    const existingUser = await readUser(uid, token);
+    let existingUser = await readUser(uid, token);
+    if (!existingUser) {
+      // First-time Stripe purchase by a user without an existing Firestore
+      // doc. Bootstrap so subsequent writes have a base to update.
+      console.log(`[webhook] bootstrapping user doc for new subscription: uid=${uid}`);
+      try {
+        existingUser = await createUser(uid, token, { tier: "free", credits: 0 });
+      } catch (e) {
+        if (!e.transient) makeTransient(e);
+        throw e;
+      }
+    }
     if (eventId && existingUser && existingUser.lastProcessedStripeEvent === eventId) {
       console.log(`[webhook] event ${eventId} already applied to uid=${uid}, skipping subscription setup`);
       const claimed = await claimWebhookEvent(eventId, token);
