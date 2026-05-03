@@ -245,13 +245,41 @@
     }
   }
 
+  // Detect the specific "stalled twice" error that agent-invoke throws when
+  // both Sonnet and Haiku fail to respond inside the 26s Netlify ceiling.
+  // When this happens, the background path (15-minute budget) usually
+  // succeeds because Anthropic's incidents typically clear inside a minute
+  // or two. Falling through automatically beats showing the user a fatal
+  // error and asking them to retry by hand.
+  function isStalledTwice(err) {
+    if (!err) return false;
+    const status = err.status;
+    const msg = String(err.message || '').toLowerCase();
+    const detail = String(err.detail?.detail || err.detail || '').toLowerCase();
+    const combined = msg + ' ' + detail;
+    if (status !== 502 && status !== 504) return false;
+    return combined.includes('stalled on both') ||
+           combined.includes('timed out twice') ||
+           combined.includes('stalled and only');
+  }
+
   const SB_Agents = {
-    invoke(agentId, input, opts = {}) {
-      // DEMO PATH: use the synchronous /agent-invoke endpoint. Owners bypass
-      // credit checks and never hit Firestore. Works within the 26s Netlify
-      // Pro timeout — single Anthropic call typically completes in 5-15s.
-      // This avoids the entire Firestore job-queue dependency.
-      return invokeSync(agentId, input, opts);
+    async invoke(agentId, input, opts = {}) {
+      // Try the fast sync path first. If it fails because Anthropic stalled
+      // both Sonnet and Haiku within the Netlify 26s ceiling, fall through
+      // to the background path which has a 15-minute budget.
+      try {
+        return await invokeSync(agentId, input, opts);
+      } catch (e) {
+        if (isStalledTwice(e)) {
+          console.warn('[SB_Agents] sync path stalled (Anthropic incident likely), falling through to background polling for', agentId);
+          if (typeof opts.onSlowFallback === 'function') {
+            try { opts.onSlowFallback(); } catch(_) {}
+          }
+          return invokeWithPolling(agentId, input, opts);
+        }
+        throw e;
+      }
     },
     // Available if you need background/long-running path (requires Firestore)
     invokePolling(agentId, input, opts = {}) {
