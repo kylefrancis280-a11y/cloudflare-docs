@@ -36,9 +36,13 @@ async function writeJob(docId, fields) {
   const store = getJobStore();
   let existing = {};
   try {
-    const cur = await store.get(docId, { type: 'json' });
-    if (cur) existing = cur;
-  } catch (_) {}
+    const raw = await store.get(docId);
+    if (raw) existing = typeof raw === 'string' ? JSON.parse(raw) : raw;
+  } catch (e) {
+    // Read failures during merge are non-fatal — we'll just overwrite. But
+    // log them so a real Blobs outage is visible in function logs.
+    console.warn('SB_BG_BLOB_READ_WARN', e.message);
+  }
   // Dates → ISO strings so they survive JSON serialization
   const serialized = Object.fromEntries(
     Object.entries(fields).map(([k, v]) => [k, v instanceof Date ? v.toISOString() : v])

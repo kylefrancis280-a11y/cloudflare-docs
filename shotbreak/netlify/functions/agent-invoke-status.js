@@ -31,14 +31,14 @@ function respond(statusCode, body) {
 }
 
 async function readJob(docId) {
-  const store = getStore({ name: 'agent_jobs', consistency: 'strong' });
-  try {
-    const raw = await store.get(docId);
-    if (!raw) return null;
-    return typeof raw === 'string' ? JSON.parse(raw) : raw;
-  } catch (_) {
-    return null;
-  }
+  let store;
+  try { store = getStore({ name: 'agent_jobs', consistency: 'strong' }); }
+  catch (e) { throw new Error('Blobs unavailable: ' + e.message); }
+  const raw = await store.get(docId);
+  if (!raw) return null;
+  if (typeof raw !== 'string') return raw;
+  try { return JSON.parse(raw); }
+  catch (_) { return null; }  // corrupted blob — treat as not found
 }
 
 exports.handler = async (event) => {
@@ -55,7 +55,12 @@ exports.handler = async (event) => {
   // Reconstruct the server-side blob key the same way the background function does.
   const docId = `${auth.uid}_${String(clientJobId).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64)}`;
 
-  const job = await readJob(docId);
+  let job;
+  try { job = await readJob(docId); }
+  catch (e) {
+    console.error('SB_STATUS_READ_FAIL', e.message);
+    return respond(500, { error: 'Job lookup failed: ' + e.message });
+  }
 
   // Job not found — return 404 to avoid leaking existence via brute-force enumeration.
   if (!job) return respond(404, { error: 'Job not found' });
