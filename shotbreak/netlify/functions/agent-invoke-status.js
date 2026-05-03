@@ -16,7 +16,8 @@
 
 'use strict';
 
-const { verifyToken, getSystemToken } = require('./lib/auth');
+const { getStore }    = require('@netlify/blobs');
+const { verifyToken } = require('./lib/auth');
 
 const CORS = {
   'Access-Control-Allow-Origin':  'https://shotbreak.io',
@@ -29,44 +30,15 @@ function respond(statusCode, body) {
   return { statusCode, headers: CORS, body: JSON.stringify(body) };
 }
 
-const FIRESTORE_BASE = () =>
-  `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/databases/(default)/documents`;
-
 async function readJob(docId) {
-  const token = await getSystemToken();
-  const r = await fetch(`${FIRESTORE_BASE()}/agent_jobs/${docId}`, {
-    headers: { Authorization: 'Bearer ' + token },
-  });
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error('JOB_READ_FAIL_' + r.status);
-  const d = await r.json();
-  const f = d.fields || {};
-
-  function unpack(v) {
-    if (!v) return null;
-    if ('stringValue'  in v) {
-      // Try to parse JSON strings back to objects (output, etc.)
-      try { return JSON.parse(v.stringValue); } catch { return v.stringValue; }
-    }
-    if ('integerValue' in v) return parseInt(v.integerValue, 10);
-    if ('booleanValue' in v) return v.booleanValue;
-    if ('nullValue'    in v) return null;
-    return null;
-  }
-
-  return {
-    uid:               unpack(f.uid),
-    agent_id:          unpack(f.agent_id),
-    status:            unpack(f.status) || 'pending',
-    output:            unpack(f.output),
-    raw:               unpack(f.raw),
-    parse_error:       unpack(f.parse_error),
-    error:             unpack(f.error),
-    credits_charged:   unpack(f.credits_charged),
-    credits_remaining: unpack(f.credits_remaining),
-    is_owner:          unpack(f.is_owner),
-    model_used:        unpack(f.model_used),
-  };
+  let store;
+  try { store = getStore({ name: 'agent_jobs', consistency: 'strong' }); }
+  catch (e) { throw new Error('Blobs unavailable: ' + e.message); }
+  const raw = await store.get(docId);
+  if (!raw) return null;
+  if (typeof raw !== 'string') return raw;
+  try { return JSON.parse(raw); }
+  catch (_) { return null; }  // corrupted blob — treat as not found
 }
 
 exports.handler = async (event) => {
@@ -80,25 +52,27 @@ exports.handler = async (event) => {
   try { auth = await verifyToken(event); }
   catch (e) { return respond(401, { error: e.message || 'AUTH_FAIL' }); }
 
-  // Reconstruct the server-side doc id the same way the background function does.
+  // Reconstruct the server-side blob key the same way the background function does.
   const docId = `${auth.uid}_${String(clientJobId).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64)}`;
 
   let job;
   try { job = await readJob(docId); }
-  catch (e) { return respond(500, { error: 'Job lookup failed: ' + e.message }); }
+  catch (e) {
+    console.error('SB_STATUS_READ_FAIL', e.message);
+    return respond(500, { error: 'Job lookup failed: ' + e.message });
+  }
 
   // Job not found — return 404 to avoid leaking existence via brute-force enumeration.
   if (!job) return respond(404, { error: 'Job not found' });
 
   // Owners can access any job; regular users can only access their own.
-  // (docId is already prefixed with auth.uid above, so this is belt-and-suspenders.)
   if (!auth.isOwner && job.uid !== auth.uid) {
     return respond(403, { error: 'Forbidden' });
   }
 
   return respond(200, {
     job_id:            clientJobId,
-    status:            job.status,
+    status:            job.status || 'pending',
     agent_id:          job.agent_id,
     output:            job.output,
     raw:               job.raw,

@@ -13,15 +13,18 @@
   const ORCHESTRATE_URL  = '/.netlify/functions/agent-orchestrate';
   const BOOTSTRAP_URL    = '/.netlify/functions/bootstrap-user';                // create user doc on first login
 
-  // Polling config — exponential backoff. Tightened from 1s→5s to 600ms→3s
-  // because during Anthropic incidents the background path is the only path
-  // that works, and the user is already waiting. Slower polling here just
-  // means more wall-clock latency between "job done in Firestore" and
-  // "browser shows result."
-  const POLL_INITIAL_MS   = 600;
-  const POLL_MAX_MS       = 3000;
-  const POLL_BACKOFF      = 1.35;
-  const POLL_TIMEOUT_MS   = 5 * 60 * 1000;
+  // Polling config — exponential backoff. Bumped initial delay to 1500ms
+  // because background-function cold starts (Lambda init + module load +
+  // auth + first blob write) can take 1–2 seconds. Polling earlier just
+  // burns 404s. POLL_NOT_FOUND_FATAL_MS caps how long we'll tolerate
+  // continuous 404s before giving up — past that, the background function
+  // almost certainly never created the doc (silent failure on the server),
+  // and waiting the full 5-minute timeout helps nobody.
+  const POLL_INITIAL_MS         = 1500;
+  const POLL_MAX_MS             = 3000;
+  const POLL_BACKOFF            = 1.35;
+  const POLL_TIMEOUT_MS         = 5 * 60 * 1000;
+  const POLL_NOT_FOUND_FATAL_MS = 20 * 1000;
 
   // ── Anthropic-slow detection ──────────────────────────────────────────
   // When ANY agent stalls hard enough to trip the background fallback, mark
@@ -234,6 +237,15 @@
       try { status = await get(statusUrlFor(jobId)); }
       catch (e) {
         if (e.status === 401 || e.status === 403) throw e;
+        // Persistent 404 means the background function never wrote the doc —
+        // typically a misconfigured deploy or Blobs outage. Don't make the
+        // user wait the full 5-minute timeout for this.
+        if (e.status === 404 && Date.now() - t0 > POLL_NOT_FOUND_FATAL_MS) {
+          const fatal = new Error('Agent job was never created on the server (persistent 404 after ' + Math.round(POLL_NOT_FOUND_FATAL_MS / 1000) + 's). Check Netlify function logs.');
+          fatal.status = 502;
+          fatal.detail = { job_id: jobId };
+          throw fatal;
+        }
         delay = Math.min(delay * POLL_BACKOFF, POLL_MAX_MS);
         continue;
       }
