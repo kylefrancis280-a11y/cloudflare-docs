@@ -45,7 +45,22 @@ async function verifyFirebaseToken(token) {
   }
 }
 
-const ALLOWED = /^https:\/\/([a-z0-9][a-z0-9-]*\.)*wavespeed\.ai\//i;
+const ALLOWED_HOSTS = new Set([
+  'wavespeed.ai',
+  'cdn.wavespeed.ai',
+  'd1q70pf5vjeyhc.cloudfront.net',
+  'fal.media',
+  'v3b.fal.media',
+  'v3.fal.media',
+]);
+
+function isAllowedUrl(rawUrl) {
+  let parsed;
+  try { parsed = new URL(rawUrl); }
+  catch { return false; }
+  if (parsed.protocol !== 'https:') return false;
+  return ALLOWED_HOSTS.has(parsed.hostname.toLowerCase());
+}
 
 export default async function handler(req) {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
@@ -71,7 +86,7 @@ export default async function handler(req) {
   catch { return json(401, { error: 'Login required' });   }
 
   if (!url || typeof url !== 'string') return json(400, { error: 'url required' });
-  if (!ALLOWED.test(url)) return json(403, { error: 'URL not from an allowed domain' });
+  if (!isAllowedUrl(url)) return json(403, { error: 'URL not from an allowed domain' });
 
   // Forward Range header so <video> seek works and Safari plays at all.
   const upstreamHeaders = {};
