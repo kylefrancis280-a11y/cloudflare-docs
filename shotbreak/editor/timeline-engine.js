@@ -267,8 +267,15 @@
     let dragMode = null;     // 'move' | 'trim-l' | 'trim-r'
     let startX = 0, startStart = 0, startIn = 0, startOut = 0;
     let moved = false;
+    let rafPending = false;
 
     const onMove = e => {
+      if (!state.timeline.includes(inst)) {
+        dragMode = null;
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        return;
+      }
       const dx = e.clientX - startX;
       const dSec = pxToSec(dx);
       if (Math.abs(dx) > 2) moved = true;
@@ -285,12 +292,16 @@
       } else if (dragMode === 'trim-r') {
         inst.sourceOut = Math.max(startIn + 0.1, Math.min(startOut + dSec, bc.duration));
       }
-      renderAll();
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(() => { rafPending = false; renderAll(); });
+      }
     };
     const onUp = () => {
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup', onUp);
       dragMode = null;
+      if (!state.timeline.includes(inst)) return;
     };
     const onDown = e => {
       e.preventDefault();
@@ -559,6 +570,11 @@
     let payload;
     try { payload = JSON.parse(raw); }
     catch (e) { logAgent(`Corrupt save: ${e.message}`, 'err'); return; }
+    for (const removed of state.bin) {
+      if (removed && typeof removed.src === 'string' && removed.src.startsWith('blob:')) {
+        URL.revokeObjectURL(removed.src);
+      }
+    }
     state.bin = Array.isArray(payload.bin) ? payload.bin : [];
     state.timeline = Array.isArray(payload.timeline) ? payload.timeline : [];
     state.selectedClipId = null;
@@ -610,18 +626,34 @@
       progressCb && progressCb(`Rendering... ${Math.round(progress * 100)}%`);
     });
     progressCb && progressCb('Starting FFmpeg worker (first run may take 30s)...');
-    await ff.load({
-      coreURL: BASE + '/ffmpeg-core.js',
-      wasmURL: BASE + '/ffmpeg-core.wasm',
-    });
+    try {
+      await ff.load({
+        coreURL: BASE + '/ffmpeg-core.js',
+        wasmURL: BASE + '/ffmpeg-core.wasm',
+      });
+    } catch (err) {
+      alert('FFmpeg requires a modern browser with SharedArrayBuffer support. Try Chrome or Firefox.');
+      const btn = document.getElementById('btn-render');
+      if (btn) { btn.disabled = false; btn.textContent = 'Render Timeline'; }
+      throw err;
+    }
     _ffmpegInstance = ff;
     return ff;
   }
 
   async function fetchToU8(url) {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error('Fetch failed: ' + url + ' (' + r.status + ')');
-    return new Uint8Array(await r.arrayBuffer());
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 30000);
+    try {
+      const r = await fetch(url, { signal: ctrl.signal });
+      if (!r.ok) throw new Error('Fetch failed: ' + url + ' (' + r.status + ')');
+      return new Uint8Array(await r.arrayBuffer());
+    } catch (e) {
+      if (e && e.name === 'AbortError') throw new Error('Clip download timed out: ' + url);
+      throw e;
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   async function renderTimelineToMP4(progressCb) {
@@ -984,6 +1016,15 @@
   $('agent-polish').addEventListener('click', () => runSingleAgent('polish-pass', 'Polish Pass'));
 
   // ---------- Boot ----------
+
+  window.addEventListener('beforeunload', () => {
+    if (state.playTimer) { clearInterval(state.playTimer); state.playTimer = null; }
+    for (const b of state.bin) {
+      if (b && typeof b.src === 'string' && b.src.startsWith('blob:')) {
+        URL.revokeObjectURL(b.src);
+      }
+    }
+  });
 
   renderAll();
   logAgent('Editor ready.', 'ok');
