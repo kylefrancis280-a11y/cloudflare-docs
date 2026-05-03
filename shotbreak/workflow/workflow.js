@@ -3411,6 +3411,21 @@ function wireGenerateStep(p){
   (async () => {
     const allShots = (p.shot_list || []);
     if (!allShots.length) return;
+    // Slim character_bible to just the fields continuity-supervisor uses.
+    // Drops core_wound, moral_flaw, arc_trajectory, period_notes, etc —
+    // those are for character/story agents, not for catching wardrobe drift
+    // or prop disappearance. Cuts the per-batch payload from ~50KB to ~25KB.
+    const slimBible = {};
+    for (const [name, c] of Object.entries(p.character_bible || {})) {
+      if (!c) continue;
+      slimBible[name] = {
+        consistency_phrase: c.consistency_phrase || '',
+        visual_anchors:     c.visual_anchors || [],
+        wardrobe_default:   c.wardrobe_default || '',
+        signature_props:    c.signature_props || [],
+        scenes_present:     c.scenes_present || 0,
+      };
+    }
     const BATCH = 25;
     const batches = [];
     for (let i = 0; i < allShots.length; i += BATCH) batches.push(allShots.slice(i, i + BATCH));
@@ -3420,7 +3435,7 @@ function wireGenerateStep(p){
       const r = await runPassive('continuity-supervisor',
         JSON.stringify({
           shot_list: batch.map(sh => ({ id: sh.id, scene_id: sh.scene_id, slot: sh.slot, characters_in_frame: sh.characters_in_frame, shot_brief: sh.shot_brief })),
-          character_bible: p.character_bible,
+          character_bible: slimBible,
           batch_info: `Batch ${bi + 1} of ${batches.length} — ${batch.length} shots`,
           instruction: 'Scan this batch of shots for continuity issues — wardrobe drift, prop disappearance, character presence inconsistencies. Return {warnings: [{shot_ids: [string], issue: string, severity: "low"|"medium"|"high"}]}.',
         }),
