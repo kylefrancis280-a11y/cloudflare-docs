@@ -207,41 +207,37 @@ const REQUIRED_ENV = ['ANTHROPIC_API_KEY', 'FIREBASE_PROJECT_ID', 'FIREBASE_API_
 exports.handler = async (event) => {
   // Background functions always return 202 to the client immediately.
   // All real work happens after this point and is invisible to the requester.
+  //
+  // CRITICAL ORDERING (root cause of "Job not found" loop):
+  // The previous version validated env vars / payload / agent / credits
+  // BEFORE writing the job doc. If any of those failed early, the doc
+  // never got created, the status endpoint returned 404, and the client
+  // polled until 5-min timeout with no useful error. This version writes
+  // a 'running' doc as soon as we have auth.uid + clientJobId, then
+  // updates that doc with errors instead of returning early.
 
-  const missingEnv = REQUIRED_ENV.filter(k => !process.env[k]);
-  if (missingEnv.length) {
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'misconfigured', missing: missingEnv }),
-    };
-  }
-
+  // 1. Need a parseable body to extract the job_id and uid (uid comes from auth).
   let payload;
   try { payload = JSON.parse(event.body || '{}'); }
   catch { return { statusCode: 400 }; }
 
   const { agent_id, input, context, job_id: clientJobId } = payload;
-  if (!agent_id || input === undefined || !clientJobId) return { statusCode: 400 };
+  if (!clientJobId) return { statusCode: 400 };  // can't even create a doc without this
 
-  let agent;
-  try { agent = getAgent(agent_id); }
-  catch { return { statusCode: 404 }; }
-
-  if (!VALID_DEDUCTIONS.has(agent.credits)) return { statusCode: 500 };
-
+  // 2. Auth FIRST so we have a uid to scope the doc to.
   let auth;
   try { auth = await verifyToken(event); }
   catch { return { statusCode: 401 }; }
 
-  // Safe doc id: uid prefix prevents cross-user job_id collisions.
   const docId = `${auth.uid}_${String(clientJobId).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64)}`;
 
-  // Write initial job record so the status endpoint returns "pending" immediately.
+  // 3. Write 'running' doc IMMEDIATELY. From this point on, every error
+  //    path updates the doc with an error message instead of silently
+  //    returning. Polling will see real errors instead of 404 loops.
   try {
     await writeJob(docId, {
       uid:       auth.uid,
-      agent_id,
+      agent_id:  agent_id || 'unknown',
       status:    'running',
       createdAt: new Date(),
     });
@@ -250,25 +246,35 @@ exports.handler = async (event) => {
     return { statusCode: 500 };
   }
 
+  // Helper: write error to the doc and return the given HTTP status.
+  const fail = async (code, msg) => {
+    await writeJob(docId, { status: 'error', error: msg, completedAt: new Date() }).catch(() => {});
+    return { statusCode: code };
+  };
+
+  // 4. Now run the validations that previously returned early. Each writes
+  //    the failure into the doc so the polling client sees it.
+  const missingEnv = REQUIRED_ENV.filter(k => !process.env[k]);
+  if (missingEnv.length) return fail(500, 'Server misconfigured (missing env): ' + missingEnv.join(', '));
+
+  if (!agent_id || input === undefined) return fail(400, 'Missing agent_id or input');
+
+  let agent;
+  try { agent = getAgent(agent_id); }
+  catch { return fail(404, 'Unknown agent: ' + agent_id); }
+
+  if (!VALID_DEDUCTIONS.has(agent.credits)) return fail(500, 'Invalid credit value for agent: ' + agent.credits);
+
   // Credit check + deduction.
   let userCredits = 0;
   if (!auth.isOwner) {
     let user;
     try { user = await getOrCreateUser(auth.uid); }
-    catch (e) {
-      await writeJob(docId, { status: 'error', error: 'Credit lookup failed: ' + e.message, completedAt: new Date() }).catch(() => {});
-      return { statusCode: 500 };
-    }
+    catch (e) { return fail(500, 'Credit lookup failed: ' + e.message); }
     userCredits = user?.credits || 0;
-    if (userCredits < agent.credits) {
-      await writeJob(docId, { status: 'error', error: 'Insufficient credits', completedAt: new Date() }).catch(() => {});
-      return { statusCode: 402 };
-    }
+    if (userCredits < agent.credits) return fail(402, 'Insufficient credits');
     try { await setCredits(auth.uid, userCredits - agent.credits); }
-    catch (e) {
-      await writeJob(docId, { status: 'error', error: 'Credit deduction failed: ' + e.message, completedAt: new Date() }).catch(() => {});
-      return { statusCode: 500 };
-    }
+    catch (e) { return fail(500, 'Credit deduction failed: ' + e.message); }
   }
 
   // Run the agent.
@@ -279,8 +285,7 @@ exports.handler = async (event) => {
     if (!auth.isOwner) {
       try { await setCredits(auth.uid, userCredits); } catch (_) {}
     }
-    await writeJob(docId, { status: 'error', error: e.message, completedAt: new Date() }).catch(() => {});
-    return { statusCode: 502 };
+    return fail(502, e.message);
   }
 
   // Write success.
