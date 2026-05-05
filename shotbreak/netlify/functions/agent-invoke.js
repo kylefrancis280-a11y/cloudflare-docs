@@ -2,19 +2,12 @@
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': 'https://shotbreak.io',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      }
-    };
+    return { statusCode: 200, headers: { 'Access-Control-Allow-Origin': '*' } };
   }
 
   try {
     const payload = JSON.parse(event.body || '{}');
-    const { agent_id, input } = payload;
+    const input = payload.input || "Test input";
 
     const res = await fetch('https://api.x.ai/v1/chat/completions', {
       method: 'POST',
@@ -24,19 +17,17 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({
         model: "grok-3",
-        max_tokens: 1200,
+        max_tokens: 1000,
         temperature: 0.8,
         messages: [
-          { role: "system", content: "You are Vision-Director, a raw cinematic neo-noir genius. Be creative and detailed." },
-          { role: "user", content: String(input || "Test") }
+          { role: "system", content: "You are Vision-Director. Give raw, cinematic answers." },
+          { role: "user", content: String(input) }
         ]
       })
     });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
     const data = await res.json();
-    const text = data.choices?.[0]?.message?.content || "Grok responded";
+    const text = data.choices?.[0]?.message?.content || "Grok is working";
 
     return {
       statusCode: 200,
@@ -48,11 +39,10 @@ exports.handler = async (event) => {
     };
 
   } catch (e) {
-    console.error(e);
     return {
       statusCode: 502,
       headers: { 'Access-Control-Allow-Origin': 'https://shotbreak.io' },
-      body: JSON.stringify({ error: "Agent invocation failed", detail: e.message })
+      body: JSON.stringify({ error: "Failed", detail: e.message })
     };
   }
 };
