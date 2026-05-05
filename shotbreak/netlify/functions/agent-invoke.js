@@ -16,7 +16,6 @@ exports.handler = async (event) => {
     const payload = JSON.parse(event.body || '{}');
     const { agent_id, input } = payload;
 
-    // GROK CALL
     const res = await fetch('https://api.x.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -25,17 +24,19 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({
         model: "grok-3",
-        max_tokens: 1500,
-        temperature: 0.75,
+        max_tokens: 1200,
+        temperature: 0.8,
         messages: [
-          { role: "system", content: "You are a helpful creative film agent." },
-          { role: "user", content: String(input || "Say hello") }
+          { role: "system", content: "You are Vision-Director, a raw cinematic neo-noir genius. Be creative and detailed." },
+          { role: "user", content: String(input || "Test") }
         ]
       })
     });
 
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
     const data = await res.json();
-    const text = data.choices?.[0]?.message?.content || "No response";
+    const text = data.choices?.[0]?.message?.content || "Grok responded";
 
     return {
       statusCode: 200,
@@ -43,10 +44,7 @@ exports.handler = async (event) => {
         'Access-Control-Allow-Origin': 'https://shotbreak.io',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        raw: text,
-        model_used: 'grok-3'
-      })
+      body: JSON.stringify({ raw: text, model_used: 'grok-3' })
     };
 
   } catch (e) {
@@ -54,7 +52,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 502,
       headers: { 'Access-Control-Allow-Origin': 'https://shotbreak.io' },
-      body: JSON.stringify({ error: "Agent failed", detail: e.message })
+      body: JSON.stringify({ error: "Agent invocation failed", detail: e.message })
     };
   }
 };
