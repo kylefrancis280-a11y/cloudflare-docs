@@ -267,8 +267,7 @@ async function runParallelChain(agentIds, input, seedContext, callStart) {
 
 // Required env vars for this handler. Checked at the top of the handler so
 // a misconfigured deploy fails with a clear 500 instead of a downstream 401.
-const REQUIRED_ENV = ['ANTHROPIC_API_KEY', 'FIREBASE_PROJECT_ID', 'FIREBASE_API_KEY', 'SYSTEM_EMAIL', 'SYSTEM_PASSWORD'];
-
+const REQUIRED_ENV = ['GROK_SHOTBREAK_KEY'];
 // ── Handler ─────────────────────────────────────────────────────────────
 exports.handler = async function (event) {
   if (event.httpMethod === 'OPTIONS') return respond(204, {});
