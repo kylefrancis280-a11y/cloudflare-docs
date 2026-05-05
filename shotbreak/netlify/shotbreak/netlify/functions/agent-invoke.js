@@ -1,5 +1,7 @@
 'use strict';
 
+const { getAgent } = require('../../agents/registry');
+
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers: { 'Access-Control-Allow-Origin': 'https://shotbreak.io' } };
@@ -9,6 +11,8 @@ exports.handler = async (event) => {
     const payload = JSON.parse(event.body || '{}');
     const { agent_id, input } = payload;
 
+    const agent = getAgent(agent_id);
+
     const res = await fetch('https://api.x.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -17,10 +21,10 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({
         model: "grok-3",
-        max_tokens: 1800,
-        temperature: 0.85,
+        max_tokens: agent.max_tokens,
+        temperature: agent.temperature,
         messages: [
-          { role: "system", content: "You are part of Shotbreak — the ultimate AI film crew. Be extremely cinematic, creative, detailed, and professional." },
+          { role: "system", content: agent.systemPrompt },
           { role: "user", content: String(input || "Test") }
         ]
       })
