@@ -432,16 +432,36 @@ function isTransientAgentError(e) {
   return false;
 }
 
+async function grokInvoke(agentId, input) {
+  try {
+    const res = await fetch('/.netlify/functions/agent-invoke', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agent_id: agentId,
+        input: typeof input === 'string' ? input : JSON.stringify(input, null, 2)
+      })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error + (data.detail ? ' — ' + data.detail : ''));
+    return { ok: true, output: data.raw || data };
+  } catch(e) {
+    console.error('[Grok Invoke Error]', e);
+    return { ok: false, error: e.message };
+  }
+}
+
 async function invokeAgent(agentId, input, opts){
   CrewFeed.log(agentId, 'working');
   const _opts = opts || {};
   const _slowFallback = () => {
     const meta = window.SB_Agents && window.SB_Agents.agentMeta(agentId);
     const label = (meta && meta.name) || agentId;
-    toast(`${label} is slow — Anthropic rerouted to background. Hang tight (~60s).`, 'ok');
+    toast(`${label} is slow — Hang tight (~60s).`, 'ok');
     if (typeof _opts.onSlowFallback === 'function') { try { _opts.onSlowFallback(); } catch(_) {} }
   };
-  const doCall = () => window.SB_Agents.invoke(agentId, input, Object.assign({}, _opts, { onSlowFallback: _slowFallback }));
+  const doCall = () => grokInvoke(agentId, input);
   const MAX_RETRIES = 2;
   const BACKOFFS_MS = [1200, 2500];
   try {
@@ -518,7 +538,7 @@ async function runPassive(agentId, input, p, onOk, opts){
     const meta = window.SB_Agents && window.SB_Agents.agentMeta(agentId);
     toast(`${(meta && meta.name) || agentId} rerouted to background — enrichment may take ~60s.`, 'ok');
   };
-  const attempt = () => window.SB_Agents.invoke(agentId, input, Object.assign(ctx ? { context: ctx } : {}, { onSlowFallback: _passiveSlowFallback }));
+  const attempt = () => grokInvoke(agentId, input);
   const MAX_RETRIES = 2;
   const BACKOFFS_MS = [1500, 3000];
   try {
