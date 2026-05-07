@@ -992,49 +992,49 @@ function getCrewSpecsFor(step, p){
     case 'story': {
       const build = (instr) => JSON.stringify({...commonScriptInput, instruction: instr}, null, 2);
       return [
-        { id: 'story-director',              label: 'Story Director',              credits: credOf('story-director'),              input: build('Declare structural verdict (sound/fixable/rewrite_needed), tag every scene with beat_type, flag cause_and_effect_gaps. Return full JSON schema.') },
-        { id: 'beat-analyst',                label: 'Beat Analyst',                credits: credOf('beat-analyst'),                input: build('Tag every scene with beat_type and strength. Flag missing beats.') },
-        { id: 'dialogue-writer',             label: 'Dialogue Writer',             credits: credOf('dialogue-writer'),             input: build('Audit dialogue across script. Return verdict, voice_distinctness_score, per_character_notes, top_rewrites.') },
-        { id: 'dialogue-coach',              label: 'Dialogue Coach',              credits: credOf('dialogue-coach'),              input: build('Score voice distinctness per character, propose targeted rewrites for lines that fail.') },
-        { id: 'cliche-detector',             label: 'Cliche Detector',             credits: credOf('cliche-detector'),             input: build('Flag on-the-nose, stock-phrase, and genre-cliche lines with severity calibration.') },
-        { id: 'voice-consistency-auditor',   label: 'Voice Consistency Auditor',   credits: credOf('voice-consistency-auditor'),   input: build('Scan dialogue for lines that do not match each character voice signature. Return flags with rewrites.') },
-        { id: 'action-writer',               label: 'Action Writer',               credits: credOf('action-writer'),               input: build('Audit action-line density per scene + formatting issues + subtext layer strength.') },
-        { id: 'script-formatter',            label: 'Script Formatter',            credits: credOf('script-formatter'),            input: build('List industry-standard format issues (slug case, cue placement, paragraph length, transitions). Do not rewrite content.') },
-        { id: 'subtext-writer',              label: 'Subtext Writer',              credits: credOf('subtext-writer'),              input: build('Layer subtext — name per-scene subtextual_intent, character_undertones, and action-line enrichments that carry meaning wordlessly.') },
-        { id: 'psychological-builder',       label: 'Psychological Builder',       credits: credOf('psychological-builder'),       input: build('Build character psychology per named character — core_wound, external/internal desire, obstacle, arc_trajectory, moral_flaw.') },
-        { id: 'voice-builder',               label: 'Voice Builder',               credits: credOf('voice-builder'),               input: build('Lock voice signatures across the 6 dimensions per character — vocabulary register, sentence length, contractions, patterns, never-says, regional markers.') },
-        { id: 'adr-supervisor',              label: 'ADR Supervisor',              credits: credOf('adr-supervisor'),              input: build('Flag dialogue needing re-recording — background_noise, performance, model_limitation. Include production notes.') },
+        { id: 'creative-director',              label: 'Creative Director',              credits: credOf('creative-director'),              input: build('Declare structural verdict (sound/fixable/rewrite_needed), tag every scene with beat_type, flag cause_and_effect_gaps. Return full JSON schema.') },
+        { id: 'beat-sheet-architect',                label: 'Beat Sheet Architect',                credits: credOf('beat-sheet-architect'),                input: build('Tag every scene with beat_type and strength. Flag missing beats.') },
+        { id: 'dialogue-editor',             label: 'Dialogue Editor',             credits: credOf('dialogue-editor'),             input: build('Audit dialogue across script. Return verdict, voice_distinctness_score, per_character_notes, top_rewrites.') },
+        { id: 'dialogue-editor',              label: 'Dialogue Editor (Coach)',              credits: credOf('dialogue-editor'),              input: build('Score voice distinctness per character, propose targeted rewrites for lines that fail.') },
+        { id: 'tone-guardian',             label: 'Tone Guardian',             credits: credOf('tone-guardian'),             input: build('Flag on-the-nose, stock-phrase, and genre-cliche lines with severity calibration.') },
+        { id: 'visual-consistency-guardian',   label: 'Visual Consistency Guardian',   credits: credOf('visual-consistency-guardian'),   input: build('Scan dialogue for lines that do not match each character voice signature. Return flags with rewrites.') },
+        { id: 'storyboard-artist',               label: 'Storyboard Artist',               credits: credOf('storyboard-artist'),               input: build('Audit action-line density per scene + formatting issues + subtext layer strength.') },
+        { id: 'creative-prompt-writer',            label: 'Creative Prompt Writer',            credits: credOf('creative-prompt-writer'),            input: build('List industry-standard format issues (slug case, cue placement, paragraph length, transitions). Do not rewrite content.') },
+        { id: 'creative-director',              label: 'Creative Director (Subtext)',              credits: credOf('creative-director'),              input: build('Layer subtext — name per-scene subtextual_intent, character_undertones, and action-line enrichments that carry meaning wordlessly.') },
+        { id: 'character-arc-guardian',       label: 'Character Arc Guardian',       credits: credOf('character-arc-guardian'),       input: build('Build character psychology per named character — core_wound, external/internal desire, obstacle, arc_trajectory, moral_flaw.') },
+        { id: 'character-designer',               label: 'Character Designer',               credits: credOf('character-designer'),               input: build('Lock voice signatures across the 6 dimensions per character — vocabulary register, sentence length, contractions, patterns, never-says, regional markers.') },
+        { id: 'adr-specialist',              label: 'ADR Specialist',              credits: credOf('adr-specialist'),              input: build('Flag dialogue needing re-recording — background_noise, performance, model_limitation. Include production notes.') },
       ];
     }
     case 'cast': {
       const build = (instr) => JSON.stringify({...commonScriptInput, instruction: instr}, null, 2);
       return [
-        { id: 'visual-character-builder',    label: 'Visual Character Builder',    credits: credOf('visual-character-builder'),    input: build('Build full character bible with canonical descriptions, consistency phrases, visual anchors per character.') },
-        { id: 'psychological-builder',       label: 'Psychological Builder',       credits: credOf('psychological-builder'),       input: build('Build actionable psychology per character — core wound through arc trajectory.') },
-        { id: 'emotion-mapper',              label: 'Emotion Mapper',              credits: credOf('emotion-mapper'),              input: build('Per-scene per-character emotional state + intensity + visible physical signs renderable by video model.') },
-        { id: 'voice-builder',               label: 'Voice Builder',               credits: credOf('voice-builder'),               input: build('Lock voice signatures across 6 dimensions per character.') },
-        { id: 'environment-builder',         label: 'Environment Builder',         credits: credOf('environment-builder'),         input: build('Build location library with scale, architecture style, era, materials, weathering, establishing prompts, sensory anchors.') },
-        { id: 'architecture-designer',       label: 'Architecture Designer',       credits: credOf('architecture-designer'),       input: build('Per-location structural specs — building type, era, materials, scale, architectural signature.') },
+        { id: 'character-designer',    label: 'Character Designer',    credits: credOf('character-designer'),    input: build('Build full character bible with canonical descriptions, consistency phrases, visual anchors per character.') },
+        { id: 'character-arc-guardian',       label: 'Character Arc Guardian',       credits: credOf('character-arc-guardian'),       input: build('Build actionable psychology per character — core wound through arc trajectory.') },
+        { id: 'emotional-truth-guardian',              label: 'Emotional Truth Guardian',              credits: credOf('emotional-truth-guardian'),              input: build('Per-scene per-character emotional state + intensity + visible physical signs renderable by video model.') },
+        { id: 'character-designer',               label: 'Character Designer',               credits: credOf('character-designer'),               input: build('Lock voice signatures across 6 dimensions per character.') },
+        { id: 'world-builder',         label: 'World Builder',         credits: credOf('world-builder'),         input: build('Build location library with scale, architecture style, era, materials, weathering, establishing prompts, sensory anchors.') },
+        { id: 'world-builder',       label: 'World Builder (Architecture)',       credits: credOf('world-builder'),       input: build('Per-location structural specs — building type, era, materials, scale, architectural signature.') },
       ];
     }
     case 'coverage': {
       const covInput = { ...commonScriptInput, shot_list: p?.shot_list };
       const build = (instr) => JSON.stringify({...covInput, instruction: instr}, null, 2);
       return [
-        { id: 'visual-director',             label: 'Visual Director',             credits: credOf('visual-director'),             input: build('Lock visual grammar — dominant lens, framing principle, movement philosophy, composition rules, palette application.') },
-        { id: 'atmospherics-builder',        label: 'Atmospherics Builder',        credits: credOf('atmospherics-builder'),        input: build('Layer per-scene atmospherics — time, weather, lighting plan, sound texture, sensory anchors.') },
-        { id: 'weather-coordinator',         label: 'Weather Coordinator',         credits: credOf('weather-coordinator'),         input: build('Per-scene time-of-day, weather (with emotional intent), air quality, temperature feel with body-language notes.') },
-        { id: 'dressing-builder',            label: 'Dressing Builder',            credits: credOf('dressing-builder'),            input: build('Coordinate per-location set dressing + per-scene hand props + VFX pipeline decisions.') },
-        { id: 'props-master',                label: 'Props Master',                credits: credOf('props-master'),                input: build('Per-scene hero + signature + active props with significance hierarchy.') },
-        { id: 'set-dresser',                 label: 'Set Dresser',                 credits: credOf('set-dresser'),                 input: build('Per-location wall/surface dressing + 3 worldbuilding hooks with density calibration per character association.') },
+        { id: 'cinematographer',             label: 'Cinematographer',             credits: credOf('cinematographer'),             input: build('Lock visual grammar — dominant lens, framing principle, movement philosophy, composition rules, palette application.') },
+        { id: 'vfx-environment-artist',        label: 'VFX Environment Artist',        credits: credOf('vfx-environment-artist'),        input: build('Layer per-scene atmospherics — time, weather, lighting plan, sound texture, sensory anchors.') },
+        { id: 'vfx-weather-effects-artist',         label: 'VFX Weather Effects Artist',         credits: credOf('vfx-weather-effects-artist'),         input: build('Per-scene time-of-day, weather (with emotional intent), air quality, temperature feel with body-language notes.') },
+        { id: 'prop-master',            label: 'Prop Master',            credits: credOf('prop-master'),            input: build('Coordinate per-location set dressing + per-scene hand props + VFX pipeline decisions.') },
+        { id: 'prop-master',                label: 'Prop Master',                credits: credOf('prop-master'),                input: build('Per-scene hero + signature + active props with significance hierarchy.') },
+        { id: 'prop-master',                 label: 'Prop Master (Set)',                 credits: credOf('prop-master'),                 input: build('Per-location wall/surface dressing + 3 worldbuilding hooks with density calibration per character association.') },
       ];
     }
     case 'generate': {
       const genInput = { ...commonScriptInput, shot_list: p?.shot_list };
       const build = (instr) => JSON.stringify({...genInput, instruction: instr}, null, 2);
       return [
-        { id: 'prompt-writer',               label: 'Prompt Writer',               credits: credOf('prompt-writer'),               input: build('Set prompt strategy, model allocation across Kling/Veo/Hailuo/Seedance, global negative prompt, character reference policy (I2V vs T2V).') },
-        { id: 'shot-calibrator',             label: 'Shot Calibrator',             credits: credOf('shot-calibrator'),             input: build('Per-shot per-model variants — Kling/Veo/Hailuo/Seedance tuned prompts with rationale.') },
+        { id: 'creative-prompt-writer',               label: 'Creative Prompt Writer',               credits: credOf('creative-prompt-writer'),               input: build('Set prompt strategy, model allocation across Kling/Veo/Hailuo/Seedance, global negative prompt, character reference policy (I2V vs T2V).') },
+        { id: 'storyboard-artist',             label: 'Storyboard Artist',             credits: credOf('storyboard-artist'),             input: build('Per-shot per-model variants — Kling/Veo/Hailuo/Seedance tuned prompts with rationale.') },
         { id: 'vfx-supervisor',              label: 'VFX Supervisor',              credits: credOf('vfx-supervisor'),              input: build('Flag shots needing post-production VFX work — plate/composite/particle/cleanup/matte — with complexity + post-hour estimates.') },
       ];
     }
@@ -1042,9 +1042,9 @@ function getCrewSpecsFor(step, p){
       const editInput = { ...commonScriptInput, shot_list: p?.shot_list, timeline: p?.timeline };
       const build = (instr) => JSON.stringify({...editInput, instruction: instr}, null, 2);
       return [
-        { id: 'timeline-editor',             label: 'Timeline Editor',             credits: credOf('timeline-editor'),             input: build('Lock cut structure (linear/rhythmic/disruptive/observational) + trim strategy. Identify match-cut / J-cut / L-cut placements.') },
-        { id: 'pacing-editor',               label: 'Pacing Editor',               credits: credOf('pacing-editor'),               input: build('Match film heartbeat to Vision Director pacing contract. Plan breathing beats vs acceleration beats with rhythm diagnosis.') },
-        { id: 'runtime-calculator',          label: 'Runtime Calculator',          credits: credOf('runtime-calculator'),          input: build('Estimate per-scene + total runtime with confidence scores. Compare to target, flag variance.') },
+        { id: 'timeline-consistency-checker',             label: 'Timeline Consistency Checker',             credits: credOf('timeline-consistency-checker'),             input: build('Lock cut structure (linear/rhythmic/disruptive/observational) + trim strategy. Identify match-cut / J-cut / L-cut placements.') },
+        { id: 'tempo-pacing-analyst',               label: 'Tempo & Pacing Analyst',               credits: credOf('tempo-pacing-analyst'),               input: build('Match film heartbeat to Vision Director pacing contract. Plan breathing beats vs acceleration beats with rhythm diagnosis.') },
+        { id: 'final-review-orchestrator',          label: 'Final Review Orchestrator',          credits: credOf('final-review-orchestrator'),          input: build('Estimate per-scene + total runtime with confidence scores. Compare to target, flag variance.') },
       ];
     }
     default:
@@ -1458,7 +1458,7 @@ function wireProjectsHandlers(){
     link.style.pointerEvents = 'none';
     const started = Date.now();
     try {
-      const r = await window.SB_Agents.invoke('auteur',
+      const r = await window.SB_Agents.invoke('vision-director',
         'ping: warmup test. Return a minimal vision JSON.',
         { context: {} }
       );
@@ -1863,8 +1863,8 @@ function wireVisionStep(p){
       aspect_ratio: ratio,
       tone_hint: 'user-supplied logline captures intended tone',
     };
-    if (!checkInputSize('auteur', brief)) { stop(); document.getElementById('vision-status').textContent = ''; return; }
-    const r = await invokeAgent('auteur', JSON.stringify(brief, null, 2), {
+    if (!checkInputSize('vision-director', brief)) { stop(); document.getElementById('vision-status').textContent = ''; return; }
+    const r = await invokeAgent('vision-director', JSON.stringify(brief, null, 2), {
       onSlowFallback: () => {
         document.getElementById('vision-status').textContent = 'Anthropic is slow — running in background (~60s)…';
       },
@@ -1930,11 +1930,11 @@ function wireVisionStep(p){
     // Promise.all would short-circuit on the first reject and the .then never
     // fires — user sees the spinner clear (via .finally) but no result lands.
     Promise.allSettled([
-      runPassive('genre-specialist',
+      runPassive('genre-interpreter',
         JSON.stringify({ vision: p.vision, instruction: 'List 5-8 genre conventions for ' + genre + ' to honor in this project. Return {conventions: [string], visual_motifs: [string], avoid: [string]}.' }, null, 2),
         p, null
       ),
-      runPassive('color-theorist',
+      runPassive('color-grading-agent',
         JSON.stringify({ vision: p.vision, instruction: 'Refine the palette. Return {primary, secondary, accent, rationale} as hex colors and a one-line rationale tied to the genre.' }, null, 2),
         p, null
       ),
@@ -2106,8 +2106,8 @@ function wireStoryStep(p){
         raw_scene: scene.raw,
         instruction: 'Tighten this scene. Keep it the same length or shorter. Keep the voice. Return only the revised scene as plain screenwriting format.',
       };
-      if (!checkInputSize('script-doctor', input)) { stop(); return; }
-      const r = await invokeAgent('script-doctor', JSON.stringify(input, null, 2), { context: buildContext(p, null, {lean: true}) });
+      if (!checkInputSize('creative-director', input)) { stop(); return; }
+      const r = await invokeAgent('creative-director', JSON.stringify(input, null, 2), { context: buildContext(p, null, {lean: true}) });
       stop();
 
       const sugEl = document.getElementById('sug-' + sceneId);
@@ -2605,8 +2605,8 @@ function wireCastStep(p){
           ? 'Return a polished, reusable character prompt (50 words max) optimized for consistency across Flux image generations and video generation. Return only the polished description as plain text.'
           : `No description yet — build one from scratch using the script context in [CONTEXT FROM UPSTREAM AGENTS] (character dialogue, scenes, actions). Infer age, build, hair, wardrobe, demeanor from what the script shows. Return a polished, reusable character prompt (50 words max) optimized for Flux image generation + video-gen consistency. Return only the description as plain text.`,
       };
-      if (!checkInputSize('character-sculptor', _csInput)) { stop(); return; }
-      const r = await invokeAgent('character-sculptor', JSON.stringify(_csInput, null, 2), { context: buildContext(p, null, {lean: true}) });
+      if (!checkInputSize('character-designer', _csInput)) { stop(); return; }
+      const r = await invokeAgent('character-designer', JSON.stringify(_csInput, null, 2), { context: buildContext(p, null, {lean: true}) });
       stop();
       const sugEl = document.querySelector(`[data-sug-char="${CSS.escape(name)}"]`);
       if (!r.ok) { sugEl.innerHTML = `<div class="suggest" style="border-color:var(--red-border);background:var(--red-bg)"><div class="suggest-body">${esc(r.error)}</div></div>`; return; }
@@ -2662,8 +2662,8 @@ function wireCastStep(p){
         character_description: c.canonical_description,
         instruction: 'Suggest a signature wardrobe and 1-2 signature props. Return as {wardrobe: string, props: [string]}.',
       };
-      if (!checkInputSize('wardrobe-props', _wpInput)) { stop(); return; }
-      const r = await invokeAgent('wardrobe-props', JSON.stringify(_wpInput, null, 2), { context: buildContext(p, null, {lean: true}) });
+      if (!checkInputSize('wardrobe-coordinator', _wpInput)) { stop(); return; }
+      const r = await invokeAgent('wardrobe-coordinator', JSON.stringify(_wpInput, null, 2), { context: buildContext(p, null, {lean: true}) });
       stop();
       const sugEl = document.querySelector(`[data-sug-char="${CSS.escape(name)}"]`);
       if (!r.ok) { sugEl.innerHTML = `<div class="suggest" style="border-color:var(--red-border);background:var(--red-bg)"><div class="suggest-body">${esc(r.error)}</div></div>`; return; }
@@ -3215,8 +3215,8 @@ function wireCoverageStep(p){
         target_model: shot.model_target || 'seedance-turbo',
         instruction: 'Rewrite this shot as an optimized video-gen prompt. Return {shot, action, mood, final_prompt, negative_prompt, model_target, character_refs_used}.',
       };
-      if (!checkInputSize('prompt-smith', _psInput)) { stop(); return; }
-      const r = await invokeAgent('prompt-smith', JSON.stringify(_psInput, null, 2), { context: buildContext(p, null, {lean: true}) });
+      if (!checkInputSize('creative-prompt-writer', _psInput)) { stop(); return; }
+      const r = await invokeAgent('creative-prompt-writer', JSON.stringify(_psInput, null, 2), { context: buildContext(p, null, {lean: true}) });
       stop();
 
       const sugEl = document.querySelector(`[data-sug-shot="${CSS.escape(shotId)}"]`);
@@ -3929,10 +3929,10 @@ function wireEditStep(p){
   agentBtn('btn-editor-ai', 'editor',
     'Propose specific cut decisions for this timeline. Return {edits: [{clip_id, change, reason}]} — keep it human-readable.',
     'Edit suggestions');
-  agentBtn('btn-pacing', 'pacing-doctor',
+  agentBtn('btn-pacing', 'tempo-pacing-analyst',
     'Check the pacing against the vision pacing_contract and target length. Flag slow or rushed sections. Return {current_runtime_seconds, target_runtime_seconds, issues: [{where, problem, fix}]}.',
     'Pacing check');
-  agentBtn('btn-transitions', 'transition-designer',
+  agentBtn('btn-transitions', 'cross-fade-transition-artist',
     'Recommend transitions between clips (hard_cut, dissolve, fade, match_cut, j_cut, l_cut). Return {per_edge: [{from_clip_id, to_clip_id, transition, reason}]}.',
     'Transition recommendations');
 }
@@ -4042,27 +4042,27 @@ function wireDeliverStep(p){
     });
   };
 
-  agentCall('btn-sound', 'sound-designer',
+  agentCall('btn-sound', 'sound-design-lead',
     { shot_list: p.shot_list, timeline: p.timeline },
     'Recommend SFX and foley per shot. Return {per_shot: [{shot_id, sfx: [string], foley: [string]}]}.',
     'SFX direction', 'sound-out');
 
-  agentCall('btn-music', 'music-supervisor',
+  agentCall('btn-music', 'music-sync-specialist',
     { vision: p.vision, shot_list: p.shot_list },
     'Score direction — genre, tempo, cue points. Return {overall_direction, genre, bpm_range, cue_points: [{seconds, intent}]}.',
     'Score direction', 'music-out');
 
-  agentCall('btn-colorist', 'colorist',
+  agentCall('btn-colorist', 'color-grading-agent',
     { vision: p.vision, shot_list: p.shot_list, timeline: p.timeline },
     'Final grade direction. Return {overall_look, per_scene_notes: [{scene_id, notes}], references}.',
     'Grade direction', 'color-out');
 
-  agentCall('btn-trailer', 'trailer-cutter',
+  agentCall('btn-trailer', 'cut-specialist',
     { project: { title: p.title, vision: p.vision, shot_list: p.shot_list } },
     'Propose a 60-second trailer structure. Return {beats: [{seconds, content, music_cue}]}.',
     'Trailer plan', 'trailer-out');
 
-  agentCall('btn-polish', 'polish-pass',
+  agentCall('btn-polish', 'final-review-orchestrator',
     { project: { title: p.title, vision: p.vision, shot_list: p.shot_list, timeline: p.timeline } },
     'Run a final polish checklist across continuity, pacing, color, audio, coverage. Return {checklist: [{axis, status, note}]}.',
     'Polish pass', 'polish-out');
