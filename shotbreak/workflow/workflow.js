@@ -1863,7 +1863,7 @@ function wireVisionStep(p){
       aspect_ratio: ratio,
       tone_hint: 'user-supplied logline captures intended tone',
     };
-    if (!checkInputSize('auteur', brief)) { stop(); document.getElementById('vision-status').textContent = ''; return; }
+    if (!checkInputSize('vision-director', brief)) { stop(); document.getElementById('vision-status').textContent = ''; return; }
     const r = await invokeAgent('vision-director', JSON.stringify(brief, null, 2), {
       onSlowFallback: () => {
         document.getElementById('vision-status').textContent = 'Anthropic is slow — running in background (~60s)…';
@@ -3929,10 +3929,10 @@ function wireEditStep(p){
   agentBtn('btn-editor-ai', 'editor',
     'Propose specific cut decisions for this timeline. Return {edits: [{clip_id, change, reason}]} — keep it human-readable.',
     'Edit suggestions');
-  agentBtn('btn-pacing', 'pacing-doctor',
+  agentBtn('btn-pacing', 'tempo-pacing-analyst',
     'Check the pacing against the vision pacing_contract and target length. Flag slow or rushed sections. Return {current_runtime_seconds, target_runtime_seconds, issues: [{where, problem, fix}]}.',
     'Pacing check');
-  agentBtn('btn-transitions', 'transition-designer',
+  agentBtn('btn-transitions', 'cross-fade-transition-artist',
     'Recommend transitions between clips (hard_cut, dissolve, fade, match_cut, j_cut, l_cut). Return {per_edge: [{from_clip_id, to_clip_id, transition, reason}]}.',
     'Transition recommendations');
 }
@@ -4042,27 +4042,27 @@ function wireDeliverStep(p){
     });
   };
 
-  agentCall('btn-sound', 'sound-designer',
+  agentCall('btn-sound', 'sound-design-lead',
     { shot_list: p.shot_list, timeline: p.timeline },
     'Recommend SFX and foley per shot. Return {per_shot: [{shot_id, sfx: [string], foley: [string]}]}.',
     'SFX direction', 'sound-out');
 
-  agentCall('btn-music', 'music-supervisor',
+  agentCall('btn-music', 'music-sync-specialist',
     { vision: p.vision, shot_list: p.shot_list },
     'Score direction — genre, tempo, cue points. Return {overall_direction, genre, bpm_range, cue_points: [{seconds, intent}]}.',
     'Score direction', 'music-out');
 
-  agentCall('btn-colorist', 'colorist',
+  agentCall('btn-colorist', 'color-grading-agent',
     { vision: p.vision, shot_list: p.shot_list, timeline: p.timeline },
     'Final grade direction. Return {overall_look, per_scene_notes: [{scene_id, notes}], references}.',
     'Grade direction', 'color-out');
 
-  agentCall('btn-trailer', 'trailer-cutter',
+  agentCall('btn-trailer', 'cut-specialist',
     { project: { title: p.title, vision: p.vision, shot_list: p.shot_list } },
     'Propose a 60-second trailer structure. Return {beats: [{seconds, content, music_cue}]}.',
     'Trailer plan', 'trailer-out');
 
-  agentCall('btn-polish', 'polish-pass',
+  agentCall('btn-polish', 'final-review-orchestrator',
     { project: { title: p.title, vision: p.vision, shot_list: p.shot_list, timeline: p.timeline } },
     'Run a final polish checklist across continuity, pacing, color, audio, coverage. Return {checklist: [{axis, status, note}]}.',
     'Polish pass', 'polish-out');
