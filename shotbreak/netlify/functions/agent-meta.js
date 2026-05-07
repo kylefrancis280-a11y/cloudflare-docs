@@ -3,10 +3,9 @@
 /**
  * Netlify Function: agent-meta
  * Endpoint: /.netlify/functions/agent-meta
- * Self-contained — requires only registry.js directly.
  */
 
-const { getAllAgents, getAgent, AGENTS } = require('../../agents/registry');
+const { getAllAgents, AGENTS } = require('../../agents/registry');
 
 const DEPARTMENTS = {
   'Executive & Creative Leadership': [
@@ -52,56 +51,60 @@ const DEPARTMENTS = {
   ]
 };
 
-exports.handler = async (event) => {
-  const headers = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS'
-  };
+const CORS_HEADERS = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin':  '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS'
+};
 
+exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+    return { statusCode: 200, headers: CORS_HEADERS, body: '' };
   }
 
   try {
     const all = getAllAgents();
 
     const agents = all.map(a => ({
-      id: a.id,
-      name: a.name,
-      max_tokens: a.max_tokens,
+      id:          a.id,
+      name:        a.name,
+      max_tokens:  a.max_tokens,
       temperature: a.temperature
     }));
 
+    // Build byDepartment from the map
+    const assignedIds = new Set();
     const byDepartment = {};
+
     for (const [dept, ids] of Object.entries(DEPARTMENTS)) {
       byDepartment[dept] = ids
         .filter(id => AGENTS[id])
-        .map(id => ({
-          id,
-          name: AGENTS[id].name,
-          max_tokens: AGENTS[id].max_tokens,
-          temperature: AGENTS[id].temperature
-        }));
+        .map(id => {
+          assignedIds.add(id);
+          return { id, name: AGENTS[id].name, max_tokens: AGENTS[id].max_tokens, temperature: AGENTS[id].temperature };
+        });
+    }
+
+    // Fix #4: catch any agents in registry not listed in a department
+    const unassigned = all.filter(a => !assignedIds.has(a.id));
+    if (unassigned.length > 0) {
+      byDepartment['Other'] = unassigned.map(a => ({
+        id: a.id, name: a.name, max_tokens: a.max_tokens, temperature: a.temperature
+      }));
     }
 
     return {
       statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        agents,
-        byDepartment,
-        count: agents.length,
-        model: 'grok-3'
-      })
+      headers: CORS_HEADERS,
+      body: JSON.stringify({ agents, byDepartment, count: agents.length, model: 'grok-3' })
     };
 
   } catch (err) {
-    console.error('agent-meta error:', err);
+    console.error('[agent-meta]', err);
     return {
       statusCode: 500,
-      headers,
+      headers: CORS_HEADERS,
       body: JSON.stringify({ error: 'Failed to load agent metadata', detail: err.message })
     };
   }
