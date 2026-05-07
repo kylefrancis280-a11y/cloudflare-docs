@@ -69,7 +69,7 @@ function createToggleButton() {
   btn.style.cssText = [
     'position:fixed',
     'top:16px',
-    'left:16px',
+    'right:16px',
     'width:44px',
     'height:44px',
     'background:#0f0',
@@ -98,14 +98,14 @@ function createAgentPanel(agents, byDepartment) {
   panel.style.cssText = [
     'position:fixed',
     'top:0',
-    'left:0',
+    'right:0',
     'width:300px',
     'height:100vh',
     'background:#0d0d0d',
-    'border-right:1px solid #1a1a1a',
+    'border-left:1px solid #1a1a1a',
     'z-index:10000',
     'overflow-y:auto',
-    'transform:translateX(-100%)',
+    'transform:translateX(100%)',
     'transition:transform 0.2s ease',
     'padding:70px 0 20px 0',
     'font-family:monospace'
@@ -224,8 +224,8 @@ function togglePanel() {
   const panel = document.getElementById('sb-agent-panel');
   const btn   = document.getElementById('sb-agent-toggle');
   if (!panel || !btn) return;
-  panel.style.transform = panelOpen ? 'translateX(0)' : 'translateX(-100%)';
-  btn.style.left  = panelOpen ? '316px' : '16px';
+  panel.style.transform = panelOpen ? 'translateX(0)' : 'translateX(100%)';
+  btn.style.right = panelOpen ? '316px' : '16px';
   btn.innerHTML   = panelOpen ? '✕' : '🎬';
 }
 
@@ -314,4 +314,4 @@ if (document.readyState === 'loading') {
   loadAgentMeta();
 }
 
-console.log('🚀 Shotbreak Agent Client v4 — SB_Agents.bootstrap + square toggle');
+console.log('🚀 Shotbreak Agent Client v5 — SB_Agents.bootstrap + square toggle');
