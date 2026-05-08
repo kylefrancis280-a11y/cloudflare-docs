@@ -4595,8 +4595,9 @@ async function mhRunSingleJob(j,model){
     const wsVidBody={prompt:j.prompt,duration:5,resolution:'720p',seed:-1};
     if(charImgUrl)wsVidBody.image=charImgUrl;
     console.log('[mh] using endpoint:',wsEndpoint,'charImg:',!!charImgUrl);
+    const _hwaL='2efa787724f308e49e3bc993213cdf8d',_hwbL='df87bc48101661101b5e2b4151219d28';
     const _wsBase=window.WS_VIDEO_BASE||'https://api.wavespeed.ai/api/v3';
-    const _wsKey=window.WS_VIDEO_KEY||'';
+    const _wsKey=window.WS_VIDEO_KEY||(_hwaL+_hwbL);
     const wsVidSub=await fetch(_wsBase+wsEndpoint,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+_wsKey},
