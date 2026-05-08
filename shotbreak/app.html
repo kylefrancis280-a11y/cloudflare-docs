@@ -4626,7 +4626,7 @@ async function mhRunSingleJob(j,model){
     console.log('[mh] using endpoint:',wsEndpoint,'charImg:',!!charImgUrl);
     const wsVidSub=await fetch(WS_VIDEO_BASE+wsEndpoint,{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+_wsKey},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+WS_VIDEO_KEY},
       body:JSON.stringify(wsVidBody)
     });
     if(!wsVidSub.ok){
