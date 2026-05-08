@@ -1323,7 +1323,7 @@ function uChImg(n){
       // WaveSpeed file upload direct — no Netlify proxy
       const r=await fetch(WS_VIDEO_BASE+'/files/upload',{
         method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+WS_VIDEO_KEY},
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+_wsKey},
         body:JSON.stringify({file_data_url:dataUrl,filename:f.name})
       });
       const d=await r.json();
@@ -1459,6 +1459,9 @@ function dL(n,c,t){const a=document.createElement('a');a.href=c instanceof Blob?
 const _hwa='2efa787724f308e49e3bc993213cdf8d',_hwb='df87bc48101661101b5e2b4151219d28';
 const WS_VIDEO_KEY=_hwa+_hwb;
 const WS_VIDEO_BASE='https://api.wavespeed.ai/api/v3';
+// Expose to global scope — mhRunSingleJob lives outside this IIFE
+window.WS_VIDEO_KEY=WS_VIDEO_KEY;
+window.WS_VIDEO_BASE=WS_VIDEO_BASE;
 
 const MP={"seedance-turbo":{l:"Seedance 2.0 Turbo",c:60},"seedance":{l:"Seedance 2.0",c:150},"veo":{l:"Veo 3.1 Fast",c:250}};
 const V=window.SBVideo={model:"seedance-turbo",jobs:new Map(),polls:new Map(),balance:0,tier:"free"};
@@ -4592,7 +4595,9 @@ async function mhRunSingleJob(j,model){
     const wsVidBody={prompt:j.prompt,duration:5,resolution:'720p',seed:-1};
     if(charImgUrl)wsVidBody.image=charImgUrl;
     console.log('[mh] using endpoint:',wsEndpoint,'charImg:',!!charImgUrl);
-    const wsVidSub=await fetch(WS_VIDEO_BASE+wsEndpoint,{
+    const _wsBase=window.WS_VIDEO_BASE||'https://api.wavespeed.ai/api/v3';
+    const _wsKey=window.WS_VIDEO_KEY||'';
+    const wsVidSub=await fetch(_wsBase+wsEndpoint,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+WS_VIDEO_KEY},
       body:JSON.stringify(wsVidBody)
@@ -4612,7 +4617,7 @@ async function mhRunSingleJob(j,model){
     while(Date.now()-started<MAX_WAIT){
       await new Promise(res=>setTimeout(res,5000));
       try{
-        const pr=await fetch(WS_VIDEO_BASE+'/predictions/'+j.requestId+'/result',{headers:{'Authorization':'Bearer '+WS_VIDEO_KEY}});
+        const pr=await fetch((window.WS_VIDEO_BASE||'https://api.wavespeed.ai/api/v3')+'/predictions/'+j.requestId+'/result',{headers:{'Authorization':'Bearer '+(window.WS_VIDEO_KEY||'')}});
         const pd=await pr.json();
         const stat=((pd.data&&pd.data.status)||pd.status||pd.state||'').toUpperCase();
         console.log('[mh poll]',j.requestId,'status:',stat);
