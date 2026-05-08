@@ -3198,11 +3198,18 @@ function wireCoverageStep(p){
         return;
       }
       if (typeof r.output === 'string') {
-        const preview = r.output.slice(0, 200);
-        toast('Scene Architect returned unparseable text. See scene panel + console.', 'err');
-        setErr('Unparseable output', preview + (r.output.length > 200 ? '…' : ''));
-        console.warn('[break-scene] unparseable string output for', scene.slug, ':', r.output);
-        return;
+        // Grok sometimes returns valid JSON as a raw string — strip markdown fences and parse before bailing.
+        try {
+          const stripped = r.output.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+          r.output = JSON.parse(stripped);
+          console.info('[break-scene] recovered JSON from string output for', scene.slug);
+        } catch (_) {
+          const preview = r.output.slice(0, 200);
+          toast('Scene Architect returned unparseable text. See scene panel + console.', 'err');
+          setErr('Unparseable output', preview + (r.output.length > 200 ? '\u2026' : ''));
+          console.warn('[break-scene] unparseable string output for', scene.slug, ':', r.output);
+          return;
+        }
       }
       const rawShots = (r.output && (r.output.shots || r.output.shot_list || r.output.shots_list))
                     || (Array.isArray(r.output) ? r.output : null);
@@ -3518,7 +3525,13 @@ function wireCoverageStep(p){
           };
           if (!r.ok) { recordErr('Agent call failed', r.error); continue; }
           if (r.output && typeof r.output === 'object' && r.output.skip) { recordErr('Scene Architect declined', r.output.reason); continue; }
-          if (typeof r.output === 'string') { recordErr('Unparseable output', r.output.slice(0, 200)); continue; }
+          if (typeof r.output === 'string') {
+            try {
+              const stripped = r.output.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+              r.output = JSON.parse(stripped);
+              console.info('[break-all-scenes] recovered JSON from string output for', scene.slug);
+            } catch (_) { recordErr('Unparseable output', r.output.slice(0, 200)); continue; }
+          }
           const rawShots = (r.output && (r.output.shots || r.output.shot_list || r.output.shots_list)) || (Array.isArray(r.output) ? r.output : null);
           if (!Array.isArray(rawShots) || rawShots.length === 0) { recordErr('No shots in response', 'Output keys: ' + (r.output && typeof r.output === 'object' ? Object.keys(r.output).join(', ') : '—')); continue; }
 
