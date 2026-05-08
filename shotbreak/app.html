@@ -2718,8 +2718,8 @@ function mhGoto(step){
   if(step===1)mhRenderScriptStep();
   if(step===2)mhRenderCharacters();
   if(step===3)mhRenderBackgrounds();
-  if(step===4){mhLoadPersistedClips();mhRenderGenerate();mhRenderGenProgress();mhRenderClipsGrid()}
-  if(step===5){mhLoadPersistedClips();mhRenderEditor()}
+  if(step===4){mhRehydrateJobsFromProject();mhLoadPersistedClips();mhRenderGenerate();mhRenderGenProgress();mhRenderClipsGrid()}
+  if(step===5){mhRehydrateJobsFromProject();mhLoadPersistedClips();mhRenderEditor()}
 }
 
 // ───────── STEP 1: Lock Script (uses real breakdown engine) ─────────
@@ -4776,6 +4776,28 @@ function mhBuildPrompt(p,sceneIdx,shotIdx,bibleCharacters,projCharDescs){
 }
 
 let _mhGenState={running:false,jobs:[]};
+
+// Rehydrate _mhGenState.jobs from the project's saved generatedClips so the
+// media hub clip grid survives page refreshes, imports, and cross-account loads.
+// Called every time Step 4 or Step 5 is activated.
+function mhRehydrateJobsFromProject(){
+  if(_mhGenState.running)return; // don't clobber an active run
+  const p=projectLoad();
+  if(!p||!Array.isArray(p.generatedClips)||!p.generatedClips.length)return;
+  // Build a lookup of existing jobs so we don't double-add
+  const existing=new Set(_mhGenState.jobs.map(j=>j.sceneIdx+'_'+j.shotIdx));
+  p.generatedClips.forEach(c=>{
+    const key=c.sceneIdx+'_'+c.shotIdx;
+    if(!existing.has(key)){
+      _mhGenState.jobs.push({
+        sceneIdx:c.sceneIdx,shotIdx:c.shotIdx,
+        prompt:(p.scenes&&p.scenes[c.sceneIdx]&&p.scenes[c.sceneIdx].shots&&p.scenes[c.sceneIdx].shots[c.shotIdx]&&p.scenes[c.sceneIdx].shots[c.shotIdx].description)||'',
+        status:'done',requestId:null,videoUrl:c.videoUrl,error:null
+      });
+      existing.add(key);
+    }
+  });
+}
 async function mhStartGeneration(){
   const p=projectLoad();if(!p){alert('No project loaded.');return}
   if(!curUser){alert('Please log in first.');return}
