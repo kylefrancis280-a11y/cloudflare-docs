@@ -4599,7 +4599,7 @@ async function mhRunSingleJob(j,model){
     const _wsKey=window.WS_VIDEO_KEY||'';
     const wsVidSub=await fetch(_wsBase+wsEndpoint,{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+WS_VIDEO_KEY},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+_wsKey},
       body:JSON.stringify(wsVidBody)
     });
     if(!wsVidSub.ok){
