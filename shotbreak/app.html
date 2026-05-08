@@ -4585,7 +4585,7 @@ async function mhRunSingleJob(j,model){
     j.status='submit';mhRenderGenProgress();
     // WaveSpeed I2V direct — submit
     const charImgUrl=j.characterImageUrl||'';
-    const wsVidBody={prompt:j.prompt,duration:6,resolution:'720p',seed:-1};
+    const wsVidBody={prompt:j.prompt,duration:5,resolution:'720p',seed:-1};
     if(charImgUrl)wsVidBody.image=charImgUrl;
     const wsVidSub=await fetch(WS_VIDEO_BASE+'/alibaba/wan-2.6/image-to-video',{
       method:'POST',
