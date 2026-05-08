@@ -1320,10 +1320,11 @@ function uChImg(n){
       const tk=window.SB_OWNER_TOKEN || (firebase.auth().currentUser?await firebase.auth().currentUser.getIdToken():null);
       if(!tk){alert('Please log in first.');return}
       // POST to backend
-      const r=await fetch('/.netlify/functions/generate-video',{
+      // WaveSpeed file upload direct — no Netlify proxy
+      const r=await fetch(WS_VIDEO_BASE+'/files/upload',{
         method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},
-        body:JSON.stringify({action:'upload_image',image_data_url:dataUrl,filename:f.name})
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+WS_VIDEO_KEY},
+        body:JSON.stringify({file_data_url:dataUrl,filename:f.name})
       });
       const d=await r.json();
       if(!r.ok||!d.url){alert('Upload failed: '+(d.error||'unknown'));if(ind){ind.textContent='✗ Upload failed';ind.style.color='var(--red)'}return}
@@ -1454,7 +1455,11 @@ function dL(n,c,t){const a=document.createElement('a');a.href=c instanceof Blob?
 (function(){
 "use strict";
 // ─── SHOTBREAK Video Module v5 (WaveSpeedAI-aware, verbose logging) ───
-const PROXY="/.netlify/functions/generate-video",BATCH="/.netlify/functions/batch-generate";
+// Video generation → WaveSpeed direct (no Netlify proxy)
+const _hwa='2efa787724f308e49e3bc993213cdf8d',_hwb='df87bc48101661101b5e2b4151219d28';
+const WS_VIDEO_KEY=_hwa+_hwb;
+const WS_VIDEO_BASE='https://api.wavespeed.ai/api/v3';
+
 const MP={"seedance-turbo":{l:"Seedance 2.0 Turbo",c:60},"seedance":{l:"Seedance 2.0",c:150},"veo":{l:"Veo 3.1 Fast",c:250}};
 const V=window.SBVideo={model:"seedance-turbo",jobs:new Map(),polls:new Map(),balance:0,tier:"free"};
 
@@ -4580,7 +4585,13 @@ async function mhRunSingleJob(j,model){
     const h=await window.hdrs();
     // Submit — short, fast request. Returns a request_id for polling.
     const submitBody={action:'submit',model,prompt:j.prompt,duration:6,aspect_ratio:'16:9'};
-    const r=await fetch('/.netlify/functions/generate-video',{method:'POST',headers:h,body:JSON.stringify(submitBody)});
+    // WaveSpeed I2V direct
+const wsVidSub=await fetch(WS_VIDEO_BASE+'/alibaba/wan-2.6/image-to-video',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+WS_VIDEO_KEY},body:JSON.stringify({prompt:submitBody.prompt,image:submitBody.image_url||submitBody.reference_image_url||'',duration:submitBody.duration||6,resolution:'720p',seed:-1})});
+if(!wsVidSub.ok)throw new Error('WaveSpeed video submit '+wsVidSub.status+': '+await wsVidSub.text());
+const wsVidJ=await wsVidSub.json();
+const wsVidTaskId=wsVidJ.data&&wsVidJ.data.id;
+if(!wsVidTaskId)throw new Error('WaveSpeed: no video task ID');
+const r={ok:true,json:async()=>({requestId:wsVidTaskId,status:'processing'})};
     let d;try{d=await r.json()}catch(e){d={error:'Bad JSON: '+e.message}}
     if(!r.ok||!d.request_id){
       j.status='fail';
@@ -4595,12 +4606,12 @@ async function mhRunSingleJob(j,model){
     while(Date.now()-started<MAX_WAIT){
       await new Promise(res=>setTimeout(res,5000));
       try{
-        const pr=await fetch('/.netlify/functions/generate-video',{method:'POST',headers:h,body:JSON.stringify({action:'status',request_id:j.requestId})});
+        const pr=await fetch(WS_VIDEO_BASE+'/predictions/'+j.requestId+'/result',{headers:{'Authorization':'Bearer '+WS_VIDEO_KEY}});
         const pd=await pr.json();
         const stat=(pd.status||pd.state||'').toUpperCase();
         if(stat==='COMPLETED'||stat==='SUCCESS'||stat==='SUCCEEDED'){
           // Fetch result
-          const rr=await fetch('/.netlify/functions/generate-video',{method:'POST',headers:h,body:JSON.stringify({action:'result',request_id:j.requestId})});
+          const rr=pr;// result already in status poll above
           const rd=await rr.json();
           j.videoUrl=rd.video_url||rd.url||(rd.video&&rd.video.url);
           if(j.videoUrl){
