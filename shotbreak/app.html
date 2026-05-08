@@ -2259,9 +2259,37 @@ V.init=V.initFromResult;
 })();
 
 // ===================== CHARACTER STUDIO =====================
-const CS_PROXY="/.netlify/functions/generate-character";
+const WS_KEY="2efa787724f308e49e3bc993213cdf8ddf87bc48101661101b5e2b4151219d28";const WS_BASE="https://api.wavespeed.ai/api/v3";const WS_MODEL_MAP={"flux-schnell":"wavespeed-ai/flux-schnell","flux-dev":"wavespeed-ai/flux-dev","flux-pro":"wavespeed-ai/flux-pro"};
 let csImages=[];    // [{url, name, prompt, model}]
 let csLocked=[];    // [{name, description, imageUrl}]
+
+async function wsImageGenerate(model,prompt,width,height){
+  const endpoint=WS_BASE+'/'+(WS_MODEL_MAP[model]||'wavespeed-ai/flux-dev');
+  const sub=await fetch(endpoint,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+WS_KEY},
+    body:JSON.stringify({prompt,size:width+'*'+height,num_inference_steps:28,guidance_scale:3.5,num_images:1,seed:-1})
+  });
+  if(!sub.ok){const t=await sub.text();throw new Error('WaveSpeed submit '+sub.status+': '+t);}
+  const sj=await sub.json();
+  const taskId=sj.data&&sj.data.id;
+  if(!taskId)throw new Error('No task ID from WaveSpeed');
+  const pollUrl=WS_BASE+'/predictions/'+taskId+'/result';
+  for(let i=0;i<60;i++){
+    await new Promise(r=>setTimeout(r,2000));
+    const pr=await fetch(pollUrl,{headers:{'Authorization':'Bearer '+WS_KEY}});
+    if(!pr.ok)continue;
+    const pj=await pr.json();
+    const status=pj.data&&pj.data.status;
+    if(status==='completed'){
+      const url=pj.data.outputs&&pj.data.outputs[0];
+      if(!url)throw new Error('No output URL from WaveSpeed');
+      return url;
+    }
+    if(status==='failed')throw new Error('WaveSpeed generation failed');
+  }
+  throw new Error('WaveSpeed timed out after 2 minutes');
+}
 
 async function csGenerate(){
   const name=document.getElementById('csName').value.trim();
@@ -2270,25 +2298,14 @@ async function csGenerate(){
   const ratio=document.getElementById('csRatio').value.split('x');
   if(!name){alert('Enter a character name.');return}
   if(!prompt){alert('Enter a description.');return}
-
   const btn=document.getElementById('csGenBtn');
   btn.disabled=true;btn.textContent='⏳ Generating...';
   const errEl=document.getElementById('csError');errEl.classList.remove('show');
-
   try{
-    const token=window.SB_OWNER_TOKEN || await firebase.auth().currentUser.getIdToken();
-    const r=await fetch(CS_PROXY,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body:JSON.stringify({action:'generate',model,prompt:'Character reference: '+name+'. '+prompt,width:parseInt(ratio[0]),height:parseInt(ratio[1])})
-    });
-    const d=await r.json();
-    if(!r.ok){errEl.textContent='⚠ '+d.error;errEl.classList.add('show');btn.disabled=false;btn.textContent='Generate Character';return}
-    if(d.image_url){
-      csImages.push({url:d.image_url,name,prompt,model});
-      csRenderResults();
-    }
-  }catch(e){errEl.textContent='⚠ '+e.message;errEl.classList.add('show')}
+    const url=await wsImageGenerate(model,'Character reference: '+name+'. '+prompt,parseInt(ratio[0]),parseInt(ratio[1]));
+    csImages.push({url,name,prompt,model});
+    csRenderResults();
+  }catch(e){errEl.textContent='⚠ '+e.message;errEl.classList.add('show');}
   btn.disabled=false;btn.textContent='Generate Character';
 }
 
@@ -4390,15 +4407,8 @@ async function mhCharGenerate(idx){
     // Use "off-white seamless background" to avoid "white" conflicting with race
     // descriptors when Flux parses the prompt (e.g. "white male" vs "white background").
     const prompt='Full body character reference sheet. '+c.name+': '+_desc+'. Neutral studio lighting, off-white seamless background, multiple angles showing front, side, and 3/4 view. Highly detailed, photorealistic.';
-    const r=await fetch('/.netlify/functions/generate-character',{method:'POST',headers:h,body:JSON.stringify({action:'generate',model,prompt,aspect_ratio:'1:1'})});
-    const d=await r.json();
-    if(!r.ok){
-      status.textContent='';
-      alert('Generation failed: '+(d.error||d.message||r.status));
-      btn.disabled=false;btn.textContent=c.imageUrl?'↻ Regenerate':'🎭 Generate';
-      return;
-    }
-    const url=d.image_url||d.images?.[0]?.url||d.url;
+    status.textContent='submitting to WaveSpeed...';
+    const url=await wsImageGenerate(model,prompt,1024,1024);
     if(!url){
       status.textContent='';alert('No image URL returned.');
       btn.disabled=false;btn.textContent='🎭 Generate';
