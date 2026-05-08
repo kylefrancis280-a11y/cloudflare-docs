@@ -2320,7 +2320,8 @@ function csRenderResults(){
   csImages.forEach((img,i)=>{
     const isLocked=csLocked.some(c=>c.imageUrl===img.url);
     h+='<div class="cs-img-card'+(isLocked?' locked':'')+'" onclick="csLockImage('+i+')">';
-    h+='<img src="'+img.url+'" alt="'+esc(img.name)+'">';
+    h+='<img src="'+img.url+'" alt="'+esc(img.name)+'" crossorigin="anonymous" style="background:var(--surface2)" onerror="this.onerror=null;this.style.opacity=\'0.5\';this.parentElement.querySelector(\'.cs-gen-label\').style.display=\'flex\'">';
+    h+='<div class="cs-gen-label" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);font-size:10px;color:#fff;text-align:center;padding:8px">✓ Generated<br><span style="font-size:9px;opacity:0.7">Click Lock to use</span></div>';
     h+='<button class="cs-lock">'+(isLocked?'🔒 LOCKED':'🔒 Lock')+'</button>';
     h+='</div>';
   });
@@ -4582,25 +4583,22 @@ async function mhRunSingleJob(j,model){
       console.warn('[mh] blocked empty prompt',j);return;
     }
     j.status='submit';mhRenderGenProgress();
-    const h=await window.hdrs();
-    // Submit — short, fast request. Returns a request_id for polling.
-    const submitBody={action:'submit',model,prompt:j.prompt,duration:6,aspect_ratio:'16:9'};
-    // WaveSpeed I2V direct
-const wsVidSub=await fetch(WS_VIDEO_BASE+'/alibaba/wan-2.6/image-to-video',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+WS_VIDEO_KEY},body:JSON.stringify({prompt:submitBody.prompt,image:submitBody.image_url||submitBody.reference_image_url||'',duration:submitBody.duration||6,resolution:'720p',seed:-1})});
-if(!wsVidSub.ok)throw new Error('WaveSpeed video submit '+wsVidSub.status+': '+await wsVidSub.text());
-const wsVidJ=await wsVidSub.json();
-const wsVidTaskId=wsVidJ.data&&wsVidJ.data.id;
-if(!wsVidTaskId)throw new Error('WaveSpeed: no video task ID');
-const r={ok:true,json:async()=>({requestId:wsVidTaskId,status:'processing'})};
-    let d;try{d=await r.json()}catch(e){d={error:'Bad JSON: '+e.message}}
-    if(!r.ok||!d.request_id){
-      j.status='fail';
-      j.error=d.error||d.detail||d.message||('HTTP '+r.status);
-      console.error('[mh submit fail]',r.status,d);
-      mhRenderGenProgress();return;
-    }
-    j.requestId=d.request_id;j.status='poll';mhRenderGenProgress();
-    // Poll loop — runs independently. Check status every 5s, max 8 minutes.
+    // WaveSpeed I2V direct — submit
+    const charImgUrl=j.characterImageUrl||'';
+    const wsVidBody={prompt:j.prompt,duration:6,resolution:'720p',seed:-1};
+    if(charImgUrl)wsVidBody.image=charImgUrl;
+    const wsVidSub=await fetch(WS_VIDEO_BASE+'/alibaba/wan-2.6/image-to-video',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+WS_VIDEO_KEY},
+      body:JSON.stringify(wsVidBody)
+    });
+    if(!wsVidSub.ok)throw new Error('WaveSpeed video submit '+wsVidSub.status+': '+await wsVidSub.text());
+    const wsVidJ=await wsVidSub.json();
+    const wsVidTaskId=wsVidJ.data&&wsVidJ.data.id;
+    if(!wsVidTaskId)throw new Error('WaveSpeed: no video task ID — response: '+JSON.stringify(wsVidJ).slice(0,200));
+    j.requestId=wsVidTaskId;j.status='poll';mhRenderGenProgress();
+    console.log('[mh] WaveSpeed task submitted, id:',wsVidTaskId);
+    // Poll loop — 5s interval, max 8 minutes
     const started=Date.now();
     const MAX_WAIT=8*60*1000;
     while(Date.now()-started<MAX_WAIT){
@@ -4608,12 +4606,12 @@ const r={ok:true,json:async()=>({requestId:wsVidTaskId,status:'processing'})};
       try{
         const pr=await fetch(WS_VIDEO_BASE+'/predictions/'+j.requestId+'/result',{headers:{'Authorization':'Bearer '+WS_VIDEO_KEY}});
         const pd=await pr.json();
-        const stat=(pd.status||pd.state||'').toUpperCase();
+        const stat=((pd.data&&pd.data.status)||pd.status||pd.state||'').toUpperCase();
+        console.log('[mh poll]',j.requestId,'status:',stat);
         if(stat==='COMPLETED'||stat==='SUCCESS'||stat==='SUCCEEDED'){
-          // Fetch result
-          const rr=pr;// result already in status poll above
-          const rd=await rr.json();
-          j.videoUrl=rd.video_url||rd.url||(rd.video&&rd.video.url);
+          // WaveSpeed shape: pd.data.outputs[0] or pd.data.video_url
+          const rd=pd.data||pd;
+          j.videoUrl=(rd.outputs&&rd.outputs[0])||rd.video_url||rd.url||(rd.video&&rd.video.url);
           if(j.videoUrl){
             j.status='done';mhPersistClips();
             // Expose to the Editor — push to window.SB_Generated + localStorage.
@@ -4798,7 +4796,7 @@ function mhRenderGenProgress(){
   for(const j of _mhGenState.jobs){
     const st={queue:['qst-q','QUEUE'],submit:['qst-p','SUBMITTING'],poll:['qst-p','GENERATING'],done:['qst-d','DONE'],fail:['qst-f','FAILED']}[j.status];
     h+='<div class="gen-queue-item"><span class="qst '+st[0]+'">'+st[1]+'</span><span style="color:var(--gold);font-weight:700">S'+(j.sceneIdx+1)+'.'+(j.shotIdx+1)+'</span><span style="flex:1;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(j.prompt.substring(0,80))+'</span>';
-    if(j.videoUrl)h+='<a href="'+j.videoUrl+'" target="_blank" class="b b-g b-xs">View</a>';
+    if(j.videoUrl)h+='<a href="'+j.videoUrl+'" target="_blank" class="b b-g b-xs" style="color:var(--green)">▶ View</a><video src="'+j.videoUrl+'" style="width:80px;height:45px;object-fit:cover;border-radius:4px;margin-left:6px;vertical-align:middle" preload="metadata" muted playsinline></video>';
     if(j.error)h+='<span style="font-size:10px;color:var(--red)" title="'+esc(j.error)+'">⚠</span>';
     h+='</div>';
   }
@@ -4818,7 +4816,8 @@ function mhRenderClipsGrid(){
   for(const j of done){
     const label='S'+(j.sceneIdx+1)+'.'+(j.shotIdx+1);
     h+='<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden">';
-    h+='<video src="'+j.videoUrl+'" controls playsinline preload="metadata" style="width:100%;display:block;background:#000"></video>';
+    h+='<video src="'+j.videoUrl+'" controls playsinline preload="metadata" style="width:100%;display:block;background:var(--surface2)" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"></video>';
+    h+='<div style="display:none;padding:20px;text-align:center;color:var(--dim);font-size:12px">⚠ Preview unavailable — <a href="'+j.videoUrl+'" target="_blank" style="color:var(--gold)">open directly ↗</a></div>';
     h+='<div style="padding:10px"><div style="color:var(--gold);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px">'+label+'</div>';
     h+='<div style="color:var(--dim);font-size:12px;line-height:1.3;max-height:48px;overflow:hidden">'+esc(j.prompt.substring(0,100))+'...</div>';
     const _mu=j.videoUrl.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
