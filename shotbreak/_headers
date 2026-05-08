@@ -37,6 +37,8 @@
 
 # FFmpeg.wasm needs these headers for SharedArrayBuffer threading on /app.html.
 /app.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Embedder-Policy: credentialless
 
