@@ -161,8 +161,21 @@ function newProject(){
     clips: {},
     timeline: null,
     step: 1,
+    quality_preset: 'cinematic',
   };
 }
+
+
+// ── Quality presets — injected into every shot prompt at staging time ──────
+const QUALITY_PRESETS = {
+  cartoon:       { label: 'Cartoon',              suffix: 'flat cel shading, illustrated animated style, vibrant colors, 2D stylized, clean linework, expressive characters' },
+  cinematic:     { label: 'Cinematic',             suffix: 'cinematic color grade, film grain, anamorphic lens flare, 24fps motion blur, shallow depth of field, professional color timing' },
+  photorealistic:{ label: 'Photorealistic',        suffix: 'photorealistic, hyperdetailed, natural lighting, DSLR quality, true-to-life textures, accurate shadows and reflections' },
+  imax8k:        { label: 'IMAX 8K',               suffix: 'IMAX 8K resolution, ultra-sharp, HDR, large format film, extreme fine detail, pristine clarity, massive dynamic range' },
+  hyperrealistic:{ label: 'Hyper Realistic',       suffix: 'hyperrealistic, 8K RAW, subsurface scattering, physically accurate lighting, micro-detail skin and fabric texture, photographic precision' },
+  masterpiece:   { label: 'Cinematic Masterpiece', suffix: 'cinematic masterpiece, award-winning cinematography, perfect composition, Kodak Vision3 film stock, ARRI Alexa, visually stunning, festival-quality' },
+};
+function getQualitySuffix(p){ return (QUALITY_PRESETS[p && p.quality_preset] || QUALITY_PRESETS.cinematic).suffix; }
 
 // ── Owner token (private; not exposed on window for exfil-resistance) ──
 // External pages (app.html, workflow/index.html) may set window.SB_OWNER_TOKEN
@@ -3059,6 +3072,21 @@ function renderCoverageStep(p){
         `) : ''}
 
         ${scenes.length > 0 ? `
+          <!-- Quality preset selector -->
+          <div style='margin-top:18px;padding:14px 16px;background:var(--surface2,rgba(255,255,255,0.04));border:1px solid var(--border);border-radius:8px'>
+            <div style='font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px'>🎬 Output Quality</div>
+            <div style='display:flex;flex-wrap:wrap;gap:8px' id='quality-pills'>
+              ${Object.entries(QUALITY_PRESETS).map(([k,v]) => `<button class='btn btn-sm ${(p.quality_preset||'cinematic')===k ? 'btn-gold' : 'btn-ghost'}' data-quality='${k}' style='font-size:12px'>${v.label}</button>`).join('')}
+            </div>
+            <div style='margin-top:8px;font-size:11px;color:var(--text2)' id='quality-desc'>${(QUALITY_PRESETS[p.quality_preset||'cinematic']||QUALITY_PRESETS.cinematic).suffix}</div>
+          </div>
+          <!-- Run All agents button -->
+          ${(p.shot_list||[]).length > 0 ? `
+          <div style='margin-top:12px'>
+            <button class='btn btn-ghost btn-sm' id='btn-run-all-agents' style='width:100%;justify-content:center;padding:10px 16px'>
+              ⚡ Run all agents on every scene — lighting + camera moves + improve all shots
+            </button>
+          </div>` : ''}
           <div class="btn-row" style="justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:12px">
             <div style="font-size:12px;color:var(--text2)">
               ${canAdvance
@@ -3474,6 +3502,103 @@ function wireCoverageStep(p){
     });
   });
 
+  // Quality pill click handler
+  document.getElementById('quality-pills')?.querySelectorAll('[data-quality]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      p.quality_preset = btn.dataset.quality;
+      saveProject(p);
+      document.getElementById('quality-pills').querySelectorAll('[data-quality]').forEach(b => {
+        b.className = b.dataset.quality === p.quality_preset ? 'btn btn-sm btn-gold' : 'btn btn-sm btn-ghost';
+      });
+      const desc = document.getElementById('quality-desc');
+      if (desc) desc.textContent = getQualitySuffix(p);
+      toast('Quality set to ' + (QUALITY_PRESETS[p.quality_preset]?.label || p.quality_preset), 'ok');
+    });
+  });
+
+  // Run All agents — lighting + camera moves + improve every shot, auto-applied
+  document.getElementById('btn-run-all-agents')?.addEventListener('click', async () => {
+    const scenes = p.script.normalized?.scenes || [];
+    const coveredScenes = scenes.filter(s => (p.shot_list||[]).some(sh => sh.scene_id === s.id));
+    if (!coveredScenes.length) { toast('No scenes with shots yet.', 'err'); return; }
+    const btn = document.getElementById('btn-run-all-agents');
+    btn.disabled = true;
+    const origLabel = btn.textContent;
+    let done = 0;
+    const total = coveredScenes.length * 2 + (p.shot_list||[]).length;
+    const setProgress = (msg) => { btn.textContent = msg; };
+
+    async function runLighting(scene) {
+      const _ldIn = { scene: { id: scene.id, slug: scene.slug, setting: scene.setting, time: scene.time, action: scene.action }, instruction: 'Design the lighting plan. Return {key_light, fill_light, rim_light, motivated_source, mood_note} — each a short descriptive phrase.' };
+      if (!checkInputSize('lighting-designer', _ldIn)) return;
+      const r = await invokeAgent('lighting-designer', JSON.stringify(_ldIn, null, 2), { context: buildContext(p, null, {lean: true}) });
+      if (!r.ok) return;
+      let lighting = {};
+      if (typeof r.output === 'string') { lighting = { mood_note: r.output }; }
+      else if (r.output && typeof r.output === 'object') {
+        if (Array.isArray(r.output.per_scene) && r.output.per_scene.length) { lighting = r.output.per_scene.find(x => x.scene_id === scene.id) || r.output.per_scene[0]; }
+        else { lighting = r.output; }
+      }
+      if (lighting.key_light || lighting.mood_note) { scene.lighting_plan = lighting; }
+      done++; setProgress('⚡ Running… ' + done + '/' + total + ' tasks done');
+    }
+
+    async function runMovement(scene) {
+      const shots = p.shot_list.filter(sh => sh.scene_id === scene.id);
+      const _mcIn = { scene: { id: scene.id, slug: scene.slug, action: scene.action }, shots: shots.map(sh => ({ id: sh.id, slot: sh.slot, shot: sh.shot_brief?.shot })), instruction: 'Recommend camera movement per shot — stillness vs motion, considering the pacing contract. Return {per_shot: [{shot_id, movement, rationale}]}.' };
+      if (!checkInputSize('movement-choreographer', _mcIn)) return;
+      const r = await invokeAgent('movement-choreographer', JSON.stringify(_mcIn, null, 2), { context: buildContext(p, null, {lean: true}) });
+      if (!r.ok) return;
+      const per = (r.output?.per_shot) || [];
+      per.forEach(x => { const sh = p.shot_list.find(s => s.id === x.shot_id); if (sh) { sh.cinematography = sh.cinematography || {}; sh.cinematography.movement = x.movement; } });
+      done++; setProgress('⚡ Running… ' + done + '/' + total + ' tasks done');
+    }
+
+    async function improveShot(shot) {
+      const current = [shot.shot_brief?.shot, shot.shot_brief?.action, shot.shot_brief?.mood].filter(Boolean).join(' | ');
+      const std = window.SB_Normalize?.standardizeShotBrief ? window.SB_Normalize.standardizeShotBrief(current) : current;
+      const _psIn = { current_shot: std, scene: p.script.normalized.scenes.find(s => s.id === shot.scene_id), characters: (shot.characters_in_frame||[]).map(n => p.character_bible[n]).filter(Boolean), target_model: shot.model_target || 'seedance-turbo', instruction: 'Rewrite this shot as an optimized video-gen prompt. Return {shot, action, mood, final_prompt, negative_prompt, model_target, character_refs_used}.' };
+      if (!checkInputSize('creative-prompt-writer', _psIn)) return;
+      const r = await invokeAgent('creative-prompt-writer', JSON.stringify(_psIn, null, 2), { context: buildContext(p, null, {lean: true}) });
+      if (!r.ok) return;
+      const out = r.output || {};
+      if (out.shot)            shot.shot_brief.shot = out.shot;
+      if (out.action)          shot.shot_brief.action = out.action;
+      if (out.mood)            shot.shot_brief.mood = out.mood;
+      if (out.final_prompt)    shot.final_prompt = out.final_prompt;
+      if (out.negative_prompt) shot.negative_prompt = out.negative_prompt;
+      if (out.model_target)    shot.model_target = out.model_target;
+      done++; setProgress('⚡ Running… ' + done + '/' + total + ' tasks done');
+    }
+
+    const sceneQueue = [...coveredScenes];
+    async function sceneWorker() {
+      while (sceneQueue.length) {
+        const scene = sceneQueue.shift();
+        if (!scene) break;
+        await runLighting(scene);
+        await runMovement(scene);
+      }
+    }
+    await Promise.all([sceneWorker(), sceneWorker()]);
+
+    const shotQueue = [...(p.shot_list||[])];
+    async function shotWorker() {
+      while (shotQueue.length) {
+        const shot = shotQueue.shift();
+        if (!shot) break;
+        await improveShot(shot);
+      }
+    }
+    await Promise.all([shotWorker(), shotWorker(), shotWorker()]);
+
+    saveProject(p);
+    render();
+    btn.disabled = false;
+    btn.textContent = origLabel;
+    toast('✅ All agents done — lighting, camera moves, and prompts applied to every scene and shot.', 'ok');
+  });
+
   document.getElementById('btn-continue-generate')?.addEventListener('click', () => {
     go('project/' + p.id + '/generate');
   });
@@ -3722,11 +3847,12 @@ function wireGenerateStep(p){
     // character_bible entry has a reference_image_url. Without enrichment
     // (pre-v83), prompts were just "shot + action + mood" which is why
     // every clip looked completely different from every other clip.
+    const _qualSuffix = ', ' + getQualitySuffix(p);
     const enrichedShots = (window.SB_Enricher && window.SB_Enricher.buildStagedShots)
-      ? window.SB_Enricher.buildStagedShots(p, { model: 'seedance-turbo' })
+      ? window.SB_Enricher.buildStagedShots(p, { model: 'seedance-turbo' }).map(s => ({ ...s, prompt: (s.prompt || '') + _qualSuffix }))
       : (p.shot_list || []).map(sh => ({
           id: sh.id,
-          prompt: sh.final_prompt || [sh.shot_brief?.shot, sh.shot_brief?.action, sh.shot_brief?.mood].filter(Boolean).join(', '),
+          prompt: (sh.final_prompt || [sh.shot_brief?.shot, sh.shot_brief?.action, sh.shot_brief?.mood].filter(Boolean).join(', ')) + _qualSuffix,
           scene_id: sh.scene_id,
           slot: sh.slot,
           duration: sh.duration_target_seconds || 5,
