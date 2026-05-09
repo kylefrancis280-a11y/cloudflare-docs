@@ -682,7 +682,7 @@ async function runCrew(p, agentSpecs, step, targetEl, label){
   // 2 in v79 after observing all 3 managers in a coverage crew time out
   // simultaneously when Anthropic was warm-but-loaded. Trade-off: a 6-agent
   // crew now takes ~45s instead of ~30s, but 95%+ reliability vs ~50%.
-  const CONCURRENCY = 2;
+  const CONCURRENCY = 5;
   const queue = [...specs];
   const runners = [];
 
@@ -1078,13 +1078,16 @@ function getCrewSpecsFor(step, p){
     case 'coverage': {
       const covInput = { ...commonScriptInput, shot_list: p?.shot_list };
       const build = (instr) => JSON.stringify({...covInput, instruction: instr}, null, 2);
+      // Lean build for VFX/prop agents — strips shot_list+bibles, keeps scene summaries only.
+      const leanScenes = (commonScriptInput.scenes||[]).map(s=>({id:s.id,slug:s.slug,setting:s.setting,time:s.time,action:(s.action||'').slice(0,300)}));
+      const leanBuild = (instr) => JSON.stringify({title:commonScriptInput.title,vision:commonScriptInput.vision,scenes:leanScenes,instruction:instr}, null, 2);
       return [
         { id: 'cinematographer',             label: 'Cinematographer',             credits: credOf('cinematographer'),             input: build('Lock visual grammar — dominant lens, framing principle, movement philosophy, composition rules, palette application.') },
-        { id: 'vfx-environment-artist',        label: 'VFX Environment Artist',        credits: credOf('vfx-environment-artist'),        input: build('Layer per-scene atmospherics — time, weather, lighting plan, sound texture, sensory anchors.') },
-        { id: 'vfx-weather-effects-artist',         label: 'VFX Weather Effects Artist',         credits: credOf('vfx-weather-effects-artist'),         input: build('Per-scene time-of-day, weather (with emotional intent), air quality, temperature feel with body-language notes.') },
-        { id: 'prop-master',            label: 'Prop Master',            credits: credOf('prop-master'),            input: build('Coordinate per-location set dressing + per-scene hand props + VFX pipeline decisions.') },
-        { id: 'prop-master',                label: 'Prop Master',                credits: credOf('prop-master'),                input: build('Per-scene hero + signature + active props with significance hierarchy.') },
-        { id: 'prop-master',                 label: 'Prop Master (Set)',                 credits: credOf('prop-master'),                 input: build('Per-location wall/surface dressing + 3 worldbuilding hooks with density calibration per character association.') },
+        { id: 'vfx-environment-artist',        label: 'VFX Environment Artist',        credits: credOf('vfx-environment-artist'),        input: leanBuild('Layer per-scene atmospherics — time, weather, lighting plan, sound texture, sensory anchors.') },
+        { id: 'vfx-weather-effects-artist',         label: 'VFX Weather Effects Artist',         credits: credOf('vfx-weather-effects-artist'),         input: leanBuild('Per-scene time-of-day, weather (with emotional intent), air quality, temperature feel with body-language notes.') },
+        { id: 'prop-master',            label: 'Prop Master',            credits: credOf('prop-master'),            input: leanBuild('Coordinate per-location set dressing + per-scene hand props + VFX pipeline decisions.') },
+        { id: 'prop-master',                label: 'Prop Master',                credits: credOf('prop-master'),                input: leanBuild('Per-scene hero + signature + active props with significance hierarchy.') },
+        { id: 'prop-master',                 label: 'Prop Master (Set)',                 credits: credOf('prop-master'),                 input: leanBuild('Per-location wall/surface dressing + 3 worldbuilding hooks with density calibration per character association.') },
       ];
     }
     case 'generate': {
@@ -3071,8 +3074,20 @@ function renderCoverageStep(p){
           Runs Visual Director, Atmospherics Builder, Weather Coordinator, Dressing Builder, Props Master, and Set Dresser in parallel.
         `) : ''}
 
+        ${hasShots ? `
+          <div class="btn-row" style="justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:12px">
+            <div style="font-size:12px;color:var(--text2)">
+              ${canAdvance
+                ? `<b style="color:#6abe7f">${coveragePct}% covered</b> · Ready to generate${redCount > 0 ? ` — ${redCount} scene${redCount === 1 ? ' is' : 's are'} still thin but can be filled later` : ''}.`
+                : `<b style="color:#e8a84a">${coveragePct}% covered</b> · You can still continue — more coverage = better output.`
+              }
+            </div>
+            <button class="btn btn-gold" id="btn-continue-generate">Continue to Generate →</button>
+          </div>
+        ` : ''}
+
         ${scenes.length > 0 ? `
-          <!-- Quality preset selector -->
+          <!-- Quality preset selector — TOP of page, always visible -->
           <div style='margin-top:18px;padding:14px 16px;background:var(--surface2,rgba(255,255,255,0.04));border:1px solid var(--border);border-radius:8px'>
             <div style='font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px'>🎬 Output Quality</div>
             <div style='display:flex;flex-wrap:wrap;gap:8px' id='quality-pills'>
@@ -3080,22 +3095,13 @@ function renderCoverageStep(p){
             </div>
             <div style='margin-top:8px;font-size:11px;color:var(--text2)' id='quality-desc'>${(QUALITY_PRESETS[p.quality_preset||'cinematic']||QUALITY_PRESETS.cinematic).suffix}</div>
           </div>
-          <!-- Run All agents button -->
+          <!-- Run All agents button — TOP, always visible -->
           ${(p.shot_list||[]).length > 0 ? `
-          <div style='margin-top:12px'>
+          <div style='margin-top:10px'>
             <button class='btn btn-ghost btn-sm' id='btn-run-all-agents' style='width:100%;justify-content:center;padding:10px 16px'>
               ⚡ Run all agents on every scene — lighting + camera moves + improve all shots
             </button>
           </div>` : ''}
-          <div class="btn-row" style="justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:12px">
-            <div style="font-size:12px;color:var(--text2)">
-              ${canAdvance
-                ? `<b style="color:#6abe7f">${coveragePct}% covered</b> · You can continue${redCount > 0 ? `; ${redCount} scene${redCount === 1 ? ' is' : 's are'} still missing coverage but can be filled later` : ''}.`
-                : `<b style="color:#c07070">${coveragePct}% covered</b> · Need at least ${Math.max(1, Math.ceil(scenes.length * 0.5))} of ${scenes.length} scenes with shots before continuing.`
-              }
-            </div>
-            <button class="btn btn-gold" id="btn-continue-generate" ${canAdvance ? '' : 'disabled style="opacity:0.5;cursor:not-allowed"'}>Continue to Generate →</button>
-          </div>
         ` : ''}
       </div>
     </div>
@@ -3541,6 +3547,8 @@ function wireCoverageStep(p){
       }
       if (lighting.key_light || lighting.mood_note) { scene.lighting_plan = lighting; }
       done++; setProgress('⚡ Running… ' + done + '/' + total + ' tasks done');
+      // Live update: re-render shot cards every 5 completions so user sees changes
+      if (done % 5 === 0) { saveProject(p); render(); }
     }
 
     async function runMovement(scene) {
@@ -3580,7 +3588,7 @@ function wireCoverageStep(p){
         await runMovement(scene);
       }
     }
-    await Promise.all([sceneWorker(), sceneWorker()]);
+    await Promise.all([sceneWorker(), sceneWorker(), sceneWorker(), sceneWorker()]);
 
     const shotQueue = [...(p.shot_list||[])];
     async function shotWorker() {
@@ -3590,7 +3598,7 @@ function wireCoverageStep(p){
         await improveShot(shot);
       }
     }
-    await Promise.all([shotWorker(), shotWorker(), shotWorker()]);
+    await Promise.all([shotWorker(), shotWorker(), shotWorker(), shotWorker(), shotWorker()]);
 
     saveProject(p);
     render();
@@ -3600,6 +3608,7 @@ function wireCoverageStep(p){
   });
 
   document.getElementById('btn-continue-generate')?.addEventListener('click', () => {
+    saveProject(p);
     go('project/' + p.id + '/generate');
   });
 
