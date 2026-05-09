@@ -3537,7 +3537,7 @@ function wireCoverageStep(p){
     async function runLighting(scene) {
       const _ldIn = { scene: { id: scene.id, slug: scene.slug, setting: scene.setting, time: scene.time, action: scene.action }, instruction: 'Design the lighting plan. Return {key_light, fill_light, rim_light, motivated_source, mood_note} — each a short descriptive phrase.' };
       if (!checkInputSize('lighting-designer', _ldIn)) return;
-      const r = await invokeAgent('lighting-designer', JSON.stringify(_ldIn, null, 2), { context: buildContext(p, null, {lean: true}) });
+      const r = await invokeAgent('lighting-designer', JSON.stringify(_ldIn, null, 2), {});
       if (!r.ok) return;
       let lighting = {};
       if (typeof r.output === 'string') { lighting = { mood_note: r.output }; }
@@ -3555,7 +3555,7 @@ function wireCoverageStep(p){
       const shots = p.shot_list.filter(sh => sh.scene_id === scene.id);
       const _mcIn = { scene: { id: scene.id, slug: scene.slug, action: scene.action }, shots: shots.map(sh => ({ id: sh.id, slot: sh.slot, shot: sh.shot_brief?.shot })), instruction: 'Recommend camera movement per shot — stillness vs motion, considering the pacing contract. Return {per_shot: [{shot_id, movement, rationale}]}.' };
       if (!checkInputSize('movement-choreographer', _mcIn)) return;
-      const r = await invokeAgent('movement-choreographer', JSON.stringify(_mcIn, null, 2), { context: buildContext(p, null, {lean: true}) });
+      const r = await invokeAgent('movement-choreographer', JSON.stringify(_mcIn, null, 2), {});
       if (!r.ok) return;
       const per = (r.output?.per_shot) || [];
       per.forEach(x => { const sh = p.shot_list.find(s => s.id === x.shot_id); if (sh) { sh.cinematography = sh.cinematography || {}; sh.cinematography.movement = x.movement; } });
@@ -3565,9 +3565,12 @@ function wireCoverageStep(p){
     async function improveShot(shot) {
       const current = [shot.shot_brief?.shot, shot.shot_brief?.action, shot.shot_brief?.mood].filter(Boolean).join(' | ');
       const std = window.SB_Normalize?.standardizeShotBrief ? window.SB_Normalize.standardizeShotBrief(current) : current;
-      const _psIn = { current_shot: std, scene: p.script.normalized.scenes.find(s => s.id === shot.scene_id), characters: (shot.characters_in_frame||[]).map(n => p.character_bible[n]).filter(Boolean), target_model: shot.model_target || 'seedance-turbo', instruction: 'Rewrite this shot as an optimized video-gen prompt. Return {shot, action, mood, final_prompt, negative_prompt, model_target, character_refs_used}.' };
+      const _sceneRaw = p.script.normalized.scenes.find(s => s.id === shot.scene_id) || {};
+      const _leanScene = { id: _sceneRaw.id, slug: _sceneRaw.slug, setting: _sceneRaw.setting, time: _sceneRaw.time, action: (_sceneRaw.action||'').slice(0,200) };
+      const _leanChars = (shot.characters_in_frame||[]).map(n => { const c = p.character_bible?.[n]; return c ? { name: c.name, role: c.role, appearance: (c.appearance||'').slice(0,100) } : null; }).filter(Boolean);
+      const _psIn = { current_shot: std, scene: _leanScene, characters: _leanChars, target_model: shot.model_target || 'seedance-turbo', instruction: 'Rewrite this shot as an optimized video-gen prompt. Return {shot, action, mood, final_prompt, negative_prompt, model_target, character_refs_used}.' };
       if (!checkInputSize('creative-prompt-writer', _psIn)) return;
-      const r = await invokeAgent('creative-prompt-writer', JSON.stringify(_psIn, null, 2), { context: buildContext(p, null, {lean: true}) });
+      const r = await invokeAgent('creative-prompt-writer', JSON.stringify(_psIn, null, 2), {});
       if (!r.ok) return;
       const out = r.output || {};
       if (out.shot)            shot.shot_brief.shot = out.shot;
@@ -3598,7 +3601,7 @@ function wireCoverageStep(p){
         await improveShot(shot);
       }
     }
-    await Promise.all([shotWorker(), shotWorker(), shotWorker(), shotWorker(), shotWorker()]);
+    await Promise.all([shotWorker(), shotWorker(), shotWorker()]);
 
     saveProject(p);
     render();
