@@ -619,10 +619,8 @@ background-size:64px 64px;pointer-events:none}
 .port-save-status.show{display:inline}
 
 
-/* ── Top-right Add Stock button ─────────────────────────── */
-.add-stock-btn-top{background:var(--ac);border:none;color:#fff;width:30px;height:30px;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s;flex-shrink:0}
-.add-stock-btn-top:hover{opacity:.85}
-
+.add-stock-btn-top{background:var(--ac,#6c63ff);border:none;color:#fff;width:30px;height:30px;border-radius:8px;font-size:1.15rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
+.add-stock-btn-top:hover{opacity:.8}
 </style>
 </head>
 <body>
@@ -1859,7 +1857,7 @@ ${Object.values(SEC).map(s=>`<div class="nav-i ${pg==='sector'&&rt.includes('/'+
 <span style="font-size:14px;font-weight:600">${pgTitle(pg,rt)}</span>
 </div>
 <div class="top-r">
-<button class="add-stock-btn-top" onclick="showAddStockModal()" title="Add Stock to Watchlist">＋</button>
+<button class="add-stock-btn-top" onclick="showAddStockModal()" title="Add Stock">&#xFF0B;</button>
 <div class="fx-badge" id="fx-badge">${ratesLoaded?'<span class="dot"></span> Live FX':''}</div>
 <div class="bell-wrap ${alertsEnabled()?'':'bell-off'}" onclick="toggleGlobalAlerts()" id="bell-wrap" title="${alertsEnabled()?'Alerts ON — click to disable':'Alerts OFF — click to enable'}">
 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 16.5c.8 0 1.5-.7 1.5-1.5h-3c0 .8.7 1.5 1.5 1.5zM14 12V8c0-2.8-1.9-5.1-4.5-5.7V1.5a.5.5 0 00-1 0v.8C6 2.9 4 5.2 4 8v4l-1.5 1.5v.5h13v-.5z"/></svg>
