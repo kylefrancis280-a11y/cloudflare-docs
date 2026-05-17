@@ -3283,6 +3283,7 @@ function mhRenderBackgrounds(){
   h+='</div>';
   h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
   h+='<button class="b b-g b-xs" onclick="mhBgRunPredictAll()" title="Re-run heuristic suggestions across all clips">🔎 Re-run suggestions</button>';
+  h+='<button class="b b-gold b-xs" onclick="mhResetAllBg()" title="Redraft all unlocked scene masters with clean location/cinematics only">↻ Redraft All Masters</button>';
   h+='<button class="b b-g b-xs" onclick="mhBgExpandAll()">▾ Expand all scenes</button>';
   h+='<button class="b b-g b-xs" onclick="mhBgCollapseAll()">▸ Collapse all scenes</button>';
   h+='</div>';
@@ -3573,6 +3574,20 @@ function mhResetBg(i){
   p.scenes[i].background.description=draftBackgroundFromScene(p.scenes[i],ref);
   projectSave(p);
   mhRenderBackgrounds();
+}
+function mhResetAllBg(){
+  const p=projectLoad();if(!p||!p.scenes)return;
+  let skipped=0;
+  p.scenes.forEach((s,i)=>{
+    if(s.background&&s.background.locked){skipped++;return;}
+    if(!s.background)s.background={};
+    const refIdx=(typeof s.background.continueFromIdx==='number')?s.background.continueFromIdx:(i-1);
+    const ref=(refIdx>=0&&refIdx<p.scenes.length&&refIdx!==i)?p.scenes[refIdx]:null;
+    s.background.description=draftBackgroundFromScene(s,ref);
+  });
+  projectSave(p);
+  mhRenderBackgrounds();
+  if(skipped)alert(skipped+' locked scene(s) were skipped.');
 }
 
 // ─── Per-clip / per-scene handlers ─────────────────────────────────────
