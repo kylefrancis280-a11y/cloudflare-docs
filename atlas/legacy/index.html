@@ -29,6 +29,170 @@
 <!-- Structured Data -->
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Atlas Analysis","applicationCategory":"FinanceApplication","operatingSystem":"Web","description":"AI-powered stock research platform delivering daily research insights, proprietary Atlas Score ratings, and institutional-grade analysis across 8 market sectors.","url":"https://atlasanalysis.net","offers":[{"@type":"Offer","name":"Atlas Core","price":"29.99","priceCurrency":"CAD","billingIncrement":"P1M"},{"@type":"Offer","name":"Atlas Pro","price":"49.99","priceCurrency":"CAD","billingIncrement":"P1M"},{"@type":"Offer","name":"Atlas Institutional","price":"99.99","priceCurrency":"CAD","billingIncrement":"P1M"}],"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","reviewCount":"12"}}
+
+function rPortfolio_render(el){el.innerHTML=rPortfolio();}
+
+// ── Portfolio Manager ────────────────────────────────────
+const PORT_PLACEHOLDER = `[
+  { "ticker": "AAPL",  "shares": 10,  "avgCost": 175.00 },
+  { "ticker": "MSFT",  "shares": 5,   "avgCost": 380.00 },
+  { "ticker": "NVDA",  "shares": 8,   "avgCost": 450.00 },
+  { "ticker": "VTI",   "shares": 20,  "avgCost": 220.00 },
+  { "ticker": "VXUS",  "shares": 15,  "avgCost": 58.00  },
+  { "ticker": "BND",   "shares": 12,  "avgCost": 72.00  }
+]`;
+
+const ETF_STRATEGIES = [
+  { name:'Core-Satellite', icon:'🎯', desc:'Anchor 60–70% in broad market ETFs, use remaining allocation for high-conviction picks.', etfs:['VTI','SPY','QQQ'] },
+  { name:'Sector Balance',  icon:'⚖️', desc:'Spread exposure across sectors to reduce concentration risk in any single industry.', etfs:['XLK','XLF','XLE','XLV','XLI'] },
+  { name:'International',   icon:'🌍', desc:'Add global diversification to reduce home-country bias and capture emerging growth.', etfs:['VXUS','EFA','VWO','IEMG'] },
+  { name:'Fixed Income',    icon:'🛡️', desc:'Reduce portfolio volatility with bond exposure, especially in uncertain rate environments.', etfs:['BND','AGG','TLT','TIPS'] },
+  { name:'Factor Investing',icon:'📐', desc:'Tilt toward proven return factors: value, momentum, quality, and low volatility.', etfs:['MTUM','VLUE','QUAL','USMV'] }
+];
+
+function parseHoldings(raw){
+  try{
+    const data=JSON.parse(raw.trim());
+    if(!Array.isArray(data))throw new Error('Must be a JSON array');
+    return data.map((h,i)=>{
+      if(!h.ticker)throw new Error(`Item ${i+1} missing "ticker"`);
+      return{ticker:String(h.ticker).toUpperCase().trim(),shares:parseFloat(h.shares)||0,avgCost:parseFloat(h.avgCost||h.avg_cost||h.cost||0),name:h.name||h.ticker};
+    });
+  }catch(e){throw new Error(e.message);}
+}
+
+function portGetLivePrice(ticker){
+  if(typeof LIVE!=='undefined'&&LIVE[ticker])return LIVE[ticker].price||null;
+  return null;
+}
+
+function gradePortfolio(holdings){
+  const n=holdings.length;
+  if(n===0)return null;
+  const enriched=holdings.map(h=>{const p=portGetLivePrice(h.ticker)||h.avgCost||100;return{...h,price:p,value:p*h.shares};});
+  const totalValue=enriched.reduce((s,h)=>s+h.value,0)||1;
+  const withWeight=enriched.map(h=>({...h,weight:h.value/totalValue}));
+  const maxWeight=Math.max(...withWeight.map(h=>h.weight));
+  const hhi=withWeight.reduce((s,h)=>s+h.weight*h.weight,0);
+  const divScore=Math.round(Math.max(0,Math.min(100,100-hhi*100*0.8)));
+  const concScore=Math.round(Math.max(0,Math.min(100,100-maxWeight*120)));
+  const sizeScore=Math.round(Math.min(100,(n/15)*100));
+  const ETF_T=['VTI','SPY','QQQ','VXUS','BND','AGG','EFA','VWO','IEMG','XLK','XLF','XLE','XLV','XLI','MTUM','VLUE','QUAL','USMV','TLT','IWM','GLD','SLV'];
+  const BOND_T=['BND','AGG','TLT','TIPS','LQD','HYG','SHY','IEF'];
+  const hasETF=withWeight.some(h=>ETF_T.includes(h.ticker));
+  const hasBond=withWeight.some(h=>BOND_T.includes(h.ticker));
+  const etfScore=hasETF?80:30;
+  const bondScore=hasBond?85:40;
+  const overall=Math.round(divScore*.30+concScore*.25+sizeScore*.15+etfScore*.20+bondScore*.10);
+  let grade,gradeLetter;
+  if(overall>=85){grade='A';gradeLetter='A';}
+  else if(overall>=75){grade='A-';gradeLetter='A';}
+  else if(overall>=65){grade='B+';gradeLetter='B';}
+  else if(overall>=55){grade='B';gradeLetter='B';}
+  else if(overall>=45){grade='C+';gradeLetter='C';}
+  else if(overall>=35){grade='C';gradeLetter='C';}
+  else{grade='D';gradeLetter='D';}
+  const flagged=withWeight.map(h=>{
+    let flag='ok',flagLabel='Balanced';
+    if(h.weight>.30){flag='bad';flagLabel='Overweight';}
+    else if(h.weight>.20){flag='warn';flagLabel='High weight';}
+    return{...h,flag,flagLabel};
+  });
+  const suggestions=[];
+  if(!hasETF)suggestions.push('No broad market ETFs detected — adding VTI or SPY as a core position would significantly improve diversification.');
+  if(!hasBond)suggestions.push('No fixed income detected — consider BND or AGG to reduce overall volatility.');
+  if(maxWeight>.25)suggestions.push(`${withWeight.find(h=>h.weight===maxWeight).ticker} is ${Math.round(maxWeight*100)}% of your portfolio — consider trimming to under 20%.`);
+  if(n<8)suggestions.push('Fewer than 8 holdings increases idiosyncratic risk — the Atlas Diversified ETF provides instant exposure to 40+ curated positions.');
+  suggestions.push('The Atlas Diversified ETF (ATLAS-ETF) combines AI-driven stock selection with built-in sector balance — a single position that complements any portfolio.');
+  return{overall,grade,gradeLetter,divScore,concScore,sizeScore,etfScore,bondScore,totalValue,holdings:flagged,suggestions,hasETF,hasBond};
+}
+
+function portFmtCurrency(val){
+  const sym=(typeof CUR!=='undefined'&&CUR.sym)?CUR.sym:'$';
+  const rate=(typeof CUR!=='undefined'&&CUR.rate)?CUR.rate:1;
+  return sym+(val*rate).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function rPortfolio(){
+  const savedRaw=localStorage.getItem('atlas_portfolio_json')||'';
+  return `<div class="port-wrap">
+  <div class="port-hero"><h1>Portfolio Manager</h1><p>Enter your holdings to get an institutional-grade portfolio grade, diversification analysis, and tailored ETF strategies.</p></div>
+  <div class="port-save-bar">
+    <span>💾 Your portfolio is saved locally in your browser.</span>
+    <button class="port-btn port-btn-ghost port-btn-sm" onclick="portSaveLocal()">Save</button>
+    <button class="port-btn port-btn-ghost port-btn-sm" onclick="portLoadLocal()">Load Saved</button>
+    <button class="port-btn port-btn-ghost port-btn-sm" onclick="portSaveCloud()">Save to Account</button>
+    <span class="port-save-status" id="port-save-status">✓ Saved</span>
+  </div>
+  <div class="port-input-card">
+    <h2>Your Holdings</h2>
+    <p>Paste your portfolio as a JSON array. Each entry needs a <code style="background:var(--bg-2);padding:1px 5px;border-radius:4px;font-size:.8rem">ticker</code> and optionally <code style="background:var(--bg-2);padding:1px 5px;border-radius:4px;font-size:.8rem">shares</code> and <code style="background:var(--bg-2);padding:1px 5px;border-radius:4px;font-size:.8rem">avgCost</code>.</p>
+    <textarea class="port-textarea" id="port-json" spellcheck="false" placeholder="${PORT_PLACEHOLDER}">${savedRaw}</textarea>
+    <div class="port-err" id="port-err"></div>
+    <div class="port-actions">
+      <button class="port-btn port-btn-primary" onclick="portGrade()">Grade My Portfolio</button>
+      <button class="port-btn port-btn-ghost" onclick="portLoadExample()">Load Example</button>
+      <button class="port-btn port-btn-ghost" onclick="portClear()">Clear</button>
+    </div>
+  </div>
+  <div class="port-results" id="port-results"></div>
+</div>`;
+}
+
+function portRenderResults(result){
+  const gradeClass='grade-'+result.gradeLetter;
+  const sc=s=>s>=70?'var(--green)':s>=45?'var(--amber)':'var(--red)';
+  const rows=result.holdings.map(h=>`<tr><td><span class="port-ticker">${h.ticker}</span></td><td>${h.shares>0?h.shares.toLocaleString():'—'}</td><td>${h.price>0?portFmtCurrency(h.price):'—'}</td><td>${portFmtCurrency(h.value)}</td><td><div class="port-weight-bar"><div class="port-weight-track"><div class="port-weight-fill" style="width:${Math.round(h.weight*100)}%"></div></div><span>${Math.round(h.weight*100)}%</span></div></td><td><span class="port-flag port-flag-${h.flag}">${h.flagLabel}</span></td></tr>`).join('');
+  const strats=ETF_STRATEGIES.map(s=>`<div class="port-strat-card"><h3>${s.icon} ${s.name}</h3><p>${s.desc}</p><div class="port-strat-etfs">${s.etfs.map(e=>`<span class="port-etf-tag">${e}</span>`).join('')}</div></div>`).join('');
+  const suggs=result.suggestions.map(s=>`<div class="port-atlas-etf-suggestion">${s}</div>`).join('');
+  const bars=[['Diversification',result.divScore],['Concentration Risk',result.concScore],['Position Count',result.sizeScore],['ETF Coverage',result.etfScore],['Fixed Income',result.bondScore]].map(([l,v])=>`<div class="port-score-row"><span class="port-score-label">${l}</span><div class="port-score-track"><div class="port-score-fill" style="width:${v}%;background:${sc(v)}"></div></div><span class="port-score-val" style="color:${sc(v)}">${v}</span></div>`).join('');
+  document.getElementById('port-results').innerHTML=`
+    <div class="port-grade-card">
+      <div class="port-grade-badge ${gradeClass}"><span class="grade-letter">${result.grade}</span><span class="grade-score">${result.overall}/100</span></div>
+      <div class="port-grade-info"><h2>Portfolio Score: ${result.overall} — ${result.grade}</h2><p>Total estimated value: <strong>${portFmtCurrency(result.totalValue)}</strong> across ${result.holdings.length} positions</p><div class="port-score-bars">${bars}</div></div>
+    </div>
+    <div class="port-section"><div class="port-section-title">Holdings Breakdown</div>
+      <div class="port-input-card" style="padding:0;overflow:hidden"><table class="port-holdings-table"><thead><tr><th>Ticker</th><th>Shares</th><th>Price</th><th>Value</th><th>Weight</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
+    </div>
+    <div class="port-section"><div class="port-section-title">ETF Diversification Strategies</div><div class="port-strat-grid">${strats}</div></div>
+    <div class="port-atlas-etf">
+      <div class="port-atlas-etf-head"><div class="port-atlas-etf-icon">▲</div><div><h2>Atlas Diversified ETF (ATLAS-ETF)</h2><p>Our proprietary closed-end fund — AI-driven, institutionally balanced</p></div></div>
+      <p>The Atlas Diversified ETF is built on the same 7-factor Atlas Score engine that powers our research platform. It provides instant exposure to our highest-conviction positions across all 8 sectors, rebalanced monthly using live data and AI analysis.</p>
+      <div class="port-atlas-etf-suggestions">${suggs}</div>
+    </div>`;
+  document.getElementById('port-results').classList.add('show');
+  document.getElementById('port-results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function portGrade(){
+  const raw=document.getElementById('port-json').value.trim();
+  const errEl=document.getElementById('port-err');
+  const ta=document.getElementById('port-json');
+  errEl.classList.remove('show');ta.classList.remove('error');
+  if(!raw){errEl.textContent='Please enter your holdings JSON first.';errEl.classList.add('show');ta.classList.add('error');return;}
+  try{
+    const holdings=parseHoldings(raw);
+    if(holdings.length===0)throw new Error('No holdings found.');
+    portRenderResults(gradePortfolio(holdings));
+  }catch(e){errEl.textContent='JSON error: '+e.message;errEl.classList.add('show');ta.classList.add('error');}
+}
+
+function portLoadExample(){document.getElementById('port-json').value=PORT_PLACEHOLDER;document.getElementById('port-err').classList.remove('show');document.getElementById('port-json').classList.remove('error');}
+function portClear(){document.getElementById('port-json').value='';document.getElementById('port-results').classList.remove('show');document.getElementById('port-err').classList.remove('show');}
+function portSaveLocal(){const raw=document.getElementById('port-json').value.trim();if(!raw)return;localStorage.setItem('atlas_portfolio_json',raw);const s=document.getElementById('port-save-status');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),2000);}
+function portLoadLocal(){const saved=localStorage.getItem('atlas_portfolio_json');if(!saved){alert('No saved portfolio found.');return;}document.getElementById('port-json').value=saved;}
+async function portSaveCloud(){
+  const raw=document.getElementById('port-json').value.trim();if(!raw)return;
+  const sess=typeof getSession==='function'?getSession():null;
+  if(!sess){alert('Please log in to save to your account.');return;}
+  try{
+    const res=await fetch('/api/portfolio/save',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+sess.token},body:JSON.stringify({userId:sess.id,portfolio:raw})});
+    if(!res.ok)throw new Error('Save failed');
+    const s=document.getElementById('port-save-status');s.textContent='✓ Saved to account';s.classList.add('show');
+    setTimeout(()=>{s.textContent='✓ Saved';s.classList.remove('show');},2500);
+  }catch(e){alert('Cloud save failed — saved locally instead.');portSaveLocal();}
+}
+
 </script>
 <title>Atlas Analysis — AI-Powered Stock Research & Analysis Platform</title>
 <!-- Meta Pixel — Replace YOUR_PIXEL_ID with your actual pixel ID -->
@@ -378,6 +542,82 @@ background-size:64px 64px;pointer-events:none}
 .stats-inner{grid-template-columns:1fr 1fr}
 .stat{justify-content:center}
 }
+
+/* ── Portfolio Manager ─────────────────────────────────── */
+.port-wrap{max-width:900px;margin:0 auto;padding:0 0 60px}
+.port-hero{margin-bottom:32px}
+.port-hero h1{font-size:1.75rem;font-weight:800;margin:0 0 6px}
+.port-hero p{color:var(--tx-2);font-size:.95rem;margin:0}
+.port-input-card{background:var(--bg-1);border:1px solid var(--bd);border-radius:16px;padding:28px;margin-bottom:24px}
+.port-input-card h2{font-size:1rem;font-weight:700;margin:0 0 6px}
+.port-input-card p{font-size:.85rem;color:var(--tx-2);margin:0 0 16px}
+.port-textarea{width:100%;min-height:160px;background:var(--bg-0);border:1px solid var(--bd);border-radius:10px;color:var(--tx-1);font-family:'IBM Plex Mono',monospace;font-size:.82rem;padding:14px;resize:vertical;box-sizing:border-box;transition:border-color .2s}
+.port-textarea:focus{outline:none;border-color:var(--ac)}
+.port-textarea.error{border-color:var(--red)}
+.port-err{color:var(--red);font-size:.8rem;margin-top:8px;display:none}
+.port-err.show{display:block}
+.port-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.port-btn{padding:10px 22px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;border:none;transition:opacity .15s,transform .1s}
+.port-btn:active{transform:scale(.97)}
+.port-btn-primary{background:var(--ac);color:#fff}
+.port-btn-primary:hover{opacity:.88}
+.port-btn-ghost{background:transparent;border:1px solid var(--bd);color:var(--tx-1)}
+.port-btn-ghost:hover{border-color:var(--ac);color:var(--ac)}
+.port-btn-sm{padding:7px 14px;font-size:.8rem}
+.port-results{display:none}
+.port-results.show{display:block}
+.port-grade-card{background:var(--bg-1);border:1px solid var(--bd);border-radius:16px;padding:28px;margin-bottom:20px;display:flex;gap:28px;align-items:center;flex-wrap:wrap}
+.port-grade-badge{width:88px;height:88px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;border:3px solid}
+.port-grade-badge .grade-letter{font-size:2rem;line-height:1}
+.port-grade-badge .grade-score{font-size:.75rem;opacity:.8}
+.grade-A{border-color:var(--green);color:var(--green);background:rgba(0,224,136,.1)}
+.grade-B{border-color:var(--ac);color:var(--ac);background:rgba(79,143,255,.1)}
+.grade-C{border-color:var(--amber);color:var(--amber);background:rgba(255,176,32,.1)}
+.grade-D{border-color:var(--red);color:var(--red);background:rgba(255,68,102,.1)}
+.port-grade-info{flex:1;min-width:200px}
+.port-grade-info h2{font-size:1.1rem;font-weight:700;margin:0 0 6px}
+.port-grade-info p{font-size:.88rem;color:var(--tx-2);margin:0 0 14px}
+.port-score-bars{display:flex;flex-direction:column;gap:8px}
+.port-score-row{display:flex;align-items:center;gap:10px;font-size:.8rem}
+.port-score-label{width:130px;color:var(--tx-2);flex-shrink:0}
+.port-score-track{flex:1;height:6px;background:var(--bg-2);border-radius:3px;overflow:hidden}
+.port-score-fill{height:100%;border-radius:3px;transition:width .6s ease}
+.port-score-val{width:30px;text-align:right;font-weight:600;font-size:.78rem}
+.port-section{margin-bottom:20px}
+.port-section-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-2);margin-bottom:12px}
+.port-holdings-table{width:100%;border-collapse:collapse}
+.port-holdings-table th{text-align:left;font-size:.75rem;font-weight:600;color:var(--tx-2);padding:8px 12px;border-bottom:1px solid var(--bd);text-transform:uppercase;letter-spacing:.06em}
+.port-holdings-table td{padding:10px 12px;font-size:.85rem;border-bottom:1px solid var(--bd)}
+.port-holdings-table tr:last-child td{border-bottom:none}
+.port-holdings-table tr:hover td{background:var(--bg-2)}
+.port-ticker{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--ac)}
+.port-weight-bar{display:flex;align-items:center;gap:8px}
+.port-weight-track{width:80px;height:5px;background:var(--bg-2);border-radius:3px;overflow:hidden}
+.port-weight-fill{height:100%;border-radius:3px;background:var(--ac)}
+.port-flag{font-size:.72rem;padding:2px 7px;border-radius:4px;font-weight:600}
+.port-flag-warn{background:rgba(255,176,32,.15);color:var(--amber)}
+.port-flag-ok{background:rgba(0,224,136,.15);color:var(--green)}
+.port-flag-bad{background:rgba(255,68,102,.15);color:var(--red)}
+.port-strat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:20px}
+.port-strat-card{background:var(--bg-1);border:1px solid var(--bd);border-radius:12px;padding:18px}
+.port-strat-card h3{font-size:.9rem;font-weight:700;margin:0 0 6px;display:flex;align-items:center;gap:8px}
+.port-strat-card p{font-size:.82rem;color:var(--tx-2);margin:0 0 10px;line-height:1.5}
+.port-strat-etfs{display:flex;flex-wrap:wrap;gap:6px}
+.port-etf-tag{font-family:'IBM Plex Mono',monospace;font-size:.75rem;font-weight:600;padding:3px 8px;border-radius:5px;background:var(--bg-2);color:var(--tx-1);border:1px solid var(--bd)}
+.port-atlas-etf{background:linear-gradient(135deg,rgba(79,143,255,.08),rgba(168,85,247,.06));border:1px solid rgba(79,143,255,.3);border-radius:16px;padding:28px;margin-bottom:20px}
+.port-atlas-etf-head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.port-atlas-etf-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--ac),#a855f7);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;color:#fff;font-weight:800}
+.port-atlas-etf-head h2{font-size:1.05rem;font-weight:800;margin:0 0 3px}
+.port-atlas-etf-head p{font-size:.82rem;color:var(--tx-2);margin:0}
+.port-atlas-etf>p{font-size:.88rem;color:var(--tx-2);line-height:1.6;margin:0 0 16px}
+.port-atlas-etf-suggestions{display:flex;flex-direction:column;gap:8px}
+.port-atlas-etf-suggestion{display:flex;align-items:flex-start;gap:10px;font-size:.85rem;color:var(--tx-1)}
+.port-atlas-etf-suggestion::before{content:'→';color:var(--ac);font-weight:700;flex-shrink:0;margin-top:1px}
+.port-save-bar{display:flex;gap:10px;align-items:center;background:var(--bg-1);border:1px solid var(--bd);border-radius:12px;padding:14px 18px;margin-bottom:20px;flex-wrap:wrap}
+.port-save-bar span{font-size:.85rem;color:var(--tx-2);flex:1;min-width:150px}
+.port-save-status{font-size:.8rem;color:var(--green);display:none}
+.port-save-status.show{display:inline}
+
 </style>
 </head>
 <body>
@@ -1594,6 +1834,7 @@ document.getElementById('app').innerHTML=`
 <div class="nav-i ${pg==='history'?'on':''}" onclick="${hasTier('institutional')?`nav('/app/history');CS()`:`nav('/subscribe')`}"><span class="ico">📊</span> Performance ${hasTier('institutional')?'':'🔒'}</div></div>
 <div class="nav-sec"><div class="nav-sec-t">Research Sectors</div>
 ${Object.values(SEC).map(s=>`<div class="nav-i ${pg==='sector'&&rt.includes('/'+s.k)?'on':''}" onclick="nav('/app/sector/${s.k}');CS()"><span class="nav-dot" style="background:${s.c}"></span> ${s.l}</div>`).join('')}</div>
+<div class="nav-i ${pg==='portfolio'?'on':''}" onclick="nav('/app/portfolio');CS()">${I.chart||'📊'} Portfolio</div>
 <div class="nav-sec"><div class="nav-sec-t">Account</div>
 <div class="nav-i ${pg==='settings'?'on':''}" onclick="nav('/app/settings');CS()">${I.gear} Settings</div></div>
 </nav>
@@ -1634,6 +1875,7 @@ else if(pg==='sector')rSector(pgEl,path.split('/')[1]);
 else if(pg==='stock')rStock(pgEl,path.split('/')[1]);
 else if(pg==='history')rHistory(pgEl);
 else if(pg==='watchlist')rWatchlist(pgEl);
+else if(pg==='portfolio')rPortfolio_render(pgEl);
 else if(pg==='settings')rSettings(pgEl);
 else rDash(pgEl);
 }
