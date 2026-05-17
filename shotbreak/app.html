@@ -3016,18 +3016,16 @@ function ensureShotBackground(sh){
 }
 
 function draftBackgroundFromScene(scene,continueFromScene){
-  // Scene-master draft. Unchanged behavior from the prior release.
+  // Scene-master draft — cinematics, location, and film setting ONLY.
+  // No action lines, no character content, no shot text.
   const h=scene.heading||'';
   const loc=(h.match(/(INT\.|EXT\.|I\/E\.?|INT\/EXT\.?)\s+(.+?)(?:\s*[—\-–]\s*(.+))?$/i)||[])[2]||'';
   const tod=(h.match(/[—\-–]\s*(DAY|NIGHT|MORNING|EVENING|DUSK|DAWN|LATER|CONTINUOUS)\b/i)||[])[1]||'';
   const isExt=/^\s*EXT/i.test(h);
-  const shotSample=(scene.shots||[]).slice(0,3).map(s=>(s.text||'').trim()).filter(Boolean).join(' ');
-  const atmospheric=shotSample.split(/(?<=[.!?])\s+/).slice(0,3).join(' ').substring(0,280);
   let d=isExt?'Exterior ':'Interior ';
   d+=loc.replace(/[—\-–].*$/,'').trim().toLowerCase();
   if(tod)d+=' at '+tod.toLowerCase();
   d+='. ';
-  if(atmospheric)d+=atmospheric.trim()+' ';
   if(continueFromScene){
     const refLoc=(continueFromScene.heading||'').replace(/^\s*(INT\.|EXT\.|I\/E\.?|INT\/EXT\.?)\s+/i,'').substring(0,60).trim();
     d+='(Continuing the visual tone from: '+refLoc+'.) ';
