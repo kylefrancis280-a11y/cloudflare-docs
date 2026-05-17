@@ -1,0 +1,6 @@
+[build]
+  base = "atlas"
+  publish = "web"
+  command = ""
+[build.environment]
+  NODE_VERSION = "20"
