@@ -1,8 +1,6 @@
 [build]
-  base      = "shotbreak"
-  publish   = "shotbreak"
-  functions = "shotbreak/netlify/functions"
-  edge_functions = "shotbreak/netlify/edge-functions"
+  base      = "atlas/legacy"
+  publish   = "atlas/legacy"
 
 [functions]
   node_bundler = "esbuild"
