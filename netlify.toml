@@ -1,6 +1,15 @@
 [build]
-  base      = "atlas/legacy"
-  publish   = "atlas/legacy"
+  base    = "shotbreak"
+  publish = "."
+  command = "echo 'no build step'"
 
 [functions]
+  directory    = "netlify/functions"
   node_bundler = "esbuild"
+
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin  = "*"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
