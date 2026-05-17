@@ -5590,7 +5590,7 @@ async function mhStitchRun(mode){
   if(!groups.length){statusEl.textContent='No sequential shots to stitch.';return}
 
   try{
-    const ff=await mhLoadFFmpeg((msg)=>{statusEl.textContent=msg});
+    const ff=await window.SBVideo._loadFFmpeg((msg)=>{statusEl.textContent=msg});
     for(let gi=0;gi<groups.length;gi++){
       const g=groups[gi];
       const label=mode==='all'?'Full Script':('Scene '+(g[0].sceneIdx+1));
