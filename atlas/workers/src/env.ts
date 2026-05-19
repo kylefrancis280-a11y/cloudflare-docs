@@ -10,8 +10,8 @@ export interface Env {
   ENVIRONMENT: string;
   ALLOWED_ORIGINS: string;
 
-  // Secrets
-  ANTHROPIC_API_KEY: string;
+  // Secrets — GROK ONLY
+  GROK_API_KEY: string;                    // ← your xAI key goes here
   POLYGON_API_KEY?: string;
   FINNHUB_KEY?: string;
   FRED_API_KEY?: string;
