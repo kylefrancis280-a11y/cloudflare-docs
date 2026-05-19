@@ -510,7 +510,10 @@ function renderETFPage() {
     </div>
   `;
 }
-// PORTFOLIO UPGRADES
+// ──────────────────────────────────────
+// CLEAN GROK FUNCTIONS - NO CLAUDE LEFT
+// ──────────────────────────────────────
+
 function renderPortfolio() {
   return `
     <div style="padding:24px;max-width:1200px;margin:0 auto">
@@ -537,7 +540,7 @@ function renderPortfolio() {
 function showAddStockModal() {
   const ticker = prompt("Enter stock ticker (example: AAPL, NVDA, SHOP, TSLA):");
   if (ticker && ticker.trim()) {
-    alert("✅ Added " + ticker.toUpperCase() + " to your Portfolio!\n\n(Full monitoring coming soon)");
+    alert("✅ Added " + ticker.toUpperCase() + " to your Portfolio!\n\n(Full Grok monitoring coming soon)");
   }
 }
 
