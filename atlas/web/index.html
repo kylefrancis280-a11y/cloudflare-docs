@@ -381,23 +381,29 @@ background-size:64px 64px;pointer-events:none}
 </head>
 <body>
 <div id="loader" style="position:fixed;inset:0;z-index:9999;background:#06080f;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s">
-<svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-<defs><linearGradient id="lgl" x1="0" y1="0" x2="48" y2="48"><stop offset="0%" stop-color="#4f8fff"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
-<polygon points="24,2 46,42 2,42" fill="url(#lgl)"/>
-<polygon points="24,14 34,36 14,36" fill="#06080f" opacity=".8"/>
-<line x1="24" y1="2" x2="24" y2="14" stroke="#fff" stroke-width="2" opacity=".5"/>
-</svg>
-<div style="margin-top:20px;font-family:'DM Sans',system-ui,sans-serif;font-size:17px;font-weight:700;letter-spacing:4px;color:#eaf0ff">ATLAS ANALYSIS</div>
-<div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:#607090">LOADING PLATFORM</div>
-<div style="margin-top:20px;width:120px;height:3px;background:#1a2045;border-radius:2px;overflow:hidden">
-<div style="width:100%;height:100%;background:linear-gradient(90deg,#4f8fff,#a855f7);border-radius:2px;animation:loadBar 1.2s ease-in-out infinite"></div>
-</div>
+  <svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="lgl" x1="0" y1="0" x2="48" y2="48"><stop offset="0%" stop-color="#4f8fff"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+    <polygon points="24,2 46,42 2,42" fill="url(#lgl)"/>
+    <polygon points="24,14 34,36 14,36" fill="#06080f" opacity=".8"/>
+    <line x1="24" y1="2" x2="24" y2="14" stroke="#fff" stroke-width="2" opacity=".5"/>
+  </svg>
+  <div style="margin-top:20px;font-family:'DM Sans',system-ui,sans-serif;font-size:17px;font-weight:700;letter-spacing:4px;color:#eaf0ff">ATLAS ANALYSIS</div>
+  <div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:#607090">LOADING PLATFORM</div>
 </div>
 <style>
 @keyframes loadBar{0%{transform:translateX(-100%)}50%{transform:translateX(0)}100%{transform:translateX(100%)}}
 </style>
 <div id="app"></div>
 <script>
+// Hide loader + force render (final fix)
+setTimeout(() => {
+  const loader = document.getElementById('loader');
+  if (loader) {
+    loader.style.opacity = '0';
+    setTimeout(() => loader.remove(), 800);
+  }
+  if (typeof render === 'function') render();
+}, 1200);
 	// ── ETF PAGE ─────────────────────────────────────────────────────
 function renderETFPage// ── PORTFOLIO UPGRADES ─────────────────────────────────────────────
 function renderPortfolio() {
