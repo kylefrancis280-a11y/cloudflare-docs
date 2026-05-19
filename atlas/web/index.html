@@ -491,3 +491,15 @@ function renderETFPage() {
     </div>
   `;
 }
+// FINAL GROK FORCE RENDER + HIDE LOADER
+setTimeout(() => {
+  const loader = document.getElementById('loader');
+  if (loader) {
+    loader.style.opacity = '0';
+    setTimeout(() => loader.remove(), 600);
+  }
+  if (typeof render === 'function') {
+    render();
+    console.log('✅ Grok forced render - site should be live');
+  }
+}, 800);
