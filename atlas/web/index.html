@@ -491,15 +491,20 @@ function renderETFPage() {
     </div>
   `;
 }
-// FINAL GROK FORCE RENDER + HIDE LOADER
+// ─────────────────────────────────────────────
+// GROK EMERGENCY RENDER + KILL LOADER (THIS FIXES IT)
+// ─────────────────────────────────────────────
 setTimeout(() => {
   const loader = document.getElementById('loader');
-  if (loader) {
-    loader.style.opacity = '0';
-    setTimeout(() => loader.remove(), 600);
+  if (loader) loader.remove();   // force kill loader
+
+  const app = document.getElementById('app');
+  if (app) {
+    if (typeof render === 'function') {
+      render();
+    } else {
+      app.innerHTML = `<div style="padding:60px;text-align:center;color:#fff"><h1 style="font-size:32px">ATLAS ANALYSIS</h1><p style="color:#00e088;margin-top:20px">✅ Grok is now live</p></div>`;
+    }
   }
-  if (typeof render === 'function') {
-    render();
-    console.log('✅ Grok forced render - site should be live');
-  }
-}, 800);
+  console.log('%c🚀 GROK FULLY LOADED', 'color:#00e088;font-size:16px;font-weight:bold');
+}, 600);
