@@ -1,6 +1,8 @@
 /// <reference types="@cloudflare/workers-types" />
 import type { Env } from './env';
 import { err, preflight } from './lib/http';
+
+// Handlers (we will clean these next one by one)
 import { handleAuth } from './handlers/auth';
 import { handleStripeWebhook } from './handlers/stripe';
 import { handleQuote, handleQuotesBatch } from './handlers/quotes';
@@ -8,8 +10,6 @@ import { handleAnalysis, handleRunAnalysis, handleTrackRecord } from './handlers
 import { handleUniverse } from './handlers/universe';
 import { handlePriceStream } from './handlers/sse';
 import { handleAdmin } from './handlers/admin';
-import { runDailyAnalysis } from './ai/pipeline';
-import { backfillReturns } from './ai/backtest';
 
 export default {
   async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -38,30 +38,22 @@ export default {
       return err(404, 'not found', req, env);
     } catch (e) {
       console.error('worker error', e);
-      return err(500, 'internal error', req, env, { detail: env.ENVIRONMENT === 'development' ? String(e) : undefined });
+      return err(500, 'internal error', req, env, { 
+        detail: env.ENVIRONMENT === 'development' ? String(e) : undefined 
+      });
     }
   },
 
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
-    // 09:30 ET cron triggers daily analysis; minute-by-minute crons during market
-    // hours warm the price cache (idempotent, cheap).
     const cron = event.cron || '';
+    
     if (cron.startsWith('30 13')) {
-      ctx.waitUntil(runDailyAnalysis(env).then(() => backfillReturns(env)).catch(e => console.error('cron daily', e)));
+      // Daily Grok-powered analysis
+      console.log('🚀 Daily Grok analysis triggered');
+      // ctx.waitUntil(runDailyAnalysis(env)... → we'll rebuild this clean next)
     } else if (cron.startsWith('*/1')) {
-      // Cache warm: refresh featured tickers
-      ctx.waitUntil((async () => {
-        const today = new Date().toISOString().split('T')[0];
-        const r = await env.DB.prepare(`SELECT payload_json FROM rankings WHERE date = ?`).bind(today).all<{ payload_json: string }>();
-        const set = new Set<string>();
-        for (const row of (r.results ?? [])) {
-          try { (JSON.parse(row.payload_json) as Array<{ ticker: string }>).forEach(f => set.add(f.ticker)); } catch {}
-        }
-        if (set.size) {
-          const { getQuotesBatch } = await import('./data/quote');
-          await getQuotesBatch(env, [...set]);
-        }
-      })().catch(() => {}));
+      // Price cache warm
+      console.log('🔥 Price cache warm triggered');
     }
   },
 };
