@@ -1,3 +1,4 @@
+/// <reference types="@cloudflare/workers-types" />
 import type { Env } from '../env';
 
 const SECURITY_HEADERS = {
@@ -12,6 +13,7 @@ export function corsHeaders(req: Request, env: Env): Record<string, string> {
   const origin = req.headers.get('Origin') ?? '';
   const allowed = env.ALLOWED_ORIGINS.split(',').map(s => s.trim());
   const ok = allowed.includes(origin) || env.ENVIRONMENT === 'development';
+
   return {
     'Access-Control-Allow-Origin': ok ? origin : allowed[0] ?? '',
     'Vary': 'Origin',
@@ -25,12 +27,16 @@ export function corsHeaders(req: Request, env: Env): Record<string, string> {
 export function json<T>(data: T, init: ResponseInit = {}, req?: Request, env?: Env): Response {
   const headers = new Headers(init.headers);
   headers.set('Content-Type', 'application/json; charset=utf-8');
+
   for (const [k, v] of Object.entries(SECURITY_HEADERS)) headers.set(k, v);
-  if (req && env) for (const [k, v] of Object.entries(corsHeaders(req, env))) headers.set(k, v);
+  if (req && env) {
+    for (const [k, v] of Object.entries(corsHeaders(req, env))) headers.set(k, v);
+  }
+
   return new Response(JSON.stringify(data), { ...init, headers });
 }
 
-export function err(status: number, message: string, req?: Request, env?: Env, extra: Record<string, unknown> = {}): Response {
+export function err(status: number, message: string, req?: Request, env?: Env, extra: Record<string, any> = {}): Response {
   return json({ error: message, ...extra }, { status }, req, env);
 }
 
@@ -38,8 +44,7 @@ export function preflight(req: Request, env: Env): Response {
   return new Response(null, { status: 204, headers: corsHeaders(req, env) });
 }
 
-// Strict HTML escape — applied to anything that flows from an external API
-// (news headlines, AI summaries, ticker/company names) before it's rendered.
+// HTML escape for anything coming from AI or external APIs
 export function escapeHtml(input: unknown): string {
   if (input == null) return '';
   return String(input)
@@ -47,11 +52,10 @@ export function escapeHtml(input: unknown): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    .replace(/'/g, '&#039;');
 }
 
-// Drop any field that isn't safe to expose to the browser.
-export function sanitizeNewsItem(n: { headline?: unknown; source?: unknown; url?: unknown; ts?: unknown; sentiment?: unknown }) {
+export function sanitizeNewsItem(n: any) {
   const url = String(n.url ?? '').trim();
   const safeUrl = /^https?:\/\//i.test(url) ? url : '';
   return {
@@ -63,23 +67,11 @@ export function sanitizeNewsItem(n: { headline?: unknown; source?: unknown; url?
   };
 }
 
-// Constant-time string compare used for token + signature verification.
 export function timingSafeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return diff === 0;
-}
-
-export function bytesToHex(bytes: ArrayBuffer | Uint8Array): string {
-  const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
-  return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-export function hexToBytes(hex: string): Uint8Array {
-  const out = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.substr(i * 2, 2), 16);
-  return out;
 }
 
 export function bytesToBase64(bytes: ArrayBuffer | Uint8Array): string {
@@ -99,15 +91,11 @@ export function base64ToBytes(b64: string): Uint8Array {
 export async function sha256Hex(input: string): Promise<string> {
   const buf = new TextEncoder().encode(input);
   const hash = await crypto.subtle.digest('SHA-256', buf);
-  return bytesToHex(hash);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 export function clientIp(req: Request): string {
-  return (
-    req.headers.get('CF-Connecting-IP') ||
-    req.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() ||
-    'unknown'
-  );
+  return req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || 'unknown';
 }
 
 export function clientUA(req: Request): string {
@@ -115,11 +103,7 @@ export function clientUA(req: Request): string {
 }
 
 export function todayET(): string {
-  // ET (America/New_York) calendar date, formatted YYYY-MM-DD.
   const now = new Date();
-  const fmt = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/New_York',
-    year: 'numeric', month: '2-digit', day: '2-digit',
-  });
+  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' });
   return fmt.format(now);
 }
