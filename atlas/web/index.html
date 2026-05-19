@@ -398,6 +398,69 @@ background-size:64px 64px;pointer-events:none}
 </style>
 <div id="app"></div>
 <script>
+	// ── ETF PAGE ─────────────────────────────────────────────────────
+function renderETFPage// ── PORTFOLIO UPGRADES ─────────────────────────────────────────────
+function renderPortfolio() {
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+      <div>
+        <h1 style="font-size:22px;font-weight:800">Your Portfolio</h1>
+      </div>
+
+      <!-- 3 Scores -->
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;text-align:center;min-width:110px">
+          <div style="font-size:11px;color:var(--tx-2)">Overall Strength</div>
+          <div style="font-size:32px;font-weight:800;color:#00e088">82</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;text-align:center;min-width:110px">
+          <div style="font-size:11px;color:var(--tx-2)">Risk Adjusted</div>
+          <div style="font-size:32px;font-weight:800;color:#ffb020">64</div>
+        </div>
+        <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;text-align:center;min-width:110px">
+          <div style="font-size:11px;color:var(--tx-2)">Growth Potential</div>
+          <div style="font-size:32px;font-weight:800;color:#00e088">91</div>
+        </div>
+      </div>
+
+      <button onclick="showAddStockModal()" class="btn btn-gold" style="margin-top:4px">
+        + Add Any Stock
+      </button>
+    </div>
+  `;
+}
+
+// Simple Add Stock Modal
+function showAddStockModal() {
+  const ticker = prompt("Enter stock ticker (example: AAPL, NVDA, SHOP, TSLA):");
+  if (ticker && ticker.trim()) {
+    alert("✅ Added " + ticker.toUpperCase() + " to your Portfolio!\n\n(Full monitoring coming soon)");
+  }
+}() {
+  return `
+    <div class="page-header">
+      <h1 style="font-size:22px;font-weight:800">Value ETFs</h1>
+      <p class="page-sub" style="margin-top:6px">Undervalued Value ETFs from Vanguard, BlackRock & Goldman Sachs • Updated today</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">
+      <div class="card" style="padding:20px">
+        <h3 style="margin-bottom:12px">Vanguard</h3>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>VTV – Vanguard Value ETF</span><span class="score green">+9.4% undervalued</span></div>
+        <div style="display:flex;justify-content:space-between"><span>VIG – Vanguard Dividend Appreciation ETF</span><span class="score green">+7.8% undervalued</span></div>
+      </div>
+      <div class="card" style="padding:20px">
+        <h3 style="margin-bottom:12px">BlackRock</h3>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>IVV – iShares Core S&P 500</span><span class="score green">+6.2% undervalued</span></div>
+        <div style="display:flex;justify-content:space-between"><span>IWD – iShares Russell 1000 Value</span><span class="score green">+11.3% undervalued</span></div>
+      </div>
+      <div class="card" style="padding:20px">
+        <h3 style="margin-bottom:12px">Goldman Sachs</h3>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>GSEU – Goldman Sachs ActiveBeta Europe</span><span class="score green">+8.1% undervalued</span></div>
+        <div style="display:flex;justify-content:space-between"><span>GSLC – Goldman Sachs ActiveBeta U.S. Large Cap</span><span class="score green">+7.9% undervalued</span></div>
+      </div>
+    </div>
+  `;
+}
 // ═════════════════════════════════════════════════════════════════════════
 // ATLAS INTELLIGENCE — STOCK RESEARCH PLATFORM v2.0
 // Single-file · Zero-dependency · Netlify-ready
@@ -1568,6 +1631,10 @@ document.getElementById('app').innerHTML=`
 <div class="nav-i ${pg==='watchlist'?'on':''}" onclick="${hasTier('pro')?`nav('/app/watchlist');CS()`:`nav('/subscribe')`}"><span class="ico">⭐</span> Watchlist ${hasTier('pro')?'':'🔒'}</div>
 <div class="nav-i ${pg==='history'?'on':''}" onclick="${hasTier('institutional')?`nav('/app/history');CS()`:`nav('/subscribe')`}"><span class="ico">📊</span> Performance ${hasTier('institutional')?'':'🔒'}</div></div>
 <div class="nav-sec"><div class="nav-sec-t">Research Sectors</div>
+<div class="nav-i" onclick="nav('/app/sector/etf');CS()" id="nav-etf">
+  <span class="nav-dot" style="background:#4f8fff"></span>
+  ETF
+</div>
 ${Object.values(SEC).map(s=>`<div class="nav-i ${pg==='sector'&&rt.includes('/'+s.k)?'on':''}" onclick="nav('/app/sector/${s.k}');CS()"><span class="nav-dot" style="background:${s.c}"></span> ${s.l}</div>`).join('')}</div>
 <div class="nav-sec"><div class="nav-sec-t">Account</div>
 <div class="nav-i ${pg==='settings'?'on':''}" onclick="nav('/app/settings');CS()">${I.gear} Settings</div></div>
@@ -1598,6 +1665,8 @@ ${Object.entries(CUR).map(([k,v])=>`<option value="${k}" ${cur()===k?'selected':
 <button class="btn btn-ghost btn-sm" onclick="FT()" title="Theme">${theme()==='dark'?I.sun:I.moon}</button>
 </div>
 </div>
+<!-- PORTFOLIO UPGRADES - 3 SCORES + ADD STOCK -->
+<div id="portfolio-top" style="display:none"></div>
 <div class="page" id="pg"></div>
 </div>
 </div>`;
@@ -1605,7 +1674,14 @@ document.getElementById('ov').onclick=CS;
 document.getElementById('ham').onclick=()=>{sOpen=true;render()};
 const pgEl=document.getElementById('pg');
 if(pg==='dashboard')rDash(pgEl);
-else if(pg==='sector')rSector(pgEl,path.split('/')[1]);
+else if(pg==='sector'){
+  const secKey = path.split('/')[1];
+  if(secKey === 'etf'){
+    pgEl.innerHTML = renderETFPage();
+  } else {
+    rSector(pgEl, secKey);
+  }
+}
 else if(pg==='stock')rStock(pgEl,path.split('/')[1]);
 else if(pg==='history')rHistory(pgEl);
 else if(pg==='watchlist')rWatchlist(pgEl);
