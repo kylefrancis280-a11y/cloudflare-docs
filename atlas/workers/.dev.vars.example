@@ -1,11 +1,24 @@
-# Copy to .dev.vars and fill in. Never commit .dev.vars.
-ANTHROPIC_API_KEY=sk-ant-...
+# Copy this file to .dev.vars and fill in your real values.
+# Never commit .dev.vars to GitHub.
+
+# ── Required for Grok (xAI) ─────────────────────────────
+GROK_API_KEY=xai-...
+
+# ── Optional data providers (recommended) ───────────────
 POLYGON_API_KEY=
 FINNHUB_KEY=
 FRED_API_KEY=
+
+# ── Payments ────────────────────────────────────────────
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
+
+# ── Email notifications (optional) ──────────────────────
 RESEND_API_KEY=
+
+# ── Security ────────────────────────────────────────────
 SESSION_PEPPER=generate-a-random-32-byte-hex-string-here
+
+# ── Environment ─────────────────────────────────────────
 ENVIRONMENT=development
-ALLOWED_ORIGINS=http://localhost:8788,http://localhost:8787
+ALLOWED_ORIGINS=http://localhost:8788,http://localhost:8787,https://atlasanalysis.net
