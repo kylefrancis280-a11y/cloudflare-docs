@@ -2,30 +2,40 @@
 import type { Env } from '../env';
 import { err, json } from '../lib/http';
 
+/**
+ * Save user portfolio + calculate Atlas Score
+ * (Future: replace hardcoded grading with Grok API call)
+ */
 export async function handlePortfolioSave(req: Request, env: Env): Promise<Response> {
   try {
     const { userId, holdings } = await req.json();
-    if (!userId || !holdings) return err(400, 'missing userId or holdings', req, env);
 
-    // Real grading logic (you can call your existing grader here later)
+    if (!userId || typeof userId !== 'string') {
+      return err(400, 'missing or invalid userId', req, env);
+    }
+    if (!holdings || !Array.isArray(holdings)) {
+      return err(400, 'holdings must be a valid JSON array', req, env);
+    }
+
+    // TODO: In the future replace this with real Grok-powered grading
     const gradeResult = {
       atlasScore: 85,
       diversificationScore: 92,
-      stabilityScore: 78,               // extra score focused on ETF / low-vol stability
+      stabilityScore: 78,        // focused on ETF / low-vol stability
       grade: 'A-',
-      suggestions: holdings.length < 8 
-        ? ['Add 2-3 Value ETFs (VOO, GLD, GIGB) for better stability'] 
-        : ['Portfolio is well balanced with good ETF exposure']
+      suggestions: holdings.length < 8
+        ? ['Consider adding 2-3 core Value ETFs (e.g. VTV, VOO) for better stability']
+        : ['Portfolio shows good diversification and ETF exposure']
     };
 
     const id = crypto.randomUUID();
 
     await env.DB.prepare(`
       INSERT INTO portfolios (
-        id, user_id, holdings, 
+        id, user_id, holdings,
         atlas_score, diversification_score, stability_score,
-        grade, total_value, suggestions, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        grade, suggestions, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `).bind(
       id,
       userId,
@@ -34,30 +44,34 @@ export async function handlePortfolioSave(req: Request, env: Env): Promise<Respo
       gradeResult.diversificationScore,
       gradeResult.stabilityScore,
       gradeResult.grade,
-      0, // total_value placeholder — update later if needed
       JSON.stringify(gradeResult.suggestions)
     ).run();
 
-    return json({ 
-      success: true, 
+    return json({
+      success: true,
       portfolioId: id,
       scores: {
         atlas: gradeResult.atlasScore,
         diversification: gradeResult.diversificationScore,
         stability: gradeResult.stabilityScore
-      }
+      },
+      grade: gradeResult.grade
     });
 
   } catch (e) {
     console.error('portfolio save error', e);
-    return err(500, 'save failed', req, env);
+    return err(500, 'failed to save portfolio', req, env);
   }
 }
 
+/**
+ * Load latest saved portfolio for a user
+ */
 export async function handlePortfolioLoad(req: Request, env: Env): Promise<Response> {
   try {
     const url = new URL(req.url);
     const userId = url.searchParams.get('userId');
+
     if (!userId) return err(400, 'missing userId', req, env);
 
     const row = await env.DB.prepare(
@@ -65,7 +79,7 @@ export async function handlePortfolioLoad(req: Request, env: Env): Promise<Respo
     ).bind(userId).first();
 
     if (!row) {
-      return json({ holdings: [], scores: { atlas: 0, diversification: 0, stability: 0 } });
+      return json({ holdings: [], scores: { atlas: 0, diversification: 0, stability: 0 }, grade: '—' });
     }
 
     return json({
@@ -78,8 +92,9 @@ export async function handlePortfolioLoad(req: Request, env: Env): Promise<Respo
       },
       grade: row.grade
     });
+
   } catch (e) {
     console.error('portfolio load error', e);
-    return err(500, 'load failed', req, env);
+    return err(500, 'failed to load portfolio', req, env);
   }
 }
