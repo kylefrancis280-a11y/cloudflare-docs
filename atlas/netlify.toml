@@ -1,6 +1,16 @@
 [build]
   base = "atlas"
   publish = "web"
-  command = ""
+  command = ""                    # No build step needed — it's a single index.html
+
 [build.environment]
   NODE_VERSION = "20"
+
+# Optional but recommended: Security headers for the whole site
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.x.ai"
