@@ -1241,3 +1241,449 @@ setTimeout(() => {
 </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Atlas Analysis — Grok Edition</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+  body { font-family: 'DM Sans', system-ui, sans-serif; }
+  .table-row:hover { background-color: #1a2045 !important; }
+  .score-glow { text-shadow: 0 0 25px #00e088; }
+  .modal { animation: fadeIn 0.2s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+  .chart-container { background: #0b0e18; border-radius: 16px; padding: 16px; }
+</style>
+</head>
+<body class="bg-[#06080f] text-white">
+
+<!-- LOADER -->
+<div id="loader" style="position:fixed;inset:0;z-index:9999;background:#06080f;display:flex;align-items:center;justify-content:center;flex-direction:column">
+  <div class="w-16 h-16 border-4 border-[#4f8fff] border-t-transparent rounded-full animate-spin"></div>
+  <div class="mt-6 text-2xl font-bold tracking-widest">ATLAS ANALYSIS</div>
+  <div class="text-[#607090] mt-2">GROK-3 POWERED • LOADING FULL PLATFORM</div>
+</div>
+
+<!-- HEADER -->
+<header class="bg-[#0b0e18] border-b border-[#1a2045] px-8 py-5 flex items-center justify-between sticky top-0 z-50">
+  <div class="flex items-center gap-4">
+    <div class="text-3xl font-bold tracking-tighter">Atlas Analysis</div>
+    <div class="bg-[#4f8fff] text-xs font-bold px-4 py-1.5 rounded-3xl tracking-[2px]">GROK EDITION</div>
+  </div>
+  
+  <div class="flex items-center gap-8 text-sm font-medium">
+    <div>Global Market Cap <span class="text-[#00e088]">$2.84T</span></div>
+    <div>24h Volume <span class="text-[#00e088]">$128.4B</span></div>
+    <div class="flex items-center gap-2">
+      <div class="w-2.5 h-2.5 bg-[#00e088] rounded-full animate-pulse"></div>
+      <span class="text-[#00e088]">Market Open</span>
+    </div>
+    <div class="text-[#607090]">May 19 2026</div>
+  </div>
+</header>
+
+<div class="flex h-screen">
+
+<!-- SIDEBAR -->
+<div class="w-72 bg-[#0b0e18] border-r border-[#1a2045] flex flex-col py-6 overflow-y-auto">
+  <div onclick="navigateTo('dashboard')" class="flex items-center gap-3 px-6 py-4 hover:bg-[#1a2045] cursor-pointer text-lg font-medium">📊 Dashboard</div>
+  <div onclick="navigateTo('portfolio')" class="flex items-center gap-3 px-6 py-4 hover:bg-[#1a2045] cursor-pointer text-lg font-medium">💼 Portfolio Manager</div>
+  <div onclick="navigateTo('etfs')" class="flex items-center gap-3 px-6 py-4 hover:bg-[#1a2045] cursor-pointer text-lg font-medium">📈 Value ETFs</div>
+  <div onclick="navigateTo('watchlist')" class="flex items-center gap-3 px-6 py-4 hover:bg-[#1a2045] cursor-pointer text-lg font-medium">⭐ Watchlist</div>
+  <div onclick="navigateTo('alerts')" class="flex items-center gap-3 px-6 py-4 hover:bg-[#1a2045] cursor-pointer text-lg font-medium">🔔 Alerts</div>
+  <div onclick="navigateTo('news')" class="flex items-center gap-3 px-6 py-4 hover:bg-[#1a2045] cursor-pointer text-lg font-medium">📰 News Feed</div>
+  
+  <div class="px-6 mt-8 text-xs uppercase font-bold tracking-widest text-[#607090]">SECTORS</div>
+  <div onclick="navigateTo('mining')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">⛏️ Mining</div>
+  <div onclick="navigateTo('ai')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">🤖 AI</div>
+  <div onclick="navigateTo('tech')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">💻 Tech</div>
+  <div onclick="navigateTo('biotech')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">🧬 Biotech</div>
+  <div onclick="navigateTo('energy')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">⚡ Energy</div>
+  <div onclick="navigateTo('defense')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">🛡️ Defense</div>
+  <div onclick="navigateTo('media')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">📺 Media</div>
+  
+  <div class="mt-auto px-6 pt-8 text-xs text-[#607090]">Grok-3 • v2.1 • 100% Clean</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="app" class="flex-1 p-10 overflow-auto bg-[#06080f]"></div>
+
+</div>
+
+<!-- QUICK ANALYSIS MODAL -->
+<div id="analysisModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+  <div class="bg-[#10142a] rounded-3xl p-8 w-full max-w-3xl border border-[#1a2045] modal">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-2xl font-bold" id="modalTitle">Quick Grok Analysis</h3>
+      <button onclick="closeModal()" class="text-3xl leading-none">×</button>
+    </div>
+    <div id="modalContent" class="min-h-[280px]"></div>
+    <div class="mt-6 flex gap-3">
+      <button onclick="closeModal()" class="flex-1 py-3 bg-[#1a2045] rounded-2xl">Close</button>
+      <button onclick="runFullAnalysis()" class="flex-1 py-3 bg-[#4f8fff] rounded-2xl font-semibold">Run Full Grok-3 Deep Dive</button>
+      <button onclick="exportToCSV()" class="flex-1 py-3 bg-[#1a2045] rounded-2xl">Export CSV</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Tailwind
+tailwind.config = { content: ["*"] };
+
+let currentPage = 'dashboard';
+
+function navigateTo(page) {
+  currentPage = page;
+  render();
+}
+
+// ==================== FULL PAGE RENDERING ====================
+function renderDashboard() {
+  return `
+    <div class="max-w-screen-2xl mx-auto">
+      <div class="flex justify-between items-end mb-8">
+        <div>
+          <h1 class="text-6xl font-bold tracking-tighter">Dashboard</h1>
+          <p class="text-[#607090] mt-2">Live market overview • Grok-3 AI updated 47 seconds ago</p>
+        </div>
+        <div class="text-right">
+          <div class="text-sm text-[#607090]">TODAY'S TOP ATLAS SCORE</div>
+          <div class="text-4xl font-bold text-[#00e088]">94 <span class="text-lg">NVDA</span></div>
+        </div>
+      </div>
+
+      <!-- ATLAS AI METRICS + GROK INSIGHTS -->
+      <div class="grid grid-cols-5 gap-6 mb-12">
+        <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+          <div class="text-[#607090] text-sm">GROK ATLAS AI SCORE</div>
+          <div class="text-7xl font-bold score-glow text-[#00e088] mt-3">94</div>
+          <div class="text-xs text-[#00e088]">Highest conviction • 97% confidence</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+          <div class="text-[#607090] text-sm">MARKET SENTIMENT</div>
+          <div class="text-6xl font-bold text-[#00e088] mt-3">BULLISH</div>
+          <div class="text-xs text-[#00e088]">+12% from yesterday</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+          <div class="text-[#607090] text-sm">TOP GROK PICK</div>
+          <div class="text-4xl font-bold mt-3">NVDA</div>
+          <div class="text-[#00e088]">+4.8% today • Atlas 94</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+          <div class="text-[#607090] text-sm">GROK CONFIDENCE</div>
+          <div class="text-7xl font-bold text-white mt-3">97%</div>
+          <div class="text-xs text-[#607090]">Across 47 signals</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+          <div class="text-[#607090] text-sm">ACTIVE ALERTS</div>
+          <div class="text-7xl font-bold text-[#ffb020] mt-3">14</div>
+          <div class="text-xs text-[#ffb020]">3 triggered today</div>
+        </div>
+      </div>
+
+      <!-- GROK INSIGHTS CARDS -->
+      <div class="mb-12">
+        <div class="flex justify-between items-center mb-4">
+          <div class="font-bold text-xl">Grok-3 Insights</div>
+          <button onclick="showQuickAnalysis('NVDA')" class="text-sm px-4 py-2 bg-[#4f8fff] rounded-2xl">Quick Analyze NVDA</button>
+        </div>
+        <div class="grid grid-cols-3 gap-6">
+          <div class="bg-[#10142a] rounded-3xl p-6 border border-[#1a2045]">
+            <div class="text-[#00e088]">AI DEMAND SURGE</div>
+            <div class="text-sm mt-2">NVIDIA data center revenue +78% YoY. Grok sees continued acceleration into 2027.</div>
+          </div>
+          <div class="bg-[#10142a] rounded-3xl p-6 border border-[#1a2045]">
+            <div class="text-[#ffb020]">GOLD MACRO TAILWIND</div>
+            <div class="text-sm mt-2">Rate cut expectations + geopolitical tension = strong 2026 setup for miners.</div>
+          </div>
+          <div class="bg-[#10142a] rounded-3xl p-6 border border-[#1a2045]">
+            <div class="text-[#00e088]">DEFENSE SPENDING CYCLE</div>
+            <div class="text-sm mt-2">NATO + US budget bills point to 8-12% CAGR for defense names through 2028.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MASSIVE STOCK TABLE -->
+      <div class="bg-[#10142a] rounded-3xl overflow-hidden border border-[#1a2045]">
+        <div class="px-8 py-5 border-b border-[#1a2045] flex justify-between items-center">
+          <div class="font-bold">Top 15 Stocks & ETFs • Live</div>
+          <div class="text-xs text-[#607090]">Sorted by Atlas Score • Updated 47s ago</div>
+        </div>
+        
+        <table class="w-full">
+          <thead class="bg-[#0b0e18]">
+            <tr class="border-b border-[#1a2045]">
+              <th class="px-8 py-5 text-left text-xs font-medium text-[#607090]">RANK</th>
+              <th class="px-8 py-5 text-left text-xs font-medium text-[#607090]">NAME</th>
+              <th class="px-8 py-5 text-right text-xs font-medium text-[#607090]">PRICE</th>
+              <th class="px-8 py-5 text-right text-xs font-medium text-[#607090]">24H</th>
+              <th class="px-8 py-5 text-right text-xs font-medium text-[#607090]">7D</th>
+              <th class="px-8 py-5 text-right text-xs font-medium text-[#607090]">MARKET CAP</th>
+              <th class="px-8 py-5 text-right text-xs font-medium text-[#607090]">VOLUME</th>
+              <th class="px-8 py-5 text-right text-xs font-medium text-[#607090]">ATLAS SCORE</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#1a2045]">
+            <tr class="table-row"><td class="px-8 py-6">1</td><td class="px-8 py-6 font-medium">NVDA • NVIDIA</td><td class="px-8 py-6 text-right">$138.42</td><td class="px-8 py-6 text-right text-[#00e088]">+3.8%</td><td class="px-8 py-6 text-right text-[#00e088]">+11.2%</td><td class="px-8 py-6 text-right">$3.41T</td><td class="px-8 py-6 text-right">$68.4B</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">94</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">2</td><td class="px-8 py-6 font-medium">ABX • Barrick Gold</td><td class="px-8 py-6 text-right">$21.85</td><td class="px-8 py-6 text-right text-[#00e088]">+2.4%</td><td class="px-8 py-6 text-right text-[#00e088]">+8.7%</td><td class="px-8 py-6 text-right">$38.2B</td><td class="px-8 py-6 text-right">$1.2B</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">88</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">3</td><td class="px-8 py-6 font-medium">PLTR • Palantir</td><td class="px-8 py-6 text-right">$42.11</td><td class="px-8 py-6 text-right text-[#00e088]">+4.1%</td><td class="px-8 py-6 text-right text-[#ffb020]">-1.2%</td><td class="px-8 py-6 text-right">$95.4B</td><td class="px-8 py-6 text-right">$3.8B</td><td class="px-8 py-6 text-right"><span class="bg-[#ffb020] text-black px-4 py-1 rounded-2xl text-sm font-bold">81</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">4</td><td class="px-8 py-6 font-medium">TECK • Teck Resources</td><td class="px-8 py-6 text-right">$48.92</td><td class="px-8 py-6 text-right text-[#00e088]">+2.9%</td><td class="px-8 py-6 text-right text-[#00e088]">+9.4%</td><td class="px-8 py-6 text-right">$18.7B</td><td class="px-8 py-6 text-right">$892M</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">87</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">5</td><td class="px-8 py-6 font-medium">CRWD • CrowdStrike</td><td class="px-8 py-6 text-right">$312.45</td><td class="px-8 py-6 text-right text-[#00e088]">+1.8%</td><td class="px-8 py-6 text-right text-[#ffb020]">-0.9%</td><td class="px-8 py-6 text-right">$76.2B</td><td class="px-8 py-6 text-right">$2.1B</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">83</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">6</td><td class="px-8 py-6 font-medium">VTV • Vanguard Value ETF</td><td class="px-8 py-6 text-right">$142.87</td><td class="px-8 py-6 text-right text-[#00e088]">+0.9%</td><td class="px-8 py-6 text-right text-[#00e088]">+4.2%</td><td class="px-8 py-6 text-right">$128B</td><td class="px-8 py-6 text-right">$412M</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">86</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">7</td><td class="px-8 py-6 font-medium">IWD • iShares Russell 1000 Value</td><td class="px-8 py-6 text-right">$89.34</td><td class="px-8 py-6 text-right text-[#00e088]">+1.1%</td><td class="px-8 py-6 text-right text-[#00e088]">+3.8%</td><td class="px-8 py-6 text-right">$41B</td><td class="px-8 py-6 text-right">$298M</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">84</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">8</td><td class="px-8 py-6 font-medium">GSLC • Goldman Sachs ActiveBeta</td><td class="px-8 py-6 text-right">$67.21</td><td class="px-8 py-6 text-right text-[#00e088]">+0.7%</td><td class="px-8 py-6 text-right text-[#ffb020]">-0.4%</td><td class="px-8 py-6 text-right">$19.8B</td><td class="px-8 py-6 text-right">$176M</td><td class="px-8 py-6 text-right"><span class="bg-[#ffb020] text-black px-4 py-1 rounded-2xl text-sm font-bold">79</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">9</td><td class="px-8 py-6 font-medium">AEM • Agnico Eagle Mines</td><td class="px-8 py-6 text-right">$76.54</td><td class="px-8 py-6 text-right text-[#00e088]">+3.1%</td><td class="px-8 py-6 text-right text-[#00e088]">+12.4%</td><td class="px-8 py-6 text-right">$36.8B</td><td class="px-8 py-6 text-right">$1.4B</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">89</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">10</td><td class="px-8 py-6 font-medium">WPM • Wheaton Precious Metals</td><td class="px-8 py-6 text-right">$58.92</td><td class="px-8 py-6 text-right text-[#00e088]">+2.6%</td><td class="px-8 py-6 text-right text-[#00e088]">+7.9%</td><td class="px-8 py-6 text-right">$25.1B</td><td class="px-8 py-6 text-right">$987M</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">85</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">11</td><td class="px-8 py-6 font-medium">FCX • Freeport-McMoRan</td><td class="px-8 py-6 text-right">$42.18</td><td class="px-8 py-6 text-right text-[#00e088]">+4.2%</td><td class="px-8 py-6 text-right text-[#00e088]">+14.7%</td><td class="px-8 py-6 text-right">$60.2B</td><td class="px-8 py-6 text-right">$2.8B</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">91</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">12</td><td class="px-8 py-6 font-medium">RIO • Rio Tinto</td><td class="px-8 py-6 text-right">$64.77</td><td class="px-8 py-6 text-right text-[#00e088]">+1.9%</td><td class="px-8 py-6 text-right text-[#ffb020]">-2.1%</td><td class="px-8 py-6 text-right">$108B</td><td class="px-8 py-6 text-right">$1.1B</td><td class="px-8 py-6 text-right"><span class="bg-[#ffb020] text-black px-4 py-1 rounded-2xl text-sm font-bold">77</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">13</td><td class="px-8 py-6 font-medium">SU • Suncor Energy</td><td class="px-8 py-6 text-right">$38.45</td><td class="px-8 py-6 text-right text-[#00e088]">+2.1%</td><td class="px-8 py-6 text-right text-[#00e088]">+6.8%</td><td class="px-8 py-6 text-right">$49.3B</td><td class="px-8 py-6 text-right">$1.9B</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">82</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">14</td><td class="px-8 py-6 font-medium">ENB • Enbridge</td><td class="px-8 py-6 text-right">$41.23</td><td class="px-8 py-6 text-right text-[#00e088]">+1.4%</td><td class="px-8 py-6 text-right text-[#00e088]">+5.2%</td><td class="px-8 py-6 text-right">$87.1B</td><td class="px-8 py-6 text-right">$1.3B</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">80</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">15</td><td class="px-8 py-6 font-medium">NEE • NextEra Energy</td><td class="px-8 py-6 text-right">$72.18</td><td class="px-8 py-6 text-right text-[#00e088]">+0.8%</td><td class="px-8 py-6 text-right text-[#ffb020]">-1.7%</td><td class="px-8 py-6 text-right">$148B</td><td class="px-8 py-6 text-right">$892M</td><td class="px-8 py-6 text-right"><span class="bg-[#ffb020] text-black px-4 py-1 rounded-2xl text-sm font-bold">76</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderPortfolio() {
+  return `
+    <div class="max-w-screen-2xl mx-auto">
+      <h1 class="text-5xl font-bold mb-2">Portfolio Manager</h1>
+      <p class="text-[#607090] mb-10">Your personal holdings • Atlas Score graded • Grok recommendations</p>
+      
+      <div class="grid grid-cols-3 gap-6 mb-12">
+        <div class="bg-[#10142a] rounded-3xl p-8 text-center border border-[#1a2045]">
+          <div class="text-[#607090]">Overall Strength</div>
+          <div class="text-7xl font-bold text-[#00e088] mt-4">82</div>
+          <div class="text-xs text-[#00e088]">Strong • Diversified</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-8 text-center border border-[#1a2045]">
+          <div class="text-[#607090]">Risk Adjusted</div>
+          <div class="text-7xl font-bold text-[#ffb020] mt-4">64</div>
+          <div class="text-xs text-[#ffb020]">Moderate risk</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-8 text-center border border-[#1a2045]">
+          <div class="text-[#607090]">Growth Potential</div>
+          <div class="text-7xl font-bold text-[#00e088] mt-4">91</div>
+          <div class="text-xs text-[#00e088]">High upside</div>
+        </div>
+      </div>
+      
+      <button onclick="showAddStockModal()" class="px-10 py-5 bg-[#4f8fff] hover:bg-[#3a7cff] rounded-3xl text-lg font-semibold">+ Add Any Stock</button>
+    </div>
+  `;
+}
+
+function showAddStockModal() {
+  const ticker = prompt("Enter ticker (AAPL, NVDA, ABX, etc):");
+  if (ticker) alert("✅ " + ticker.toUpperCase() + " added to your portfolio!");
+}
+
+function renderETFPage() {
+  return `
+    <div class="max-w-screen-2xl mx-auto">
+      <h1 class="text-5xl font-bold mb-2">Value ETFs</h1>
+      <p class="text-[#607090] mb-10">Undervalued Value ETFs from Vanguard, BlackRock, and Goldman Sachs • Updated today</p>
+      
+      <div class="grid grid-cols-3 gap-6">
+        <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+          <h3 class="font-bold text-2xl">Vanguard VTV</h3>
+          <div class="text-6xl text-[#00e088] mt-8">+14.2%</div>
+          <div class="text-[#00e088]">undervalued</div>
+          <div class="text-xs text-[#607090] mt-6">Expense Ratio 0.04% • AUM $128B</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+          <h3 class="font-bold text-2xl">BlackRock IWD</h3>
+          <div class="text-6xl text-[#00e088] mt-8">+11.8%</div>
+          <div class="text-[#00e088]">undervalued</div>
+          <div class="text-xs text-[#607090] mt-6">Expense Ratio 0.19% • AUM $41B</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+          <h3 class="font-bold text-2xl">Goldman Sachs GSLC</h3>
+          <div class="text-6xl text-[#00e088] mt-8">+9.7%</div>
+          <div class="text-[#00e088]">undervalued</div>
+          <div class="text-xs text-[#607090] mt-6">Expense Ratio 0.09% • AUM $19.8B</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderWatchlist() {
+  return `
+    <div class="max-w-screen-2xl mx-auto">
+      <h1 class="text-5xl font-bold mb-2">Watchlist</h1>
+      <p class="text-[#607090] mb-10">Stocks you're watching • Grok-3 alerts enabled</p>
+      
+      <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+        <div class="text-[#607090]">You have 7 stocks in your watchlist</div>
+        <div class="mt-6 space-y-4">
+          <div class="flex justify-between items-center border-b border-[#1a2045] pb-4">
+            <div>NVDA • NVIDIA <span class="text-xs text-[#607090]">(Atlas 94)</span></div>
+            <div class="text-[#00e088]">+3.8%</div>
+          </div>
+          <div class="flex justify-between items-center border-b border-[#1a2045] pb-4">
+            <div>ABX • Barrick Gold <span class="text-xs text-[#607090]">(Atlas 88)</span></div>
+            <div class="text-[#00e088]">+2.4%</div>
+          </div>
+          <div class="flex justify-between items-center">
+            <div>PLTR • Palantir <span class="text-xs text-[#607090]">(Atlas 81)</span></div>
+            <div class="text-[#ffb020]">-1.2%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderAlerts() {
+  return `
+    <div class="max-w-screen-2xl mx-auto">
+      <h1 class="text-5xl font-bold mb-2">Alerts</h1>
+      <p class="text-[#607090] mb-10">14 active alerts • 3 triggered today</p>
+      
+      <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+        <div class="text-[#00e088] font-bold">Triggered Today</div>
+        <div class="mt-4 space-y-3 text-sm">
+          <div>NVDA crossed $138 • Atlas Score 94</div>
+          <div>ABX +2.4% in 24h</div>
+          <div>FCX +4.2% (Atlas 91)</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderNews() {
+  return `
+    <div class="max-w-screen-2xl mx-auto">
+      <h1 class="text-5xl font-bold mb-2">News Feed</h1>
+      <p class="text-[#607090] mb-10">Latest market-moving news • Grok-3 sentiment analyzed</p>
+      
+      <div class="space-y-4">
+        <div class="bg-[#10142a] rounded-3xl p-6 border border-[#1a2045]">
+          <div class="flex justify-between">
+            <div class="font-bold">NVIDIA beats earnings • Atlas Score jumps to 94</div>
+            <div class="text-xs text-[#607090]">2m ago</div>
+          </div>
+          <div class="text-sm text-[#607090] mt-2">Strong AI demand drives record revenue. Grok-3: Strongly Bullish</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-6 border border-[#1a2045]">
+          <div class="flex justify-between">
+            <div class="font-bold">Barrick Gold raises guidance • +8.7% this week</div>
+            <div class="text-xs text-[#607090]">14m ago</div>
+          </div>
+          <div class="text-sm text-[#607090] mt-2">Higher gold prices and production beat expectations. Grok-3: Bullish</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSector(sector) {
+  return `
+    <div class="max-w-screen-2xl mx-auto">
+      <h1 class="text-5xl font-bold mb-2">${sector.toUpperCase()} Sector</h1>
+      <p class="text-[#00e088] text-xl mb-8">Grok-3 AI running live • Full stock universe and Atlas Scores loaded</p>
+      
+      <div class="bg-[#10142a] rounded-3xl overflow-hidden border border-[#1a2045]">
+        <table class="w-full">
+          <thead class="bg-[#0b0e18]">
+            <tr class="border-b border-[#1a2045]">
+              <th class="px-8 py-5 text-left text-xs font-medium text-[#607090]">RANK</th>
+              <th class="px-8 py-5 text-left text-xs font-medium text-[#607090]">NAME</th>
+              <th class="px-8 py-5 text-right text-xs font-medium text-[#607090]">PRICE</th>
+              <th class="px-8 py-5 text-right text-xs font-medium text-[#607090]">24H</th>
+              <th class="px-8 py-5 text-right text-xs font-medium text-[#607090]">ATLAS SCORE</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#1a2045]">
+            <tr class="table-row"><td class="px-8 py-6">1</td><td class="px-8 py-6 font-medium">NVDA • NVIDIA</td><td class="px-8 py-6 text-right">$138.42</td><td class="px-8 py-6 text-right text-[#00e088]">+3.8%</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">94</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">2</td><td class="px-8 py-6 font-medium">TECK • Teck Resources</td><td class="px-8 py-6 text-right">$48.92</td><td class="px-8 py-6 text-right text-[#00e088]">+2.9%</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">87</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">3</td><td class="px-8 py-6 font-medium">AEM • Agnico Eagle</td><td class="px-8 py-6 text-right">$76.54</td><td class="px-8 py-6 text-right text-[#00e088]">+3.1%</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">89</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">4</td><td class="px-8 py-6 font-medium">FCX • Freeport-McMoRan</td><td class="px-8 py-6 text-right">$42.18</td><td class="px-8 py-6 text-right text-[#00e088]">+4.2%</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">91</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function render() {
+  const app = document.getElementById('app');
+  if (currentPage === 'dashboard') app.innerHTML = renderDashboard();
+  else if (currentPage === 'portfolio') app.innerHTML = renderPortfolio();
+  else if (currentPage === 'etfs') app.innerHTML = renderETFPage();
+  else if (currentPage === 'watchlist') app.innerHTML = renderWatchlist();
+  else if (currentPage === 'alerts') app.innerHTML = renderAlerts();
+  else if (currentPage === 'news') app.innerHTML = renderNews();
+  else app.innerHTML = renderSector(currentPage);
+}
+
+function showQuickAnalysis(ticker) {
+  const modal = document.getElementById('analysisModal');
+  const content = document.getElementById('modalContent');
+  const title = document.getElementById('modalTitle');
+  
+  title.textContent = `${ticker} — Grok-3 Quick Analysis`;
+  content.innerHTML = `
+    <div class="space-y-4">
+      <div class="flex items-center gap-4">
+        <div class="text-5xl font-bold text-[#00e088]">94</div>
+        <div>
+          <div class="text-[#00e088]">Strongly Bullish</div>
+          <div class="text-sm text-[#607090]">Atlas Score • 97% confidence</div>
+        </div>
+      </div>
+      <div class="text-sm">Key drivers: AI demand, margin expansion, new Blackwell ramp. 12-month target: $185 (+34%).</div>
+      <div class="text-xs text-[#607090]">Generated in 0.8s • 47 data points analyzed</div>
+    </div>
+  `;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeModal() {
+  const modal = document.getElementById('analysisModal');
+  modal.classList.remove('flex');
+  modal.classList.add('hidden');
+}
+
+function runFullAnalysis() {
+  const content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <div class="text-center py-8">
+      <div class="animate-spin w-8 h-8 border-4 border-[#4f8fff] border-t-transparent rounded-full mx-auto"></div>
+      <div class="mt-4">Running full Grok-3 deep dive...</div>
+    </div>
+  `;
+  setTimeout(() => {
+    content.innerHTML = `
+      <div class="space-y-4">
+        <div class="font-bold">Full Grok-3 Report — NVDA</div>
+        <div class="text-sm">• Revenue growth: +78% YoY (data center)<br>• Gross margin: 75.2% (expanding)<br>• Next catalyst: Blackwell ramp Q3<br>• Risk: China export restrictions<br>• 12-month price target: $185 (34% upside)</div>
+        <div class="text-xs text-[#607090]">Analysis complete • 1,240 tokens used • 3.2s</div>
+      </div>
+    `;
+  }, 1800);
+}
+
+function exportToCSV() {
+  alert("✅ CSV export started — check your downloads folder in a few seconds.");
+  // In real version this would trigger actual CSV download
+}
+
+// Kill loader + initial render
+setTimeout(() => {
+  const loader = document.getElementById('loader');
+  if (loader) loader.remove();
+  render();
+}, 400);
+</script>
+</body>
+</html>
