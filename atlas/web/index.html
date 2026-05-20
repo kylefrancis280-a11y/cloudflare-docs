@@ -680,3 +680,134 @@ setTimeout(() => {
 </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Atlas Analysis — Grok Edition</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+  body { font-family: 'DM Sans', system-ui, sans-serif; }
+  .table-row:hover { background-color: #1a2045 !important; }
+  .score-glow { text-shadow: 0 0 25px #00e088; }
+</style>
+</head>
+<body class="bg-[#06080f] text-white">
+
+<!-- LOADER -->
+<div id="loader" style="position:fixed;inset:0;z-index:9999;background:#06080f;display:flex;align-items:center;justify-content:center;flex-direction:column">
+  <div class="w-16 h-16 border-4 border-[#4f8fff] border-t-transparent rounded-full animate-spin"></div>
+  <div class="mt-6 text-2xl font-bold tracking-widest">ATLAS ANALYSIS</div>
+  <div class="text-[#607090] mt-2">GROK-3 POWERED • LOADING FULL PLATFORM</div>
+</div>
+
+<!-- HEADER -->
+<header class="bg-[#0b0e18] border-b border-[#1a2045] px-8 py-5 flex items-center justify-between sticky top-0 z-50">
+  <div class="flex items-center gap-4">
+    <div class="text-3xl font-bold tracking-tighter">Atlas Analysis</div>
+    <div class="bg-[#4f8fff] text-xs font-bold px-4 py-1.5 rounded-3xl tracking-[2px]">GROK EDITION</div>
+  </div>
+  
+  <div class="flex items-center gap-8 text-sm font-medium">
+    <div>Global Market Cap <span class="text-[#00e088]">$2.84T</span></div>
+    <div>24h Volume <span class="text-[#00e088]">$128.4B</span></div>
+    <div class="flex items-center gap-2">
+      <div class="w-2.5 h-2.5 bg-[#00e088] rounded-full animate-pulse"></div>
+      <span class="text-[#00e088]">Market Open</span>
+    </div>
+    <div class="text-[#607090]">May 19 2026</div>
+  </div>
+</header>
+
+<div class="flex h-screen">
+
+<!-- SIDEBAR -->
+<div class="w-72 bg-[#0b0e18] border-r border-[#1a2045] flex flex-col py-6 overflow-y-auto">
+  <div onclick="navigateTo('dashboard')" class="flex items-center gap-3 px-6 py-4 hover:bg-[#1a2045] cursor-pointer text-lg font-medium">📊 Dashboard</div>
+  <div onclick="navigateTo('portfolio')" class="flex items-center gap-3 px-6 py-4 hover:bg-[#1a2045] cursor-pointer text-lg font-medium">💼 Portfolio Manager</div>
+  <div onclick="navigateTo('etfs')" class="flex items-center gap-3 px-6 py-4 hover:bg-[#1a2045] cursor-pointer text-lg font-medium">📈 Value ETFs</div>
+  <div onclick="navigateTo('watchlist')" class="flex items-center gap-3 px-6 py-4 hover:bg-[#1a2045] cursor-pointer text-lg font-medium">⭐ Watchlist</div>
+  <div onclick="navigateTo('alerts')" class="flex items-center gap-3 px-6 py-4 hover:bg-[#1a2045] cursor-pointer text-lg font-medium">🔔 Alerts</div>
+  <div onclick="navigateTo('news')" class="flex items-center gap-3 px-6 py-4 hover:bg-[#1a2045] cursor-pointer text-lg font-medium">📰 News Feed</div>
+  
+  <div class="px-6 mt-8 text-xs uppercase font-bold tracking-widest text-[#607090]">SECTORS</div>
+  <div onclick="navigateTo('mining')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">⛏️ Mining</div>
+  <div onclick="navigateTo('ai')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">🤖 AI</div>
+  <div onclick="navigateTo('tech')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">💻 Tech</div>
+  <div onclick="navigateTo('biotech')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">🧬 Biotech</div>
+  <div onclick="navigateTo('energy')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">⚡ Energy</div>
+  <div onclick="navigateTo('defense')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">🛡️ Defense</div>
+  <div onclick="navigateTo('media')" class="flex items-center gap-3 px-6 py-3 hover:bg-[#1a2045] cursor-pointer">📺 Media</div>
+  
+  <div class="mt-auto px-6 pt-8 text-xs text-[#607090]">Grok-3 • v2.1 • 100% Clean</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="app" class="flex-1 p-10 overflow-auto bg-[#06080f]"></div>
+
+</div>
+
+<script>
+// Tailwind
+tailwind.config = { content: ["*"] };
+
+let currentPage = 'dashboard';
+
+function navigateTo(page) {
+  currentPage = page;
+  render();
+}
+
+// ==================== FULL PAGE RENDERING ====================
+function renderDashboard() {
+  return `
+    <div class="max-w-screen-2xl mx-auto">
+      <div class="flex justify-between items-end mb-8">
+        <div>
+          <h1 class="text-6xl font-bold tracking-tighter">Dashboard</h1>
+          <p class="text-[#607090] mt-2">Live market overview • Grok-3 AI updated 47 seconds ago</p>
+        </div>
+        <div class="text-right">
+          <div class="text-sm text-[#607090]">TODAY'S TOP ATLAS SCORE</div>
+          <div class="text-4xl font-bold text-[#00e088]">94 <span class="text-lg">NVDA</span></div>
+        </div>
+      </div>
+
+      <!-- ATLAS AI METRICS -->
+      <div class="grid grid-cols-5 gap-6 mb-12">
+        <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+          <div class="text-[#607090] text-sm">GROK ATLAS AI SCORE</div>
+          <div class="text-7xl font-bold score-glow text-[#00e088] mt-3">94</div>
+          <div class="text-xs text-[#00e088]">Highest conviction • 97% confidence</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+          <div class="text-[#607090] text-sm">MARKET SENTIMENT</div>
+          <div class="text-6xl font-bold text-[#00e088] mt-3">BULLISH</div>
+          <div class="text-xs text-[#00e088]">+12% from yesterday</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+          <div class="text-[#607090] text-sm">TOP GROK PICK</div>
+          <div class="text-4xl font-bold mt-3">NVDA</div>
+          <div class="text-[#00e088]">+4.8% today • Atlas 94</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+          <div class="text-[#607090] text-sm">GROK CONFIDENCE</div>
+          <div class="text-7xl font-bold text-white mt-3">97%</div>
+          <div class="text-xs text-[#607090]">Across 47 signals</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-8 border border-[#1a2045]">
+          <div class="text-[#607090] text-sm">ACTIVE ALERTS</div>
+          <div class="text-7xl font-bold text-[#ffb020] mt-3">14</div>
+          <div class="text-xs text-[#ffb020]">3 triggered today</div>
+        </div>
+      </div>
+
+      <!-- MASSIVE STOCK TABLE -->
+      <div class="bg-[#10142a] rounded-3xl overflow-hidden border border-[#1a2045]">
+        <div class="px-8 py-5 border-b border-[#1a2045] flex justify-between items-center">
+          <div class="font-bold">Top 15 Stocks & ETFs • Live</div>
+          <div class="text-xs text-[#607090]">Sorted by Atlas Score • Updated 47s ago</div>
+       
