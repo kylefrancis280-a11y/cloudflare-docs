@@ -3,9 +3,6 @@ main = "src/index.ts"
 compatibility_date = "2025-01-15"
 compatibility_flags = ["nodejs_compat"]
 
-# Pages-friendly: this Worker is mounted at /api/* on the same hostname as the static frontend.
-# When deploying as a Pages Function, copy src/* into functions/api/[[path]].ts instead.
-
 # ── D1 Database ─────────────────────────────────────────────────────────────
 [[d1_databases]]
 binding = "DB"
@@ -13,12 +10,12 @@ database_name = "atlas"
 database_id = "REPLACE_WITH_D1_ID"
 migrations_dir = "migrations"
 
-# ── KV (caches: prices/news/FX) ─────────────────────────────────────────────
+# ── KV (caches: prices, news, macro, etc.) ──────────────────────────────────
 [[kv_namespaces]]
 binding = "CACHE"
 id = "REPLACE_WITH_KV_ID"
 
-# ── Durable Objects (SSE price stream coordinator) ──────────────────────────
+# ── Durable Objects (SSE price stream) ──────────────────────────────────────
 [[durable_objects.bindings]]
 name = "PRICE_STREAM"
 class_name = "PriceStream"
@@ -28,8 +25,8 @@ tag = "v1"
 new_classes = ["PriceStream"]
 
 # ── Cron triggers ───────────────────────────────────────────────────────────
-# 09:30 ET (pre-open) M-F  → daily analysis pass
-# Every 1 minute during market hours → price refresh
+# 30 13 * * 1-5 → Daily Grok analysis at 8:30 AM EST
+# */1 13-21 * * 1-5 → Price cache warm every minute during market hours
 [triggers]
 crons = ["*/1 13-21 * * 1-5", "30 13 * * 1-5"]
 
@@ -38,12 +35,13 @@ crons = ["*/1 13-21 * * 1-5", "30 13 * * 1-5"]
 ENVIRONMENT = "production"
 ALLOWED_ORIGINS = "https://atlasanalysis.net,https://www.atlasanalysis.net"
 
-# Secrets (set with `wrangler secret put`):
-#   ANTHROPIC_API_KEY      — Claude API
-#   POLYGON_API_KEY        — Polygon.io (preferred)
-#   FINNHUB_KEY            — Finnhub fallback
-#   FRED_API_KEY           — FRED macroeconomic data
-#   STRIPE_SECRET_KEY      — Stripe API
-#   STRIPE_WEBHOOK_SECRET  — Stripe webhook signing secret (REQUIRED)
-#   RESEND_API_KEY         — transactional email
-#   SESSION_PEPPER         — server-side pepper for password hashing
+# ── Secrets (set with `wrangler secret put`) ───────────────────────────────
+# GROK_API_KEY          ← Required (your xAI key)
+# POLYGON_API_KEY       ← Preferred real-time quotes
+# FINNHUB_KEY           ← Fallback quotes
+# FRED_API_KEY          ← Macro data
+# STRIPE_SECRET_KEY
+# STRIPE_WEBHOOK_SECRET ← Required for payments
+# RESEND_API_KEY        ← Email notifications
+# SESSION_PEPPER        ← Password hashing
+# ADMIN_BOOTSTRAP_TOKEN ← One-time bootstrap (optional)
