@@ -101,7 +101,8 @@ let prices = {
   'VTV': 142.87, 'IWD': 89.34, 'GSLC': 67.21, 'AEM': 76.54, 'WPM': 58.92,
   'FCX': 42.18, 'RIO': 64.77, 'SU': 38.45, 'ENB': 41.23, 'NEE': 72.18,
   'AAPL': 226.84, 'MSFT': 425.22, 'GOOGL': 175.41, 'AMZN': 185.13, 'META': 502.31,
-  'TSLA': 248.76, 'AMD': 124.85, 'INTC': 22.41, 'QCOM': 168.92, 'AVGO': 162.34
+  'TSLA': 248.76, 'AMD': 124.85, 'INTC': 22.41, 'QCOM': 168.92, 'AVGO': 162.34,
+  'JPM': 198.45, 'V': 312.87, 'MA': 458.12, 'XOM': 108.76, 'CVX': 152.34
 };
 
 function navigateTo(page) {
@@ -240,6 +241,11 @@ function renderDashboard() {
             <tr class="table-row"><td class="px-8 py-6">18</td><td class="px-8 py-6 font-medium">GOOGL • Alphabet</td><td class="px-8 py-6 text-right live-price" data-ticker="GOOGL">$${prices['GOOGL'].toFixed(2)}</td><td class="px-8 py-6 text-right text-[#00e088]">+1.5%</td><td class="px-8 py-6 text-right text-[#ffb020]">-0.6%</td><td class="px-8 py-6 text-right">$2.18T</td><td class="px-8 py-6 text-right">$19.7B</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">84</span></td></tr>
             <tr class="table-row"><td class="px-8 py-6">19</td><td class="px-8 py-6 font-medium">AMZN • Amazon</td><td class="px-8 py-6 text-right live-price" data-ticker="AMZN">$${prices['AMZN'].toFixed(2)}</td><td class="px-8 py-6 text-right text-[#00e088]">+2.1%</td><td class="px-8 py-6 text-right text-[#00e088]">+6.3%</td><td class="px-8 py-6 text-right">$1.98T</td><td class="px-8 py-6 text-right">$31.2B</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">86</span></td></tr>
             <tr class="table-row"><td class="px-8 py-6">20</td><td class="px-8 py-6 font-medium">META • Meta Platforms</td><td class="px-8 py-6 text-right live-price" data-ticker="META">$${prices['META'].toFixed(2)}</td><td class="px-8 py-6 text-right text-[#00e088]">+1.9%</td><td class="px-8 py-6 text-right text-[#00e088]">+8.4%</td><td class="px-8 py-6 text-right">$1.27T</td><td class="px-8 py-6 text-right">$24.8B</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">88</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">21</td><td class="px-8 py-6 font-medium">TSLA • Tesla</td><td class="px-8 py-6 text-right live-price" data-ticker="TSLA">$${prices['TSLA'].toFixed(2)}</td><td class="px-8 py-6 text-right text-[#ffb020]">-2.3%</td><td class="px-8 py-6 text-right text-[#00e088]">+4.2%</td><td class="px-8 py-6 text-right">$791B</td><td class="px-8 py-6 text-right">$38.7B</td><td class="px-8 py-6 text-right"><span class="bg-[#ffb020] text-black px-4 py-1 rounded-2xl text-sm font-bold">79</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">22</td><td class="px-8 py-6 font-medium">AMD • Advanced Micro Devices</td><td class="px-8 py-6 text-right live-price" data-ticker="AMD">$${prices['AMD'].toFixed(2)}</td><td class="px-8 py-6 text-right text-[#00e088]">+3.4%</td><td class="px-8 py-6 text-right text-[#00e088]">+9.7%</td><td class="px-8 py-6 text-right">$202B</td><td class="px-8 py-6 text-right">$14.2B</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">85</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">23</td><td class="px-8 py-6 font-medium">INTC • Intel</td><td class="px-8 py-6 text-right live-price" data-ticker="INTC">$${prices['INTC'].toFixed(2)}</td><td class="px-8 py-6 text-right text-[#ffb020]">-1.8%</td><td class="px-8 py-6 text-right text-[#ffb020]">-4.2%</td><td class="px-8 py-6 text-right">$96B</td><td class="px-8 py-6 text-right">$8.9B</td><td class="px-8 py-6 text-right"><span class="bg-[#ffb020] text-black px-4 py-1 rounded-2xl text-sm font-bold">71</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">24</td><td class="px-8 py-6 font-medium">QCOM • Qualcomm</td><td class="px-8 py-6 text-right live-price" data-ticker="QCOM">$${prices['QCOM'].toFixed(2)}</td><td class="px-8 py-6 text-right text-[#00e088]">+2.7%</td><td class="px-8 py-6 text-right text-[#00e088]">+7.1%</td><td class="px-8 py-6 text-right">$189B</td><td class="px-8 py-6 text-right">$11.4B</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">82</span></td></tr>
+            <tr class="table-row"><td class="px-8 py-6">25</td><td class="px-8 py-6 font-medium">AVGO • Broadcom</td><td class="px-8 py-6 text-right live-price" data-ticker="AVGO">$${prices['AVGO'].toFixed(2)}</td><td class="px-8 py-6 text-right text-[#00e088]">+1.6%</td><td class="px-8 py-6 text-right text-[#00e088]">+5.8%</td><td class="px-8 py-6 text-right">$672B</td><td class="px-8 py-6 text-right">$9.8B</td><td class="px-8 py-6 text-right"><span class="bg-[#00e088] text-black px-4 py-1 rounded-2xl text-sm font-bold">86</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -387,6 +393,13 @@ function renderNews() {
             <div class="text-xs text-[#607090]">47m ago</div>
           </div>
           <div class="text-sm text-[#607090] mt-2">New $1.2B contract announced. Grok-3: Bullish</div>
+        </div>
+        <div class="bg-[#10142a] rounded-3xl p-6 border border-[#1a2045]">
+          <div class="flex justify-between">
+            <div class="font-bold">Freeport-McMoRan raises copper guidance • Atlas 91</div>
+            <div class="text-xs text-[#607090]">1h ago</div>
+          </div>
+          <div class="text-sm text-[#607090] mt-2">Strong demand from AI data centers. Grok-3: Strongly Bullish</div>
         </div>
       </div>
     </div>
