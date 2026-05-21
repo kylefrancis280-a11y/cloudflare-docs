@@ -3,504 +3,285 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Atlas Analysis — Grok Edition</title>
+<title>Atlas Analysis — AI-Powered Stock Research</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   body { font-family: 'DM Sans', system-ui, sans-serif; background: #06080f; color: white; }
-  .table-row:hover { background-color: #1a2045; cursor: pointer; }
-  .score-glow { text-shadow: 0 0 20px #00e088; }
-  .price-up { color: #00e088 !important; }
-  .price-down { color: #ff4d4d !important; }
-  .nav-item { transition: background 0.15s; }
-  .nav-item.active { background: #1a2045; color: #4f8fff; }
+  .gradient-text { background: linear-gradient(135deg, #4f8fff, #00e088); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .card { background: #10142a; border: 1px solid #1a2045; border-radius: 1.5rem; }
-  .badge-green { background: #00e088; color: #000; padding: 2px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
-  .badge-blue { background: #4f8fff; color: #fff; padding: 2px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
-  .badge-red { background: #ff4d4d; color: #fff; padding: 2px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
-  .badge-yellow { background: #ffb020; color: #000; padding: 2px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
-  .grok-btn { background: linear-gradient(135deg, #4f8fff, #7c3aed); border: none; color: white; font-weight: 600; border-radius: 1rem; padding: 0.6rem 1.4rem; cursor: pointer; transition: opacity 0.15s; }
-  .grok-btn:hover { opacity: 0.85; }
-  .alert-item { border-left: 3px solid #4f8fff; padding: 0.75rem 1rem; background: #0d1020; border-radius: 0 0.75rem 0.75rem 0; margin-bottom: 0.5rem; }
-  .alert-item.triggered { border-left-color: #00e088; }
-  .news-card { background: #0d1020; border: 1px solid #1a2045; border-radius: 1rem; padding: 1rem; margin-bottom: 0.75rem; transition: border-color 0.15s; }
-  .news-card:hover { border-color: #4f8fff; }
-  ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #06080f; } ::-webkit-scrollbar-thumb { background: #1a2045; border-radius: 2px; }
+  .btn-primary { background: linear-gradient(135deg, #4f8fff, #00e088); color: #000; font-weight: 700; border-radius: 0.75rem; padding: 0.75rem 2rem; transition: opacity 0.2s; }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-outline { border: 1px solid #4f8fff; color: #4f8fff; border-radius: 0.75rem; padding: 0.75rem 2rem; transition: all 0.2s; }
+  .btn-outline:hover { background: #4f8fff22; }
+  .ticker-tape { display: flex; animation: scroll 30s linear infinite; white-space: nowrap; }
+  @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  .modal-bg { background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); }
+  .input-field { background: #0d1020; border: 1px solid #1a2045; border-radius: 0.75rem; padding: 0.75rem 1rem; color: white; width: 100%; outline: none; transition: border-color 0.2s; }
+  .input-field:focus { border-color: #4f8fff; }
+  .price-up { color: #00e088; }
+  .price-down { color: #ff4d4d; }
+  .score-badge { background: linear-gradient(135deg, #4f8fff22, #00e08822); border: 1px solid #00e08844; border-radius: 999px; padding: 2px 12px; font-size: 0.75rem; font-weight: 700; color: #00e088; }
 </style>
 </head>
 <body>
 
-<!-- LOADER -->
-<div id="loader" style="position:fixed;inset:0;background:#06080f;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9999">
-  <div class="w-14 h-14 border-4 border-[#4f8fff] border-t-transparent rounded-full animate-spin"></div>
-  <div class="mt-6 text-2xl font-bold tracking-[3px]">ATLAS ANALYSIS</div>
-  <div class="text-[#607090] mt-1 text-sm">GROK-3 POWERED • LOADING</div>
-</div>
-
-<!-- HEADER -->
-<header class="bg-[#0b0e18] border-b border-[#1a2045] px-8 py-4 flex items-center justify-between sticky top-0 z-50">
-  <div class="flex items-center gap-3">
-    <div class="text-2xl font-bold">Atlas Analysis</div>
-    <div class="bg-[#4f8fff] text-xs font-bold px-3 py-1 rounded-full tracking-widest">GROK EDITION</div>
-  </div>
-  <div class="flex items-center gap-6 text-sm">
-    <div>S&amp;P 500 <span class="text-[#00e088]">+0.84%</span></div>
-    <div>NASDAQ <span class="text-[#00e088]">+1.12%</span></div>
-    <div>BTC <span class="text-[#00e088]">$103,420</span></div>
-    <div class="flex items-center gap-1.5"><div class="w-2 h-2 bg-[#00e088] rounded-full animate-pulse"></div><span class="text-[#00e088]">Live</span></div>
-  </div>
-</header>
-
-<div class="flex">
-
-<!-- SIDEBAR -->
-<div class="w-64 bg-[#0b0e18] border-r border-[#1a2045] min-h-screen p-4 flex-shrink-0">
-  <div class="mb-2 px-4 pt-2 text-xs uppercase tracking-widest text-[#607090]">MAIN</div>
-  <div id="nav-dashboard" onclick="showPage('dashboard')" class="nav-item flex items-center gap-3 px-4 py-2.5 hover:bg-[#1a2045] rounded-xl cursor-pointer mb-1 text-sm">📊 Dashboard</div>
-  <div id="nav-portfolio" onclick="showPage('portfolio')" class="nav-item flex items-center gap-3 px-4 py-2.5 hover:bg-[#1a2045] rounded-xl cursor-pointer mb-1 text-sm">💼 Portfolio</div>
-  <div id="nav-watchlist" onclick="showPage('watchlist')" class="nav-item flex items-center gap-3 px-4 py-2.5 hover:bg-[#1a2045] rounded-xl cursor-pointer mb-1 text-sm">⭐ Watchlist</div>
-  <div id="nav-alerts" onclick="showPage('alerts')" class="nav-item flex items-center gap-3 px-4 py-2.5 hover:bg-[#1a2045] rounded-xl cursor-pointer mb-1 text-sm">🔔 Alerts</div>
-  <div id="nav-news" onclick="showPage('news')" class="nav-item flex items-center gap-3 px-4 py-2.5 hover:bg-[#1a2045] rounded-xl cursor-pointer mb-1 text-sm">📰 News</div>
-  <div id="nav-etfs" onclick="showPage('etfs')" class="nav-item flex items-center gap-3 px-4 py-2.5 hover:bg-[#1a2045] rounded-xl cursor-pointer mb-1 text-sm">📈 Value ETFs</div>
-
-  <div class="mt-6 mb-2 px-4 text-xs uppercase tracking-widest text-[#607090]">SECTORS</div>
-  <div id="nav-ai" onclick="showPage('ai')" class="nav-item px-4 py-2 hover:bg-[#1a2045] rounded-xl cursor-pointer text-sm mb-1">🤖 AI</div>
-  <div id="nav-tech" onclick="showPage('tech')" class="nav-item px-4 py-2 hover:bg-[#1a2045] rounded-xl cursor-pointer text-sm mb-1">💻 Tech</div>
-  <div id="nav-defense" onclick="showPage('defense')" class="nav-item px-4 py-2 hover:bg-[#1a2045] rounded-xl cursor-pointer text-sm mb-1">🛡️ Defense</div>
-  <div id="nav-mining" onclick="showPage('mining')" class="nav-item px-4 py-2 hover:bg-[#1a2045] rounded-xl cursor-pointer text-sm mb-1">⛏️ Mining</div>
-
-  <div class="mt-8 mx-4 p-3 bg-[#0d1020] rounded-xl border border-[#1a2045]">
-    <div class="text-xs text-[#607090] mb-1">GROK-3 STATUS</div>
-    <div class="flex items-center gap-2 text-xs"><div class="w-2 h-2 bg-[#00e088] rounded-full animate-pulse"></div>Connected</div>
-    <div class="text-xs text-[#607090] mt-1">Last sync: just now</div>
-  </div>
-</div>
-
-<!-- MAIN AREA -->
-<div id="main" class="flex-1 p-8 overflow-auto"></div>
-
-</div>
-
-<!-- ANALYSIS MODAL -->
-<div id="modal" onclick="if(event.target.id==='modal')closeModal()" class="hidden fixed inset-0 bg-black/70 items-center justify-center z-[100]">
-  <div onclick="event.stopPropagation()" class="bg-[#10142a] rounded-3xl p-8 w-full max-w-2xl border border-[#1a2045] mx-4">
-    <div class="flex justify-between mb-6">
-      <div id="modalTitle" class="text-2xl font-bold"></div>
-      <div onclick="closeModal()" class="text-3xl cursor-pointer text-[#607090] hover:text-white">×</div>
+<!-- NAV -->
+<nav class="fixed top-0 w-full z-50 border-b border-white/5" style="background: rgba(6,8,15,0.95); backdrop-filter: blur(12px);">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm" style="background: linear-gradient(135deg,#4f8fff,#00e088); color:#000;">A</div>
+      <span class="font-bold text-lg">Atlas Analysis</span>
     </div>
-    <div id="modalContent" class="min-h-[220px]"></div>
-    <div class="flex gap-3 mt-6">
-      <button onclick="closeModal()" class="flex-1 py-3 bg-[#1a2045] rounded-2xl text-sm">Close</button>
-      <button onclick="runFullAnalysis()" class="grok-btn flex-1 py-3">Run Full Grok-3 Analysis</button>
+    <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
+      <a href="#features" class="hover:text-white transition-colors">Features</a>
+      <a href="#sectors" class="hover:text-white transition-colors">Sectors</a>
+      <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="openModal('login')" class="btn-outline text-sm px-4 py-2">Sign In</button>
+      <button onclick="openModal('signup')" class="btn-primary text-sm px-4 py-2">Get Started</button>
+    </div>
+  </div>
+</nav>
+
+<!-- TICKER TAPE -->
+<div class="overflow-hidden border-b border-white/5 pt-16" style="background:#0a0d1a;">
+  <div class="ticker-tape py-2 text-sm font-mono">
+    <span class="px-6 price-up">NVDA $138.42 ▲3.8%</span><span class="px-6 price-up">MSFT $422.18 ▲1.2%</span><span class="px-6 price-up">PLTR $42.11 ▲4.1%</span><span class="px-6 price-up">META $594.22 ▲2.1%</span><span class="px-6 price-down">GOOGL $178.34 ▼0.9%</span><span class="px-6 price-up">AMD $162.55 ▲2.7%</span><span class="px-6 price-up">LMT $468.90 ▲0.6%</span><span class="px-6 price-up">FCX $42.18 ▲4.2%</span><span class="px-6 price-up">ABX $21.85 ▲2.4%</span><span class="px-6 price-up">BTC $103,420 ▲1.9%</span>
+    <span class="px-6 price-up">NVDA $138.42 ▲3.8%</span><span class="px-6 price-up">MSFT $422.18 ▲1.2%</span><span class="px-6 price-up">PLTR $42.11 ▲4.1%</span><span class="px-6 price-up">META $594.22 ▲2.1%</span><span class="px-6 price-down">GOOGL $178.34 ▼0.9%</span><span class="px-6 price-up">AMD $162.55 ▲2.7%</span><span class="px-6 price-up">LMT $468.90 ▲0.6%</span><span class="px-6 price-up">FCX $42.18 ▲4.2%</span><span class="px-6 price-up">ABX $21.85 ▲2.4%</span><span class="px-6 price-up">BTC $103,420 ▲1.9%</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="max-w-7xl mx-auto px-6 py-24 text-center">
+  <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-8" style="background:#10142a; border:1px solid #1a2045;">
+    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+    Powered by Grok-3 AI • Live Polygon.io Data
+  </div>
+  <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
+    AI-Powered<br><span class="gradient-text">Stock Research</span><br>Built for Serious Investors
+  </h1>
+  <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-10">Atlas Analysis combines Grok-3 AI, live market data, and proprietary scoring to give you institutional-grade research on AI, Tech, Mining, Defense, Biotech, Energy, and Cannabis stocks.</p>
+  <div class="flex flex-col sm:flex-row gap-4 justify-center">
+    <button onclick="openModal('signup')" class="btn-primary text-lg px-8 py-4">Launch Dashboard →</button>
+    <a href="#pricing" class="btn-outline text-lg px-8 py-4 text-center">View Plans</a>
+  </div>
+  <div class="flex justify-center gap-12 mt-16 text-center">
+    <div><div class="text-3xl font-black gradient-text">500+</div><div class="text-sm text-gray-400 mt-1">Stocks Tracked</div></div>
+    <div><div class="text-3xl font-black gradient-text">7</div><div class="text-sm text-gray-400 mt-1">Key Sectors</div></div>
+    <div><div class="text-3xl font-black gradient-text">Live</div><div class="text-sm text-gray-400 mt-1">Market Data</div></div>
+    <div><div class="text-3xl font-black gradient-text">Grok-3</div><div class="text-sm text-gray-400 mt-1">AI Engine</div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="max-w-7xl mx-auto px-6 py-20">
+  <h2 class="text-4xl font-black text-center mb-4">Everything you need to invest smarter</h2>
+  <p class="text-gray-400 text-center mb-16">From live charts to AI-generated research, Atlas gives you the edge institutional investors have always had.</p>
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="card p-8"><div class="text-3xl mb-4">📊</div><h3 class="text-xl font-bold mb-3">Proprietary Atlas Score</h3><p class="text-gray-400">5-factor scoring model combining momentum, macro alignment, analyst consensus, news sentiment, and valuation into a single 0-100 score. Boosted by Grok-3 AI.</p></div>
+    <div class="card p-8"><div class="text-3xl mb-4">📈</div><h3 class="text-xl font-bold mb-3">Live Polygon.io Charts</h3><p class="text-gray-400">Real-time and historical price charts powered by Polygon.io. Bollinger Bands, EMA overlays, volume analysis, and technical indicators built in.</p></div>
+    <div class="card p-8"><div class="text-3xl mb-4">🤖</div><h3 class="text-xl font-bold mb-3">Grok-3 AI Research</h3><p class="text-gray-400">Deep AI-generated research reports on every stock. Thesis, risks, catalysts, and 12-month price targets updated daily with the latest market intelligence.</p></div>
+    <div class="card p-8"><div class="text-3xl mb-4">📰</div><h3 class="text-xl font-bold mb-3">Curated News Feed</h3><p class="text-gray-400">AI-filtered news with sentiment scoring. Know instantly whether breaking news is bullish or bearish for your positions.</p></div>
+    <div class="card p-8"><div class="text-3xl mb-4">💼</div><h3 class="text-xl font-bold mb-3">Portfolio Manager</h3><p class="text-gray-400">Track your positions with real-time P&L, portfolio-level Atlas scoring, risk analysis, and Grok-3 rebalancing suggestions.</p></div>
+    <div class="card p-8"><div class="text-3xl mb-4">🔔</div><h3 class="text-xl font-bold mb-3">Smart Alerts</h3><p class="text-gray-400">Set price alerts, Atlas score thresholds, and AI sentiment shift notifications. Get notified the moment Grok-3 changes its outlook.</p></div>
+  </div>
+</section>
+
+<!-- SECTORS -->
+<section id="sectors" class="max-w-7xl mx-auto px-6 py-20">
+  <h2 class="text-4xl font-black text-center mb-4">Deep research across 7 key sectors</h2>
+  <p class="text-gray-400 text-center mb-16">Comprehensive coverage of the markets that matter most.</p>
+  <div class="grid md:grid-cols-4 gap-4">
+    <div class="card p-6 text-center"><div class="text-3xl mb-3">🤖</div><h3 class="font-bold mb-2">Artificial Intelligence</h3><p class="text-sm text-gray-400 mb-3">NVDA, PLTR, AMD and the AI infrastructure supercycle</p><span class="score-badge">Avg Score: 88</span></div>
+    <div class="card p-6 text-center"><div class="text-3xl mb-3">💻</div><h3 class="font-bold mb-2">Technology</h3><p class="text-sm text-gray-400 mb-3">MSFT, GOOGL, META -- Big Tech monetizing AI</p><span class="score-badge">Avg Score: 86</span></div>
+    <div class="card p-6 text-center"><div class="text-3xl mb-3">⛏️</div><h3 class="font-bold mb-2">Mining</h3><p class="text-sm text-gray-400 mb-3">ABX, FCX -- Gold and copper commodity supercycle</p><span class="score-badge">Avg Score: 89</span></div>
+    <div class="card p-6 text-center"><div class="text-3xl mb-3">🛡️</div><h3 class="font-bold mb-2">Defense</h3><p class="text-sm text-gray-400 mb-3">LMT, RTX -- NATO spending surge and hypersonics</p><span class="score-badge">Avg Score: 81</span></div>
+    <div class="card p-6 text-center"><div class="text-3xl mb-3">🧬</div><h3 class="font-bold mb-2">Biotech</h3><p class="text-sm text-gray-400 mb-3">MRNA, VRTX, CRSP -- Next-gen therapeutics</p><span class="score-badge">Avg Score: 79</span></div>
+    <div class="card p-6 text-center"><div class="text-3xl mb-3">⚡</div><h3 class="font-bold mb-2">Energy</h3><p class="text-sm text-gray-400 mb-3">XOM, CVX, EOG -- Energy transition plays</p><span class="score-badge">Avg Score: 77</span></div>
+    <div class="card p-6 text-center"><div class="text-3xl mb-3">🌿</div><h3 class="font-bold mb-2">Cannabis</h3><p class="text-sm text-gray-400 mb-3">TLRY, CGC, ACB -- Legalization catalysts</p><span class="score-badge">Avg Score: 72</span></div>
+    <div class="card p-6 text-center border-dashed cursor-pointer hover:border-blue-500 transition-colors" onclick="openModal('signup')"><div class="text-3xl mb-3">🏦</div><h3 class="font-bold mb-2">Financials</h3><p class="text-sm text-gray-400 mb-3">JPM, GS, V -- Banking and fintech leaders</p><span class="score-badge">Avg Score: 83</span></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="max-w-7xl mx-auto px-6 py-20">
+  <h2 class="text-4xl font-black text-center mb-4">Choose your edge</h2>
+  <p class="text-gray-400 text-center mb-16">All plans include live Polygon data and Grok-3 AI. Billed monthly in CAD.</p>
+  <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+    <div class="card p-8">
+      <h3 class="text-xl font-bold mb-2">Core</h3>
+      <div class="text-4xl font-black mb-1">$29.99<span class="text-lg font-normal text-gray-400"> CAD/mo</span></div>
+      <p class="text-gray-400 text-sm mb-6">Perfect for individual investors getting started.</p>
+      <ul class="space-y-3 text-sm mb-8">
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Dashboard and live prices</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Atlas Score for all stocks</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Basic Grok-3 analysis</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> News feed</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Watchlist (up to 10)</li>
+        <li class="flex gap-2 text-gray-500"><span>✗</span> Live charts</li>
+        <li class="flex gap-2 text-gray-500"><span>✗</span> Portfolio manager</li>
+      </ul>
+      <button onclick="startCheckout('core')" class="btn-outline w-full text-center">Get Started</button>
+    </div>
+    <div class="card p-8 relative" style="border-color:#4f8fff; box-shadow: 0 0 40px #4f8fff22;">
+      <div class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold" style="background:linear-gradient(135deg,#4f8fff,#00e088);color:#000;">MOST POPULAR</div>
+      <h3 class="text-xl font-bold mb-2">Pro</h3>
+      <div class="text-4xl font-black mb-1">$49.99<span class="text-lg font-normal text-gray-400"> CAD/mo</span></div>
+      <p class="text-gray-400 text-sm mb-6">For active traders who need the full picture.</p>
+      <ul class="space-y-3 text-sm mb-8">
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Everything in Core</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Live Polygon.io charts</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Bollinger Bands and EMA</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Full Grok-3 deep research</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Portfolio manager</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> ETF research and scoring</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Smart alerts</li>
+      </ul>
+      <button onclick="startCheckout('pro')" class="btn-primary w-full text-center">Get Pro →</button>
+    </div>
+    <div class="card p-8">
+      <h3 class="text-xl font-bold mb-2">Institutional</h3>
+      <div class="text-4xl font-black mb-1">$99.99<span class="text-lg font-normal text-gray-400"> CAD/mo</span></div>
+      <p class="text-gray-400 text-sm mb-6">For funds and serious professionals.</p>
+      <ul class="space-y-3 text-sm mb-8">
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Everything in Pro</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Daily AI research reports</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Sector deep dives</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Macro alignment signals</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Backtest engine</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> API access</li>
+        <li class="flex gap-2"><span class="text-green-400">✓</span> Priority support</li>
+      </ul>
+      <button onclick="startCheckout('institutional')" class="btn-outline w-full text-center">Get Institutional</button>
+    </div>
+  </div>
+  <p class="text-center text-gray-500 text-sm mt-8">Payments processed securely by Stripe. Cancel anytime.</p>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/5 py-12">
+  <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs" style="background:linear-gradient(135deg,#4f8fff,#00e088);color:#000;">A</div>
+      <span class="font-bold">Atlas Analysis</span>
+    </div>
+    <p class="text-gray-500 text-sm">© 2025 Atlas Analysis. All rights reserved.</p>
+    <div class="flex gap-6 text-sm text-gray-500">
+      <a href="#" class="hover:text-white">Privacy</a>
+      <a href="#" class="hover:text-white">Terms</a>
+      <a href="mailto:support@atlasanalysis.net" class="hover:text-white">Support</a>
+    </div>
+  </div>
+</footer>
+
+<!-- AUTH MODAL -->
+<div id="authModal" class="fixed inset-0 z-50 hidden items-center justify-center modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="card p-8 w-full max-w-md mx-4 relative">
+    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">✕</button>
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm" style="background:linear-gradient(135deg,#4f8fff,#00e088);color:#000;">A</div>
+      <span class="font-bold text-lg">Atlas Analysis</span>
+    </div>
+    <div id="modalLogin">
+      <h2 class="text-2xl font-black mb-2">Welcome back</h2>
+      <p class="text-gray-400 text-sm mb-6">Sign in to your Atlas account</p>
+      <div class="space-y-4">
+        <input id="loginEmail" type="email" placeholder="Email address" class="input-field">
+        <input id="loginPassword" type="password" placeholder="Password" class="input-field">
+        <div id="loginError" class="text-red-400 text-sm hidden"></div>
+        <button onclick="handleLogin()" class="btn-primary w-full text-center py-3">Sign In</button>
+      </div>
+      <p class="text-center text-gray-400 text-sm mt-4">Don't have an account? <button onclick="switchModal('signup')" class="text-blue-400 hover:underline">Sign up</button></p>
+    </div>
+    <div id="modalSignup" class="hidden">
+      <h2 class="text-2xl font-black mb-2">Create your account</h2>
+      <p class="text-gray-400 text-sm mb-6">Start your Atlas Analysis journey</p>
+      <div class="space-y-4">
+        <input id="signupEmail" type="email" placeholder="Email address" class="input-field">
+        <input id="signupPassword" type="password" placeholder="Password (min 8 chars)" class="input-field">
+        <input id="signupConfirm" type="password" placeholder="Confirm password" class="input-field">
+        <div id="signupError" class="text-red-400 text-sm hidden"></div>
+        <button onclick="handleSignup()" class="btn-primary w-full text-center py-3">Create Account</button>
+      </div>
+      <p class="text-center text-gray-400 text-sm mt-4">Already have an account? <button onclick="switchModal('login')" class="text-blue-400 hover:underline">Sign in</button></p>
     </div>
   </div>
 </div>
 
 <script>
-const STOCKS = {
-  NVDA: { name:'NVIDIA', price:138.42, change:'+3.8%', score:94, sector:'AI', sentiment:'Bullish', target:185, thesis:'AI infrastructure leader. Blackwell ramp accelerating. Data center revenue +78% YoY. Dominant GPU market share.' },
-  MSFT: { name:'Microsoft', price:422.18, change:'+1.2%', score:88, sector:'Tech', sentiment:'Bullish', target:480, thesis:'Azure AI growth +29% QoQ. Copilot monetization beginning. Strong FCF and dividend growth.' },
-  PLTR: { name:'Palantir', price:42.11, change:'+4.1%', score:81, sector:'AI', sentiment:'Bullish', target:58, thesis:'AIP platform gaining enterprise traction. US commercial revenue +55% YoY. Rule of 40 score: 83.' },
-  GOOGL: { name:'Alphabet', price:178.34, change:'+0.9%', score:86, sector:'Tech', sentiment:'Bullish', target:210, thesis:'Gemini integration across products. Search resilient. YouTube monetization improving. Cloud +28% YoY.' },
-  META: { name:'Meta', price:594.22, change:'+2.1%', score:89, sector:'Tech', sentiment:'Bullish', target:680, thesis:'Ad revenue reaccelerating. Llama 4 competitive. Reality Labs losses narrowing. 3.2B DAU.' },
-  AMD: { name:'AMD', price:162.55, change:'+2.7%', score:79, sector:'AI', sentiment:'Neutral', target:195, thesis:'MI300X gaining HPC share. EPYC server CPU momentum. Execution risk on AI roadmap vs NVDA.' },
-  LMT: { name:'Lockheed Martin', price:468.90, change:'+0.6%', score:82, sector:'Defense', sentiment:'Bullish', target:520, thesis:'F-35 backlog $134B. NATO spending increases. Hypersonics program accelerating. 3.1% dividend.' },
-  RTX: { name:'RTX Corp', price:128.44, change:'+1.1%', score:80, sector:'Defense', sentiment:'Bullish', target:148, thesis:'Pratt & Whitney GTF engine demand. Raytheon missile systems backlog at record. Defense budget tailwinds.' },
-  ABX: { name:'Barrick Gold', price:21.85, change:'+2.4%', score:88, sector:'Mining', sentiment:'Bullish', target:28, thesis:'Gold at ATH. Low AISC $1,050/oz. Copper exposure growing. Strong FCF generation.' },
-  FCX: { name:'Freeport-McMoRan', price:42.18, change:'+4.2%', score:91, sector:'Mining', sentiment:'Bullish', target:56, thesis:'Copper supercycle. AI data center copper demand. Grasberg mine expansion. EV tailwinds.' },
-};
+const API = '/.netlify/functions/auth';
 
-let watchlist = ['NVDA','MSFT','PLTR','META'];
-let alerts = [
-  { ticker:'NVDA', type:'Price Above', value:145, triggered:false },
-  { ticker:'PLTR', type:'Score Above', value:85, triggered:false },
-  { ticker:'FCX', type:'Price Above', value:50, triggered:false },
-];
-let portfolio = [
-  { ticker:'NVDA', shares:10, avgCost:118.50 },
-  { ticker:'MSFT', shares:5, avgCost:398.20 },
-  { ticker:'PLTR', shares:25, avgCost:35.80 },
-];
-let currentModal = 'NVDA';
-
-function setActive(page) {
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  const el = document.getElementById('nav-' + page);
-  if (el) el.classList.add('active');
-}
-
-function showPage(page) {
-  setActive(page);
-  const main = document.getElementById('main');
-
-  if (page === 'dashboard') {
-    main.innerHTML = `
-      <div class="max-w-7xl mx-auto">
-        <div class="flex justify-between items-end mb-8">
-          <div>
-            <h1 class="text-5xl font-bold tracking-tighter">Dashboard</h1>
-            <p class="text-[#607090] mt-1">Grok-3 powered • Live market data</p>
-          </div>
-          <button onclick="showPage('ai')" class="grok-btn px-6 py-3">🤖 AI Sector Deep Dive</button>
-        </div>
-        <div class="grid grid-cols-4 gap-5 mb-8">
-          <div class="card p-6"><div class="text-[#607090] text-xs uppercase tracking-widest mb-2">TOP ATLAS SCORE</div><div class="text-6xl font-bold score-glow text-[#00e088]">94</div><div class="text-sm mt-1">NVDA</div></div>
-          <div class="card p-6"><div class="text-[#607090] text-xs uppercase tracking-widest mb-2">MARKET SENTIMENT</div><div class="text-4xl font-bold text-[#00e088] mt-1">BULLISH</div><div class="text-xs text-[#607090] mt-2">8/10 stocks positive</div></div>
-          <div class="card p-6"><div class="text-[#607090] text-xs uppercase tracking-widest mb-2">PORTFOLIO VALUE</div><div class="text-4xl font-bold mt-1">$8,420</div><div class="text-[#00e088] text-sm mt-1">+$342 today</div></div>
-          <div class="card p-6"><div class="text-[#607090] text-xs uppercase tracking-widest mb-2">GROK CONFIDENCE</div><div class="text-6xl font-bold mt-1">97%</div></div>
-        </div>
-        <div class="card p-6">
-          <div class="flex justify-between items-center mb-5">
-            <div class="font-bold text-lg">Live Market Table</div>
-            <div class="flex gap-2">
-              <button onclick="showQuickAnalysis('NVDA')" class="grok-btn text-sm px-4 py-2">Quick Analysis</button>
-            </div>
-          </div>
-          <table class="w-full text-sm">
-            <thead><tr class="border-b border-[#1a2045] text-[#607090] text-xs uppercase tracking-wider">
-              <th class="py-3 text-left">Ticker</th>
-              <th class="py-3 text-left">Name</th>
-              <th class="py-3 text-right">Price</th>
-              <th class="py-3 text-right">24H</th>
-              <th class="py-3 text-right">Sector</th>
-              <th class="py-3 text-right">Atlas Score</th>
-              <th class="py-3 text-right">Action</th>
-            </tr></thead>
-            <tbody id="liveTable"></tbody>
-          </table>
-        </div>
-      </div>`;
-    renderLiveTable();
-
-  } else if (page === 'portfolio') {
-    const totalValue = portfolio.reduce((s,p) => s + (STOCKS[p.ticker]?.price||0)*p.shares, 0);
-    const totalCost = portfolio.reduce((s,p) => s + p.avgCost*p.shares, 0);
-    const totalPnl = totalValue - totalCost;
-    const pnlPct = ((totalPnl/totalCost)*100).toFixed(1);
-    main.innerHTML = `
-      <div class="max-w-5xl mx-auto">
-        <div class="flex justify-between items-end mb-8">
-          <h1 class="text-5xl font-bold">Portfolio</h1>
-          <button onclick="addStock()" class="grok-btn px-6 py-3">+ Add Position</button>
-        </div>
-        <div class="grid grid-cols-3 gap-5 mb-8">
-          <div class="card p-6 text-center"><div class="text-[#607090] text-xs uppercase tracking-widest mb-2">Total Value</div><div class="text-4xl font-bold">$${totalValue.toFixed(0)}</div></div>
-          <div class="card p-6 text-center"><div class="text-[#607090] text-xs uppercase tracking-widest mb-2">Total P&L</div><div class="text-4xl font-bold ${totalPnl>=0?'text-[#00e088]':'text-[#ff4d4d]'}">${totalPnl>=0?'+':''}$${totalPnl.toFixed(0)}</div><div class="text-sm mt-1 ${totalPnl>=0?'text-[#00e088]':'text-[#ff4d4d]'}">${totalPnl>=0?'+':''}${pnlPct}%</div></div>
-          <div class="card p-6 text-center"><div class="text-[#607090] text-xs uppercase tracking-widest mb-2">Grok Score</div><div class="text-4xl font-bold score-glow text-[#00e088]">88</div></div>
-        </div>
-        <div class="card p-6">
-          <div class="font-bold text-lg mb-4">Positions</div>
-          <table class="w-full text-sm">
-            <thead><tr class="border-b border-[#1a2045] text-[#607090] text-xs uppercase tracking-wider">
-              <th class="py-3 text-left">Ticker</th><th class="py-3 text-right">Shares</th><th class="py-3 text-right">Avg Cost</th><th class="py-3 text-right">Current</th><th class="py-3 text-right">P&L</th><th class="py-3 text-right">Score</th>
-            </tr></thead>
-            <tbody>${portfolio.map(p => {
-              const s = STOCKS[p.ticker];
-              const val = s.price * p.shares;
-              const pnl = val - p.avgCost * p.shares;
-              const pct = ((pnl/(p.avgCost*p.shares))*100).toFixed(1);
-              return `<tr class="table-row border-b border-[#1a2045]" onclick="showQuickAnalysis('${p.ticker}')">
-                <td class="py-4 font-bold">${p.ticker}</td>
-                <td class="py-4 text-right">${p.shares}</td>
-                <td class="py-4 text-right">$${p.avgCost}</td>
-                <td class="py-4 text-right live-price" data-ticker="${p.ticker}">$${s.price}</td>
-                <td class="py-4 text-right ${pnl>=0?'text-[#00e088]':'text-[#ff4d4d]'}">${pnl>=0?'+':''}$${pnl.toFixed(0)} (${pnl>=0?'+':''}${pct}%)</td>
-                <td class="py-4 text-right"><span class="badge-green">${s.score}</span></td>
-              </tr>`;
-            }).join('')}</tbody>
-          </table>
-        </div>
-      </div>`;
-
-  } else if (page === 'watchlist') {
-    main.innerHTML = `
-      <div class="max-w-5xl mx-auto">
-        <div class="flex justify-between items-end mb-8">
-          <h1 class="text-5xl font-bold">Watchlist</h1>
-          <button onclick="addToWatchlist()" class="grok-btn px-6 py-3">+ Add Ticker</button>
-        </div>
-        <div class="grid grid-cols-2 gap-5" id="watchlistGrid"></div>
-      </div>`;
-    renderWatchlist();
-
-  } else if (page === 'alerts') {
-    main.innerHTML = `
-      <div class="max-w-4xl mx-auto">
-        <div class="flex justify-between items-end mb-8">
-          <h1 class="text-5xl font-bold">Alerts</h1>
-          <button onclick="addAlert()" class="grok-btn px-6 py-3">+ New Alert</button>
-        </div>
-        <div class="card p-6 mb-6">
-          <div class="font-bold mb-4">Active Alerts</div>
-          <div id="alertsList">${alerts.map((a,i) => `
-            <div class="alert-item ${a.triggered?'triggered':''}">
-              <div class="flex justify-between items-center">
-                <div><span class="font-bold">${a.ticker}</span> — ${a.type} <span class="${a.triggered?'text-[#00e088]':'text-[#4f8fff]'} font-bold">${a.value}</span></div>
-                <div class="flex items-center gap-3">
-                  <span class="${a.triggered?'badge-green':'badge-blue'}">${a.triggered?'TRIGGERED':'WATCHING'}</span>
-                  <button onclick="removeAlert(${i})" class="text-[#607090] hover:text-[#ff4d4d] text-lg">×</button>
-                </div>
-              </div>
-            </div>`).join('')}
-          </div>
-        </div>
-        <div class="card p-6">
-          <div class="font-bold mb-3">Grok-3 Smart Alerts</div>
-          <div class="text-sm text-[#607090] mb-4">AI-powered alerts based on sentiment shifts and technical signals</div>
-          <div class="alert-item triggered"><div class="flex justify-between"><div>🤖 <span class="font-bold">NVDA</span> — Grok sentiment upgraded to STRONGLY BULLISH</div><span class="badge-green">NEW</span></div></div>
-          <div class="alert-item"><div class="flex justify-between"><div>📊 <span class="font-bold">FCX</span> — Copper demand signal detected from AI data centers</div><span class="badge-blue">SIGNAL</span></div></div>
-        </div>
-      </div>`;
-
-  } else if (page === 'news') {
-    main.innerHTML = `
-      <div class="max-w-4xl mx-auto">
-        <div class="flex justify-between items-end mb-8">
-          <h1 class="text-5xl font-bold">News</h1>
-          <div class="flex gap-2">
-            <button class="grok-btn text-sm px-4 py-2">All</button>
-            <button onclick="filterNews('AI')" class="bg-[#1a2045] text-sm px-4 py-2 rounded-xl hover:bg-[#252d50]">AI</button>
-            <button onclick="filterNews('Tech')" class="bg-[#1a2045] text-sm px-4 py-2 rounded-xl hover:bg-[#252d50]">Tech</button>
-          </div>
-        </div>
-        <div id="newsFeed">${[
-          { time:'2m ago', tag:'AI', title:'NVIDIA Blackwell GPU shipments accelerate ahead of schedule', summary:'Q2 data center revenue guidance raised to $43B as hyperscaler demand outpaces supply.', ticker:'NVDA', sentiment:'Bullish' },
-          { time:'18m ago', tag:'Tech', title:'Microsoft Azure AI revenue surges 29% quarter-over-quarter', summary:'Copilot enterprise adoption reaches 85,000 organizations. OpenAI partnership deepening.', ticker:'MSFT', sentiment:'Bullish' },
-          { time:'45m ago', tag:'AI', title:'Palantir wins $480M US Army AI contract extension', summary:'AIP platform selected for battlefield intelligence. Commercial pipeline also expanding.', ticker:'PLTR', sentiment:'Bullish' },
-          { time:'1h ago', tag:'Tech', title:'Meta AI assistant reaches 1 billion users milestone', summary:'Llama 4 integration driving engagement. Ad revenue reaccelerating on AI-powered targeting.', ticker:'META', sentiment:'Bullish' },
-          { time:'2h ago', tag:'Mining', title:'Copper hits 3-month high on AI infrastructure demand', summary:'Data center buildout driving unprecedented copper demand. FCX and Teck benefit.', ticker:'FCX', sentiment:'Bullish' },
-          { time:'3h ago', tag:'Defense', title:'NATO members commit to 3% GDP defense spending target', summary:'Lockheed Martin and RTX backlog expected to grow significantly through 2030.', ticker:'LMT', sentiment:'Bullish' },
-        ].map(n => `
-          <div class="news-card" onclick="showQuickAnalysis('${n.ticker}')">
-            <div class="flex justify-between items-start mb-2">
-              <div class="flex items-center gap-2">
-                <span class="badge-blue">${n.tag}</span>
-                <span class="text-xs text-[#607090]">${n.time}</span>
-              </div>
-              <span class="badge-green">${n.sentiment}</span>
-            </div>
-            <div class="font-semibold mb-1">${n.title}</div>
-            <div class="text-sm text-[#607090]">${n.summary}</div>
-            <div class="text-xs text-[#4f8fff] mt-2">Related: ${n.ticker} →</div>
-          </div>`).join('')}
-        </div>
-      </div>`;
-
-  } else if (page === 'etfs') {
-    main.innerHTML = `
-      <div class="max-w-5xl mx-auto">
-        <h1 class="text-5xl font-bold mb-8">Value ETFs</h1>
-        <div class="grid grid-cols-3 gap-5 mb-8">
-          ${[
-            { name:'Vanguard VTV', ticker:'VTV', ret:'+14.2%', score:82, desc:'Large-cap value blend. Low 0.04% expense ratio.' },
-            { name:'BlackRock IWD', ticker:'IWD', ret:'+11.8%', score:78, desc:'Russell 1000 Value. Broad diversification.' },
-            { name:'Goldman GSLC', ticker:'GSLC', ret:'+9.7%', score:75, desc:'ActiveBeta large cap. Factor-weighted.' },
-            { name:'Invesco QQQ', ticker:'QQQ', ret:'+18.4%', score:88, desc:'NASDAQ-100. Heavy AI/Tech exposure.' },
-            { name:'SPDR XLK', ticker:'XLK', ret:'+21.1%', score:91, desc:'Tech sector pure play. NVDA + MSFT heavy.' },
-            { name:'Global X AIQ', ticker:'AIQ', ret:'+31.2%', score:94, desc:'AI & Big Data ETF. Grok top pick.' },
-          ].map(e => `
-            <div class="card p-6 hover:border-[#4f8fff] transition-colors cursor-pointer" onclick="showQuickAnalysis('${e.ticker}')">
-              <div class="flex justify-between items-start mb-3">
-                <div><div class="font-bold">${e.name}</div><div class="text-xs text-[#607090]">${e.ticker}</div></div>
-                <span class="badge-green">${e.score}</span>
-              </div>
-              <div class="text-3xl font-bold text-[#00e088] mb-2">${e.ret}</div>
-              <div class="text-xs text-[#607090]">${e.desc}</div>
-            </div>`).join('')}
-        </div>
-      </div>`;
-
-  } else if (page === 'ai') {
-    renderSectorPage('AI', '🤖', ['NVDA','PLTR','AMD'], 'Artificial Intelligence sector is in a multi-year supercycle. Grok-3 rates AI infrastructure as the highest-conviction theme for 2025-2026.');
-  } else if (page === 'tech') {
-    renderSectorPage('Tech', '💻', ['MSFT','GOOGL','META'], 'Big Tech is monetizing AI investments. Cloud growth reaccelerating. Ad markets recovering. Strong FCF generation across the sector.');
-  } else if (page === 'defense') {
-    renderSectorPage('Defense', '🛡️', ['LMT','RTX'], 'Global defense spending at highest levels since Cold War. NATO 3% GDP commitment. Hypersonics and drone programs accelerating.');
-  } else if (page === 'mining') {
-    renderSectorPage('Mining', '⛏️', ['ABX','FCX'], 'Commodity supercycle driven by AI infrastructure copper demand and gold as macro hedge. Grok rates mining as high-conviction value play.');
-  }
-}
-
-function renderSectorPage(sector, icon, tickers, thesis) {
-  const main = document.getElementById('main');
-  const stocks = tickers.map(t => STOCKS[t]).filter(Boolean);
-  const avgScore = Math.round(stocks.reduce((s,st)=>s+st.score,0)/stocks.length);
-  main.innerHTML = `
-    <div class="max-w-5xl mx-auto">
-      <div class="flex justify-between items-end mb-8">
-        <div>
-          <h1 class="text-5xl font-bold">${icon} ${sector}</h1>
-          <p class="text-[#607090] mt-1">Grok-3 Sector Analysis</p>
-        </div>
-        <div class="card p-4 text-center"><div class="text-xs text-[#607090] uppercase tracking-widest">Sector Score</div><div class="text-4xl font-bold score-glow text-[#00e088]">${avgScore}</div></div>
-      </div>
-      <div class="card p-6 mb-6">
-        <div class="text-xs uppercase tracking-widest text-[#607090] mb-2">Grok-3 Thesis</div>
-        <div class="text-sm leading-relaxed">${thesis}</div>
-      </div>
-      <div class="grid grid-cols-${tickers.length > 2 ? '3' : '2'} gap-5">
-        ${tickers.map(t => {
-          const s = STOCKS[t];
-          if (!s) return '';
-          return `<div class="card p-6 hover:border-[#4f8fff] transition-colors cursor-pointer" onclick="showQuickAnalysis('${t}')">
-            <div class="flex justify-between items-start mb-4">
-              <div><div class="text-xl font-bold">${t}</div><div class="text-xs text-[#607090]">${s.name}</div></div>
-              <span class="badge-green">${s.score}</span>
-            </div>
-            <div class="text-3xl font-bold mb-1 live-price" data-ticker="${t}">$${s.price}</div>
-            <div class="text-[#00e088] text-sm mb-3">${s.change} today</div>
-            <div class="text-xs text-[#607090] mb-4">${s.thesis.substring(0,80)}...</div>
-            <button class="grok-btn w-full py-2 text-sm">Grok Analysis →</button>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-}
-
-function renderLiveTable() {
-  const tbody = document.getElementById('liveTable');
-  if (!tbody) return;
-  tbody.innerHTML = Object.entries(STOCKS).map(([ticker, s]) => `
-    <tr class="table-row border-b border-[#1a2045]" onclick="showQuickAnalysis('${ticker}')">
-      <td class="py-3 font-bold">${ticker}</td>
-      <td class="py-3 text-[#607090]">${s.name}</td>
-      <td class="py-3 text-right live-price" data-ticker="${ticker}">$${s.price}</td>
-      <td class="py-3 text-right text-[#00e088]">${s.change}</td>
-      <td class="py-3 text-right"><span class="badge-blue">${s.sector}</span></td>
-      <td class="py-3 text-right"><span class="badge-green">${s.score}</span></td>
-      <td class="py-3 text-right"><button class="grok-btn text-xs px-3 py-1">Analyze</button></td>
-    </tr>`).join('');
-}
-
-function renderWatchlist() {
-  const grid = document.getElementById('watchlistGrid');
-  if (!grid) return;
-  grid.innerHTML = watchlist.map(t => {
-    const s = STOCKS[t];
-    if (!s) return '';
-    return `<div class="card p-6 hover:border-[#4f8fff] transition-colors">
-      <div class="flex justify-between items-start mb-4">
-        <div><div class="text-2xl font-bold">${t}</div><div class="text-sm text-[#607090]">${s.name}</div></div>
-        <div class="flex items-center gap-2">
-          <span class="badge-green">${s.score}</span>
-          <button onclick="removeFromWatchlist('${t}')" class="text-[#607090] hover:text-[#ff4d4d]">×</button>
-        </div>
-      </div>
-      <div class="text-3xl font-bold mb-1 live-price" data-ticker="${t}">$${s.price}</div>
-      <div class="text-[#00e088] mb-4">${s.change}</div>
-      <div class="text-xs text-[#607090] mb-4">${s.thesis.substring(0,90)}...</div>
-      <button onclick="showQuickAnalysis('${t}')" class="grok-btn w-full py-2 text-sm">Grok Analysis →</button>
-    </div>`;
-  }).join('');
-}
-
-function showQuickAnalysis(ticker) {
-  currentModal = ticker;
-  const s = STOCKS[ticker];
-  if (!s) return;
-  const modal = document.getElementById('modal');
-  document.getElementById('modalTitle').innerHTML = `${ticker} — Grok-3 Analysis`;
-  document.getElementById('modalContent').innerHTML = `
-    <div class="grid grid-cols-3 gap-4 mb-6">
-      <div class="bg-[#0d1020] rounded-2xl p-4 text-center"><div class="text-xs text-[#607090] mb-1">Atlas Score</div><div class="text-4xl font-bold score-glow text-[#00e088]">${s.score}</div></div>
-      <div class="bg-[#0d1020] rounded-2xl p-4 text-center"><div class="text-xs text-[#607090] mb-1">Sentiment</div><div class="text-xl font-bold text-[#00e088] mt-1">${s.sentiment}</div></div>
-      <div class="bg-[#0d1020] rounded-2xl p-4 text-center"><div class="text-xs text-[#607090] mb-1">12M Target</div><div class="text-2xl font-bold mt-1">$${s.target}</div></div>
-    </div>
-    <div class="bg-[#0d1020] rounded-2xl p-4 mb-4">
-      <div class="text-xs text-[#607090] uppercase tracking-widest mb-2">Grok-3 Thesis</div>
-      <div class="text-sm leading-relaxed">${s.thesis}</div>
-    </div>
-    <div class="flex gap-2">
-      <button onclick="addToWatchlistDirect('${ticker}')" class="flex-1 py-2 bg-[#1a2045] rounded-xl text-sm hover:bg-[#252d50]">⭐ Watchlist</button>
-      <button onclick="showPage('${s.sector.toLowerCase()}')" class="flex-1 py-2 bg-[#1a2045] rounded-xl text-sm hover:bg-[#252d50]">View Sector</button>
-    </div>`;
+function openModal(type) {
+  const modal = document.getElementById('authModal');
   modal.classList.remove('hidden');
   modal.classList.add('flex');
+  switchModal(type);
 }
-
 function closeModal() {
-  const modal = document.getElementById('modal');
-  modal.classList.remove('flex');
+  const modal = document.getElementById('authModal');
   modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+function switchModal(type) {
+  document.getElementById('modalLogin').classList.toggle('hidden', type !== 'login');
+  document.getElementById('modalSignup').classList.toggle('hidden', type !== 'signup');
 }
 
-function runFullAnalysis() {
-  const content = document.getElementById('modalContent');
-  const s = STOCKS[currentModal];
-  content.innerHTML = `<div class="text-center py-8"><div class="animate-spin w-8 h-8 border-4 border-[#4f8fff] border-t-transparent rounded-full mx-auto mb-4"></div><div class="text-[#607090]">Running Grok-3 deep analysis...</div></div>`;
-  setTimeout(() => {
-    content.innerHTML = `
-      <div class="space-y-3">
-        <div class="bg-[#0d1020] rounded-xl p-4"><div class="text-xs text-[#607090] mb-1">FUNDAMENTAL</div><div class="text-sm">${s ? s.thesis : 'Analysis complete.'}</div></div>
-        <div class="bg-[#0d1020] rounded-xl p-4"><div class="text-xs text-[#607090] mb-1">TECHNICAL</div><div class="text-sm">RSI 58 — not overbought. Trading above 50-day MA. Volume confirming trend.</div></div>
-        <div class="bg-[#0d1020] rounded-xl p-4"><div class="text-xs text-[#607090] mb-1">GROK VERDICT</div><div class="text-sm text-[#00e088] font-semibold">Strong Buy — High conviction. Add on any pullback to 200-day MA.</div></div>
-      </div>`;
-  }, 1600);
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.classList.add('hidden');
+  if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; errEl.classList.remove('hidden'); return; }
+  try {
+    const res = await fetch(API, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'login', email, password }) });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error || 'Login failed'; errEl.classList.remove('hidden'); return; }
+    localStorage.setItem('atlas_token', data.token);
+    localStorage.setItem('atlas_email', data.email);
+    window.location.href = '/dashboard.html';
+  } catch { errEl.textContent = 'Network error. Please try again.'; errEl.classList.remove('hidden'); }
 }
 
-function addToWatchlist() {
-  const t = prompt('Enter ticker symbol:');
-  if (t && STOCKS[t.toUpperCase()]) {
-    const ticker = t.toUpperCase();
-    if (!watchlist.includes(ticker)) { watchlist.push(ticker); }
-    showPage('watchlist');
-  } else if (t) {
-    alert('Ticker not found in Atlas database.');
-  }
+async function handleSignup() {
+  const email = document.getElementById('signupEmail').value;
+  const password = document.getElementById('signupPassword').value;
+  const confirm = document.getElementById('signupConfirm').value;
+  const errEl = document.getElementById('signupError');
+  errEl.classList.add('hidden');
+  if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; errEl.classList.remove('hidden'); return; }
+  if (password !== confirm) { errEl.textContent = 'Passwords do not match.'; errEl.classList.remove('hidden'); return; }
+  if (password.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.classList.remove('hidden'); return; }
+  try {
+    const res = await fetch(API, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'signup', email, password }) });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error || 'Signup failed'; errEl.classList.remove('hidden'); return; }
+    localStorage.setItem('atlas_token', data.token);
+    localStorage.setItem('atlas_email', data.email);
+    window.location.href = '/dashboard.html';
+  } catch { errEl.textContent = 'Network error. Please try again.'; errEl.classList.remove('hidden'); }
 }
 
-function addToWatchlistDirect(ticker) {
-  if (!watchlist.includes(ticker)) { watchlist.push(ticker); }
-  closeModal();
-  showPage('watchlist');
+async function startCheckout(plan) {
+  const token = localStorage.getItem('atlas_token');
+  const email = localStorage.getItem('atlas_email');
+  if (!token || !email) { openModal('signup'); return; }
+  try {
+    const res = await fetch(API, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'checkout', plan, email }) });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+  } catch { alert('Checkout error. Please try again.'); }
 }
 
-function removeFromWatchlist(ticker) {
-  watchlist = watchlist.filter(t => t !== ticker);
-  renderWatchlist();
+// Check if already logged in
+if (localStorage.getItem('atlas_token')) {
+  document.querySelectorAll('nav button').forEach(b => {
+    if (b.textContent.includes('Sign In')) b.textContent = 'Dashboard';
+    if (b.textContent.includes('Get Started')) { b.textContent = 'Dashboard →'; b.onclick = () => window.location.href = '/dashboard.html'; }
+  });
 }
-
-function addAlert() {
-  const t = prompt('Ticker (e.g. NVDA):');
-  if (!t) return;
-  const val = prompt('Alert price:');
-  if (!val) return;
-  alerts.push({ ticker: t.toUpperCase(), type: 'Price Above', value: parseFloat(val), triggered: false });
-  showPage('alerts');
-}
-
-function removeAlert(i) {
-  alerts.splice(i, 1);
-  showPage('alerts');
-}
-
-function filterNews(tag) { showPage('news'); }
-
-function startLivePrices() {
-  setInterval(() => {
-    document.querySelectorAll('.live-price').forEach(cell => {
-      const ticker = cell.dataset.ticker;
-      if (!ticker || !STOCKS[ticker]) return;
-      let price = parseFloat(cell.textContent.replace('$',''));
-      const delta = (Math.random() - 0.48) * 0.8;
-      price = Math.max(price + delta, 1);
-      STOCKS[ticker].price = parseFloat(price.toFixed(2));
-      cell.textContent = '$' + price.toFixed(2);
-      cell.classList.remove('price-up','price-down');
-      cell.classList.add(delta >= 0 ? 'price-up' : 'price-down');
-      setTimeout(() => { cell.classList.remove('price-up','price-down'); }, 800);
-    });
-  }, 3200);
-}
-
-function init() {
-  const loader = document.getElementById('loader');
-  if (loader) { setTimeout(() => loader.remove(), 800); }
-  showPage('dashboard');
-  startLivePrices();
-}
-
-window.onload = init;
 </script>
 </body>
 </html>

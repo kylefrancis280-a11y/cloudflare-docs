@@ -1,16 +1,20 @@
 [build]
-  base = "atlas"
-  publish = "web"
-  command = ""                    # No build step needed — it's a single index.html
+  base    = "atlas/web"
+  publish = "."
+  command = "echo 'no build step'"
 
-[build.environment]
-  NODE_VERSION = "20"
+[functions]
+  directory    = "netlify/functions"
+  node_bundler = "esbuild"
 
-# Optional but recommended: Security headers for the whole site
 [[headers]]
-  for = "/*"
+  for = "/.netlify/functions/*"
   [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.x.ai"
+    Access-Control-Allow-Origin  = "*"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+
+[[redirects]]
+  from = "/api/*"
+  to   = "/.netlify/functions/:splat"
+  status = 200
